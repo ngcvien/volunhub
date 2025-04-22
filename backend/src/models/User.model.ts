@@ -62,6 +62,7 @@ User.init(
     tableName: 'users',       // Tên bảng trong database
     sequelize,              // Truyền instance sequelize vào
     timestamps: true,         // Bật timestamps tự động
+    underscored: true 
   }
 );
 
