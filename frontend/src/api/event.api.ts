@@ -34,3 +34,33 @@ export const getAllEventsApi = async (): Promise<GetAllEventsResponse> => {
 };
 
 // TODO: Thêm các hàm gọi API khác cho event sau (getById, create, join...)
+// --- THÊM ĐOẠN CODE NÀY VÀO CUỐI FILE event.api.ts ---
+
+// Hàm gọi API để tham gia sự kiện
+export const joinEventApi = async (eventId: number): Promise<{ message: string }> => { // Giả sử backend trả về message
+    try {
+        // Request POST đến /api/events/:eventId/join
+        // Axios interceptor sẽ tự động thêm header Authorization
+        const response = await api.post<{ message: string }>(`/events/${eventId}/join`);
+        return response.data;
+    } catch (error: any) {
+        console.error(`Lỗi API Tham gia sự kiện (ID: ${eventId}):`, error.response?.data || error.message);
+        // Trả về message lỗi từ backend nếu có
+        throw new Error(error.response?.data?.message || 'Không thể tham gia sự kiện.');
+    }
+};
+
+// Hàm gọi API để rời khỏi sự kiện
+export const leaveEventApi = async (eventId: number): Promise<{ message: string }> => { // Giả sử backend trả về message
+    try {
+        // Request DELETE đến /api/events/:eventId/leave
+        // Axios interceptor sẽ tự động thêm header Authorization
+        const response = await api.delete<{ message: string }>(`/events/${eventId}/leave`);
+        return response.data;
+    } catch (error: any) {
+        console.error(`Lỗi API Rời sự kiện (ID: ${eventId}):`, error.response?.data || error.message);
+        // Trả về message lỗi từ backend nếu có
+        throw new Error(error.response?.data?.message || 'Không thể rời khỏi sự kiện.');
+    }
+};
+// --- KẾT THÚC PHẦN THÊM VÀO ---
