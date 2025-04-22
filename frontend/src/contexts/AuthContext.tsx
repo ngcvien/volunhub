@@ -1,13 +1,12 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { registerUserApi, loginUserApi } from '../api/auth.api'; // Đổi tên hàm gọi API
-import { User, RegisterUserInput, AuthContextType } from '../api/user.types'; // Import types
+// import { User, RegisterUserInput, AuthContextType } from '../api/user.types'; // Import types
+import { User, RegisterUserInput, LoginUserInput, AuthContextType as ContextType } from '../types/user.types';
+
 
 
 // Interface cho LoginUserInput (nếu chưa có trong types)
-interface LoginUserInput {
-  email?: string;
-  password?: string;
-}
+
 
 export interface AuthContextType extends BaseAuthContextType {
   theme: 'light' | 'dark';
@@ -15,7 +14,7 @@ export interface AuthContextType extends BaseAuthContextType {
 }
 
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<ContextType | undefined>(undefined);
 
 
 // Hàm lấy theme ban đầu: ưu tiên localStorage, sau đó đến system preference, mặc định là light
@@ -131,7 +130,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 };
 
 // Custom hook để sử dụng AuthContext dễ dàng hơn
-export const useAuth = (): AuthContextType => {
+export const useAuth = (): ContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
