@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col, Alert, Spinner, Image } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext'; // Giữ lại useAuth
-import './LoginPage.css'; 
+// import './LoginPage.css'; 
 
 const LoginPage = () => {
     const { login } = useAuth();
@@ -15,18 +15,24 @@ const LoginPage = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setError(null);
+        setError(null); // Reset lỗi cũ
+
         if (!email || !password) {
             setError('Vui lòng nhập email và mật khẩu.');
             return;
         }
+
         setLoading(true);
         try {
+            // Gọi hàm login từ context
             await login({ email, password });
+            // Nếu login thành công (không ném lỗi), điều hướng về trang chủ
             navigate('/');
         } catch (err: any) {
-            setError(err.message || 'Đăng nhập thất bại.');
+            // Bắt lỗi được ném ra từ context/API và hiển thị
+            setError(err.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
         } finally {
+            // Luôn dừng loading dù thành công hay thất bại
             setLoading(false);
         }
     };
