@@ -1,28 +1,30 @@
+// backend/src/middlewares/error.middleware.ts
 import { Request, Response, NextFunction } from 'express';
 
-const errorMiddleware = (err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error("MIDDLEWARE LỖI:", err.message); // Log lỗi ra console backend
-  // console.error(err.stack); // Log cả stack trace nếu cần debug sâu
+const errorMiddleware = (err: any, req: Request, res: Response, next: NextFunction) => { // Thay Error thành any để nhận statusCode tùy chỉnh
+  console.error("MIDDLEWARE LỖI:", err.message);
+  // console.error(err.stack);
 
-  let statusCode = 500;
-  let message = 'Lỗi máy chủ nội bộ.';
+  // Ưu tiên statusCode gắn vào lỗi, nếu không có thì xét lỗi Sequelize hoặc mặc định 500
+  let statusCode = err.statusCode || 500;
+  let message = err.message || 'Lỗi máy chủ nội bộ.';
 
-  // Xử lý các loại lỗi cụ thể nếu cần
-  if (err.message.includes('đã tồn tại')) {
+  // Giữ lại các xử lý lỗi cụ thể nếu cần
+  if (err.name === 'SequelizeValidationError' || err.message.includes('Validation error')) {
+      statusCode = 400; // Bad Request cho lỗi validation
+      message = `Lỗi validation: ${err.message}`;
+  } else if (err.message.includes('đã tồn tại')) {
       statusCode = 409; // Conflict
-      message = err.message;
-  } else if (err.message.includes('là bắt buộc') || err.message.includes('Lỗi validation')) {
-      statusCode = 400; // Bad Request
-      message = err.message;
+  } else if (err.message.includes('không chính xác')) { // Lỗi login sai pass
+       statusCode = 401; // Unauthorized
   }
-  // Thêm các xử lý lỗi khác ở đây (ví dụ: lỗi xác thực JWT, lỗi quyền truy cập...)
+  // Các lỗi 401, 403 từ authenticateToken sẽ được giữ nguyên statusCode
 
-  // Chỉ gửi stack trace về client khi ở môi trường development
   const stack = process.env.NODE_ENV === 'development' ? err.stack : undefined;
 
   res.status(statusCode).json({
     message: message,
-    stack: stack, // Chỉ có giá trị khi development
+    stack: stack,
   });
 };
 
