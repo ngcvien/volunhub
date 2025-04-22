@@ -1,16 +1,18 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom'; // Đảm bảo import Router
+import { BrowserRouter as Router } from 'react-router-dom';
 import AppRoutes from './routes';
 import { AuthProvider } from './contexts/AuthContext';
+import ThemeToggle from './components/ThemeToggle/ThemeToggle';
 import './App.css';
 
 function App() {
   return (
-    <Router> {/* Bọc toàn bộ ứng dụng trong Router */}
-      <AuthProvider>
+    <AuthProvider>
+      <Router>
         <AppRoutes />
-      </AuthProvider>
-    </Router>
+        <ThemeToggle /> {/* <<<--- ĐẶT NÚT Ở ĐÂY */}
+      </Router>
+    </AuthProvider>
   );
 }
 

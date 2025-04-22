@@ -1,0 +1,27 @@
+.theme-toggle-button {
+    position: fixed; /* Cố định vị trí */
+    bottom: 20px;    /* Cách đáy 20px */
+    right: 20px;     /* Cách phải 20px */
+    z-index: 1050;   /* Nổi lên trên các thành phần khác (dưới modal nếu có) */
+    border-radius: 50%; /* Bo tròn */
+    width: 50px;       /* Kích thước */
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Thêm đổ bóng nhẹ */
+    transition: transform 0.2s ease-in-out; /* Hiệu ứng khi hover */
+  }
+  
+  .theme-toggle-button:hover {
+      transform: scale(1.1); /* Phóng to nhẹ khi hover */
+  }
+  
+   @media (max-width: 767.98px) {
+    .theme-toggle-button {
+      bottom: 15px;
+      right: 15px;
+      width: 45px;
+      height: 45px;
+    }
+  }

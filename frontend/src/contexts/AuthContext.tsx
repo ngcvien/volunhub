@@ -1,14 +1,50 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { registerUserApi } from '../api/auth.api'; // Đổi tên hàm gọi API
-import { User, RegisterUserInput, AuthContextType } from '../types/user.types'; // Import types
+import { User, RegisterUserInput, AuthContextType } from '../api/user.types'; // Import types
+
+// Interface cho LoginUserInput (nếu chưa có trong types)
+interface LoginUserInput {
+  email?: string;
+  password?: string;
+}
+
+export interface AuthContextType extends BaseAuthContextType {
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
+}
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+
+// Hàm lấy theme ban đầu: ưu tiên localStorage, sau đó đến system preference, mặc định là light
+const getInitialTheme = (): 'light' | 'dark' => {
+  const storedTheme = localStorage.getItem('appTheme') as 'light' | 'dark' | null;
+  if (storedTheme) {
+      return storedTheme;
+  }
+  // Kiểm tra cài đặt hệ thống
+  // if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  //     return 'dark';
+  // }
+  // Tạm thời mặc định là dark vì bạn đã set trong index.html
+  return 'dark';
+};
+
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(() => localStorage.getItem('authToken')); // Lấy token từ localStorage khi load
   const [isLoading, setIsLoading] = useState<boolean>(true); // Mặc định là true để kiểm tra auth
+  const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
 
+
+  useEffect(() => {
+    // Áp dụng theme lên thẻ <html>
+    document.documentElement.setAttribute('data-bs-theme', theme);
+    // Lưu theme vào localStorage
+    localStorage.setItem('appTheme', theme);
+  }, [theme]);
   // Effect kiểm tra trạng thái đăng nhập khi ứng dụng tải lần đầu
   useEffect(() => {
     const verifyToken = async () => {
@@ -30,7 +66,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
     verifyToken();
   }, [token]);
-
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
+  };
   // Hàm login (sẽ hoàn thiện sau)
   const login = (newToken: string, userData: User) => {
     localStorage.setItem('authToken', newToken);
@@ -60,7 +98,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const value = { user, token, isLoading, login, logout, register };
+  const value = { user, token, isLoading, login, logout, register, theme, toggleTheme };
 
   // Chỉ render children khi đã kiểm tra xong trạng thái auth ban đầu
   return (

@@ -1,3 +1,4 @@
+// frontend/src/components/Layout/Navbar.tsx
 import React from 'react';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -7,34 +8,34 @@ const AppNavbar = () => {
     const { user, logout } = useAuth();
 
     return (
-        // --- THAY ĐỔI Ở ĐÂY: Dùng fixed="top" ---
-        <Navbar bg="primary" variant="dark" expand="lg" collapseOnSelect fixed="top">
-            {/* Container vẫn giữ nguyên bên trong để giới hạn chiều rộng content */}
+        // Bỏ variant="dark" và className="navbar-neon-gradient"
+        <Navbar expand="lg" collapseOnSelect fixed="top" data-bs-theme={null}> {/* Có thể thêm data-bs-theme={null} để reset mặc định nếu cần */}
             <Container>
                 <LinkContainer to="/">
-                    <Navbar.Brand href="#home" className="fw-bold">VolunHub</Navbar.Brand>
+                     {/* Thêm class nếu muốn target riêng brand */}
+                    <Navbar.Brand href="#home" className="fw-bold app-navbar-brand">VolunHub</Navbar.Brand>
                 </LinkContainer>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="ms-auto align-items-center">
-                        {/* ... Các Nav.Link của bạn ... */}
-                         <LinkContainer to="/">
-                            <Nav.Link>Sự kiện</Nav.Link>
+                        <LinkContainer to="/">
+                             {/* Thêm class nếu muốn target riêng link */}
+                            <Nav.Link className="app-nav-link">Sự kiện</Nav.Link>
                         </LinkContainer>
                         {user ? (
                             <>
-                                <Nav.Link disabled>Chào, {user.username}!</Nav.Link>
-                                <Nav.Link onClick={logout} style={{ cursor: 'pointer' }}>
+                                <Nav.Link disabled className="app-nav-link">Chào, {user.username}!</Nav.Link>
+                                <Nav.Link onClick={logout} style={{ cursor: 'pointer' }} className="app-nav-link">
                                     Đăng xuất
                                 </Nav.Link>
                             </>
                         ) : (
                             <>
                                 <LinkContainer to="/login">
-                                    <Nav.Link>Đăng nhập</Nav.Link>
+                                    <Nav.Link className="app-nav-link">Đăng nhập</Nav.Link>
                                 </LinkContainer>
                                 <LinkContainer to="/register">
-                                    <Nav.Link>Đăng ký</Nav.Link>
+                                    <Nav.Link className="app-nav-link">Đăng ký</Nav.Link>
                                 </LinkContainer>
                             </>
                         )}

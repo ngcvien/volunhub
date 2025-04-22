@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Form, Button, Container, Row, Col, Card, Alert, Spinner } from 'react-bootstrap'; // Thêm Spinner
+// Import thêm Spinner, Image nếu cần
+import { Form, Button, Container, Row, Col, Alert, Spinner, Image } from 'react-bootstrap';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -18,14 +19,13 @@ const RegisterPage = () => {
         setError(null);
         setSuccess(null);
 
-        // Validation cơ bản phía client (có thể thêm phức tạp hơn)
         if (password.length < 6) {
             setError('Mật khẩu phải có ít nhất 6 ký tự.');
             return;
         }
         if (!username || !email) {
-             setError('Vui lòng điền đầy đủ thông tin.');
-             return;
+            setError('Vui lòng điền đầy đủ thông tin.');
+            return;
         }
 
         setLoading(true);
@@ -35,7 +35,7 @@ const RegisterPage = () => {
             setUsername('');
             setEmail('');
             setPassword('');
-            setTimeout(() => navigate('/login'), 2000); // Chuyển hướng sau khi thành công
+            setTimeout(() => navigate('/login'), 2000);
         } catch (err: any) {
             setError(err.message || 'Đã xảy ra lỗi không mong muốn khi đăng ký.');
         } finally {
@@ -44,80 +44,81 @@ const RegisterPage = () => {
     };
 
     return (
-        <Container className="mt-5 mb-5"> {/* Thêm mb-5 */}
-            <Row className="justify-content-md-center">
-                <Col xs={12} md={12} lg={20} xl={200}>
-                    <Card className="shadow-sm border-0"> {/* Bỏ border */}
-                        <Card.Body className="p-4 p-md-5"> {/* Tăng padding trên màn hình lớn */}
-                            <h2 className="text-center mb-4 fw-bold text-primary">Đăng Ký VolunHub</h2> {/* Thêm màu primary */}
-                            {error && <Alert variant="danger" onClose={() => setError(null)} dismissible>{error}</Alert>}
-                            {success && <Alert variant="success">{success}</Alert>}
+        // Container fluid để chiếm hết chiều rộng, vh-100 để chiếm hết chiều cao viewport
+        <Container fluid className="vh-100 p-0">
+            {/* Row chiếm hết chiều cao, căn giữa nội dung theo chiều dọc */}
+            <Row className="g-0 h-100 align-items-center">
 
-                            <Form noValidate onSubmit={handleSubmit}> {/* Thêm noValidate để dùng validation của React */}
-                                <Form.Group className="mb-3" controlId="registerUsername">
-                                    <Form.Label>Tên đăng nhập</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Nhập tên đăng nhập"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                        required
-                                        disabled={loading}
-                                        isInvalid={!!error && error.toLowerCase().includes('tên đăng nhập')} // Highlight nếu lỗi liên quan
-                                    />
-                                    {/* Có thể thêm Form.Control.Feedback type="invalid" */}
-                                </Form.Group>
+                {/* --- CỘT TRÁI (Ảnh/Text) - Ẩn trên màn hình nhỏ --- */}
+                <Col md={6} lg={7} className="d-none d-md-flex align-items-center justify-content-center p-5 h-100" style={{ /* backgroundColor: '#111' */ }}>
+                    {/* Thay thế bằng nội dung và ảnh của bạn */}
+                    <div className="text-center text-light">
+                        <Image src="..\src\assets\Feta-IG-Web-A.png" className="hover-effect-image" fluid rounded style={{ maxWidth: '700px', marginBottom: '30px' }} />
 
-                                <Form.Group className="mb-3" controlId="registerEmail">
-                                    <Form.Label>Địa chỉ email</Form.Label>
-                                    <Form.Control
-                                        type="email"
-                                        placeholder="Nhập email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        required
-                                        disabled={loading}
-                                        isInvalid={!!error && error.toLowerCase().includes('email')} // Highlight nếu lỗi liên quan
-                                    />
-                                </Form.Group>
+                    </div>
+                </Col>
 
-                                <Form.Group className="mb-3" controlId="registerPassword">
-                                    <Form.Label>Mật khẩu</Form.Label>
-                                    <Form.Control
-                                        type="password"
-                                        placeholder="Ít nhất 6 ký tự"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        required
-                                        minLength={6}
-                                        disabled={loading}
-                                        isInvalid={!!error && error.toLowerCase().includes('mật khẩu')} // Highlight nếu lỗi liên quan
-                                    />
-                                </Form.Group>
+                {/* --- CỘT PHẢI (Form Đăng ký) --- */}
+                {/* Căn giữa nội dung cột này */}
+                <Col xs={12} md={6} lg={5} className="d-flex flex-column align-items-center justify-content-center p-4 h-100">
+                    {/* Container giới hạn độ rộng của form */}
+                    <div style={{ width: '100%', maxWidth: '380px' }}>
 
-                                <Button variant="primary" type="submit" className="w-100 mt-3" disabled={loading}>
-                                    {loading ? (
-                                        <>
-                                            <Spinner
-                                                as="span"
-                                                animation="border"
-                                                size="sm"
-                                                role="status"
-                                                aria-hidden="true"
-                                                className="me-2"
-                                            />
-                                            Đang xử lý...
-                                        </>
-                                    ) : (
-                                        'Đăng Ký'
-                                    )}
-                                </Button>
-                            </Form>
-                            <div className="mt-4 text-center"> {/* Tăng margin top */}
-                                Đã có tài khoản? <Link to="/login">Đăng nhập tại đây</Link>
-                            </div>
-                        </Card.Body>
-                    </Card>
+                        <div className="text-center mb-4"> {/* Giảm mb từ 5 xuống 4 */}
+                            {/* Có thể thêm logo VolunHub ở đây */}
+                            <h1 className="fw-bold">VolunHub</h1>
+                            <h2 className="fw-bold mt-3 h4">Đăng Ký</h2> {/* Đổi thành h4 cho nhỏ hơn */}
+                        </div>
+
+                        {error && <Alert variant="danger" onClose={() => setError(null)} dismissible className="py-2" style={{ fontSize: '0.9em' }}>{error}</Alert>}
+                        {success && <Alert variant="success" className="py-2" style={{ fontSize: '0.9em' }}>{success}</Alert>}
+
+                        <Form noValidate onSubmit={handleSubmit}>
+                            <Form.Group className="mb-2" controlId="registerUsername">
+                                <Form.Control
+                                    size="lg"
+                                    type="text"
+                                    placeholder="Tên đăng nhập"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    required
+                                    disabled={loading}
+                                />
+                            </Form.Group>
+
+                            <Form.Group className="mb-2" controlId="registerEmail">
+                                <Form.Control
+                                    size="lg"
+                                    type="email"
+                                    placeholder="Email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                    disabled={loading}
+                                />
+                            </Form.Group>
+
+                            <Form.Group className="mb-3" controlId="registerPassword">
+                                <Form.Control
+                                    size="lg"
+                                    type="password"
+                                    placeholder="Mật khẩu (ít nhất 6 ký tự)"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    minLength={6}
+                                    disabled={loading}
+                                />
+                            </Form.Group>
+
+                            <Button variant="primary" type="submit" className="w-100 mt-3 submit-button" size="lg" disabled={loading}>
+                                {loading ? <Spinner animation="border" size="sm" /> : 'Đăng Ký'}
+                            </Button>
+                        </Form>
+                        <div className="mt-4 text-center"> {/* Tăng margin top */}
+                            Đã có tài khoản? <Link to="/login" style={{ color: 'var(--bs-primary-text-emphasis)' }}>Đăng nhập</Link>
+                        </div>
+                    </div>
                 </Col>
             </Row>
         </Container>

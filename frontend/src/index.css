@@ -66,3 +66,149 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* Định nghĩa các bước của animation "hít thở" */
+@keyframes breathe {
+  0% {
+    transform: scale(1); /* Trạng thái ban đầu - kích thước gốc */
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */ /* Tùy chọn: bóng đổ ban đầu */
+  }
+  50% {
+    transform: scale(1.03); /* Trạng thái giữa - phóng to nhẹ 3% */
+    /* box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); */ /* Tùy chọn: tăng bóng đổ */
+  }
+  100% {
+    transform: scale(1); /* Quay về trạng thái ban đầu */
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */ /* Tùy chọn: bóng đổ ban đầu */
+  }
+}
+
+/* Áp dụng animation vào ảnh */
+.hover-effect-image { /* Vẫn dùng class cũ hoặc đổi tên nếu muốn */
+  display: block; /* Đảm bảo transform hoạt động tốt */
+  border-radius: var(--bs-border-radius); /* Giữ bo góc nếu có */
+  /* Giữ các style khác như max-width, margin nếu cần */
+
+  /* --- Áp dụng animation --- */
+  animation-name: breathe;                   /* Tên keyframes đã định nghĩa */
+  animation-duration: 3s;                  /* Thời gian hoàn thành 1 chu kỳ (0% -> 100%) - điều chỉnh tốc độ ở đây */
+  animation-timing-function: ease-in-out;  /* Kiểu chuyển động mượt mà */
+  animation-iteration-count: infinite;     /* Lặp lại vô hạn */
+  animation-direction: alternate;          /* Chạy từ 0% -> 100% rồi 100% -> 0% và lặp lại */
+}
+
+/* Đảm bảo không còn các quy tắc :hover cũ gây xung đột */
+/*
+.hover-effect-image:hover {
+   // Xóa các style cũ ở đây
+}
+*/
+
+.submit-button  {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.464);
+  transition: transform 0.3s ease-in-out;
+}
+.submit-button:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.429);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Áp dụng cho class tùy chỉnh đã thêm vào Navbar */
+.navbar-neon-gradient.navbar {
+  /* Ghi đè màu nền mặc định của Bootstrap */
+  background-color: transparent !important; /* Quan trọng: đảm bảo không có màu nền đơn sắc */
+  background-image: none !important; /* Ghi đè background-image mặc định nếu có */
+
+  
+  /* background: linear-gradient(to right, #007bff, #8a2be2, #ff00ff) !important; */
+  /* background: linear-gradient(to right, #00ffff, #00ff7f) !important;  */
+  /* background: linear-gradient(to right, #ff00ff, #ff4500) !important;  */
+  background: linear-gradient(90deg, rgba(58,123,213,1) 0%, rgba(0,210,255,1) 100%) !important; 
+
+  /* --- Tùy chọn: Thêm hiệu ứng Glow (Tỏa sáng) --- */
+  /* Sử dụng box-shadow với màu sáng và mờ */
+  /* Ví dụ với màu tím nhạt */
+  /* box-shadow: 0 3px 20px -5px rgba(138, 43, 226, 0.6); */
+  /* Ví dụ với màu xanh dương nhạt */
+  box-shadow: 0 3px 20px -5px rgba(0, 123, 255, 0.5);
+
+  border-bottom: none; /* Có thể bỏ đường viền dưới nếu muốn */
+}
+
+/* Đảm bảo màu chữ vẫn sáng (variant="dark" thường đã xử lý việc này) */
+/* Nếu chữ bị tối đi, bạn có thể thêm các quy tắc sau: */
+/*
+.navbar-neon-gradient .navbar-brand,
+.navbar-neon-gradient .navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+.navbar-neon-gradient .navbar-brand:hover,
+.navbar-neon-gradient .navbar-nav .nav-link:hover,
+.navbar-neon-gradient .navbar-nav .nav-link.active {
+  color: #fff !important;
+}
+.navbar-neon-gradient .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+*/
+
+/* CSS cho Navbar - Áp dụng theo theme */
+
+/* (Tùy chọn) Style cơ bản và transition cho Navbar */
+.navbar {
+  transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+/* --- Style cho DARK MODE --- */
+html[data-bs-theme="dark"] .navbar {
+  background-color: transparent !important; /* Bỏ màu nền đơn sắc */
+  background-image: linear-gradient(90deg, rgba(58,123,213,1) 0%, rgba(0,210,255,1) 100%);/* Gradient Neon */
+  box-shadow: 0 3px 20px -5px rgba(138, 43, 226, 0.5); /* Hiệu ứng Glow */
+  border-bottom: none;
+}
+
+/* Màu chữ/link cho Dark Mode (Thường Bootstrap đã xử lý, nhưng cứ thêm cho chắc) */
+html[data-bs-theme="dark"] .navbar .navbar-brand,
+html[data-bs-theme="dark"] .navbar .nav-link {
+  color: rgba(255, 255, 255, 0.85);
+}
+html[data-bs-theme="dark"] .navbar .navbar-brand:hover,
+html[data-bs-theme="dark"] .navbar .nav-link:hover,
+html[data-bs-theme="dark"] .navbar .nav-link.active {
+  color: #fff;
+}
+/* Icon toggler cho Dark Mode */
+html[data-bs-theme="dark"] .navbar .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+
+/* --- Style cho LIGHT MODE --- */
+html[data-bs-theme="light"] .navbar {
+  /* Nền sáng - Có thể dùng màu light mặc định hoặc màu trắng */
+  background-color: var(--bs-body-bg, #fff); /* Dùng màu nền body (thường là trắng) */
+  /* Hoặc dùng màu light của bootstrap: background-color: var(--bs-light-bg-subtle); */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Bóng đổ nhẹ cho nền sáng */
+  background-image: linear-gradient(90deg, rgba(58,123,213,1) 0%, rgba(0,210,255,1) 100%); /* Đảm bảo không có gradient */
+  border-bottom: 1px solid var(--bs-border-color-translucent); /* Thêm đường kẻ dưới nhẹ */
+}
+
+/* Màu chữ/link XANH ĐẬM cho Light Mode */
+html[data-bs-theme="light"] .navbar .navbar-brand,
+html[data-bs-theme="light"] .navbar .nav-link {
+  /* Sử dụng màu primary của Bootstrap (xanh dương đậm) */
+  /* color: var(--bs-primary); */
+  color: #003B71 !important;
+  /* Hoặc một màu xanh đậm cụ thể: color: #003B71; */
+}
+html[data-bs-theme="light"] .navbar .navbar-brand:hover,
+html[data-bs-theme="light"] .navbar .nav-link:hover,
+html[data-bs-theme="light"] .navbar .nav-link.active {
+   /* Có thể làm màu đậm hơn một chút khi hover/active */
+  color: var(--bs-primary-text-emphasis);
+  /* Hoặc màu xanh đậm hơn: color: #00284d; */
+}
+/* Icon toggler cho Light Mode */
+html[data-bs-theme="light"] .navbar .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280, 0, 0, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
