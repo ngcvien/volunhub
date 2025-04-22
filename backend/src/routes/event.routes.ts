@@ -6,6 +6,13 @@ import { eventValidator } from '../middlewares/validation.middleware'; // Middle
 
 const router = Router();
 
+// --- Định nghĩa route LẤY TẤT CẢ SỰ KIỆN ---
+router.get(
+    '/',
+    // Không cần authenticateToken ở đây vì route này là public
+    eventController.getAll
+);
+
 // --- Định nghĩa route TẠO SỰ KIỆN MỚI ---
 // POST /api/events/
 router.post(

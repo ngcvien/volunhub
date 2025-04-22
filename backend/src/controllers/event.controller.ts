@@ -34,6 +34,16 @@ class EventController {
         }
     }
 
+    // --- THÊM HÀM GET ALL ---
+    async getAll(req: Request, res: Response, next: NextFunction) {
+        try {
+            const events = await eventService.getAllEvents();
+            res.status(200).json({ message: 'Lấy danh sách sự kiện thành công!', events });
+        } catch (error) {
+            next(error); // Chuyển lỗi cho error middleware
+        }
+    }
+
     // Thêm các hàm khác sau: getAll, getById...
 }
 
