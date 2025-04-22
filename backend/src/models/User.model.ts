@@ -1,7 +1,8 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import bcrypt from 'bcryptjs';
 import { sequelize } from '../services/database.service'; // Import instance sequelize
-
+import Event from './Event.model'; // Import Event
+import Participation from './Participation.model';
 // Interface mô tả các thuộc tính của User (cho TypeScript)
 export interface UserAttributes {
   id: number;
@@ -66,6 +67,11 @@ User.init(
   }
 );
 
-// Việc băm mật khẩu sẽ thực hiện ở tầng Service trước khi gọi User.create
+User.belongsToMany(Event, {
+  through: Participation, // Thông qua bảng trung gian Participation
+  foreignKey: 'userId', // Khóa ngoại trong bảng Participation tham chiếu đến User
+  otherKey: 'eventId', // Khóa ngoại trong bảng Participation tham chiếu đến Event
+  as: 'participatingEvents' // Tên định danh để lấy các event user tham gia (vd: user.getParticipatingEvents())
+});
 
 export default User;

@@ -2,7 +2,7 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import { sequelize } from '../services/database.service';
 import User from './User.model'; // Import User model để tạo quan hệ
-
+import Participation from './Participation.model';
 // Interface mô tả thuộc tính Event
 export interface EventAttributes {
   id: number;
@@ -93,5 +93,11 @@ User.hasMany(Event, { // Quan hệ ngược lại (optional nhưng nên có)
 });
 // --- Kết thúc định nghĩa mối quan hệ ---
 
+Event.belongsToMany(User, {
+  through: Participation, // Thông qua bảng trung gian Participation
+  foreignKey: 'eventId', // Khóa ngoại trong bảng Participation tham chiếu đến Event
+  otherKey: 'userId', // Khóa ngoại trong bảng Participation tham chiếu đến User
+  as: 'participants' // Tên định danh để lấy danh sách người tham gia (vd: event.getParticipants())
+});
 
 export default Event;
