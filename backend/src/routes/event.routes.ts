@@ -1,27 +1,33 @@
 // backend/src/routes/event.routes.ts
 import { Router } from 'express';
 import eventController from '../controllers/event.controller';
-import authenticateToken from '../middlewares/auth.middleware'; // Middleware xác thực
-import { eventValidator } from '../middlewares/validation.middleware'; // Middleware validate
+import participationController from '../controllers/participation.controller'; // <<<--- IMPORT CONTROLLER MỚI
+import authenticateToken from '../middlewares/auth.middleware'; // Import middleware xác thực
+import { eventValidator } from '../middlewares/validation.middleware'; // Import validator event (nếu cần cho các route khác)
 
 const router = Router();
 
-// --- Định nghĩa route LẤY TẤT CẢ SỰ KIỆN ---
-router.get(
-    '/',
-    // Không cần authenticateToken ở đây vì route này là public
-    eventController.getAll
-);
+// --- Event Routes ---
+router.get('/', eventController.getAll); // Lấy danh sách sự kiện (public)
+router.post('/', authenticateToken, eventValidator, eventController.create); // Tạo sự kiện (private)
+// router.get('/:eventId', eventController.getById); // Route lấy chi tiết (sẽ làm sau)
 
-// --- Định nghĩa route TẠO SỰ KIỆN MỚI ---
-// POST /api/events/
+// --- Participation Routes (Thêm vào đây) ---
+
+// POST /api/events/:eventId/join - Tham gia sự kiện (Yêu cầu đăng nhập)
 router.post(
-    '/',
-    authenticateToken, // 1. Yêu cầu xác thực token JWT
-    eventValidator,    // 2. Validate dữ liệu input
-    eventController.create // 3. Gọi controller xử lý
+    '/:eventId/join',       // Path có chứa ID của sự kiện cần tham gia
+    authenticateToken,      // Bắt buộc phải xác thực token trước
+    participationController.join // Gọi hàm xử lý 'join' trong participationController
 );
 
-// Thêm các route khác cho event sau (GET / , GET /:id ...)
+// DELETE /api/events/:eventId/leave - Rời khỏi sự kiện (Yêu cầu đăng nhập)
+router.delete(
+    '/:eventId/leave',      // Path có chứa ID của sự kiện cần rời khỏi
+    authenticateToken,      // Bắt buộc phải xác thực token trước
+    participationController.leave // Gọi hàm xử lý 'leave' trong participationController
+);
+// --- Kết thúc thêm Participation Routes ---
+
 
 export default router;

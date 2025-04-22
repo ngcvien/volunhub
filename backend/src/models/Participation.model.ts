@@ -1,6 +1,6 @@
 // backend/src/models/Participation.model.ts
 import { DataTypes, Model, Optional } from 'sequelize';
-import { sequelize } from '../services/database.service';
+import { sequelize } from '../config/database.config';
 // Không cần import User, Event ở đây nếu chỉ định nghĩa bảng nối
 // Nhưng sẽ cần nếu muốn thêm các thuộc tính khác hoặc association phức tạp hơn
 

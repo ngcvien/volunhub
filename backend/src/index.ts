@@ -6,6 +6,10 @@ import morgan from 'morgan';
 import { connectDB } from './services/database.service';
 import rootRouter from './routes/index.routes'; // Import root router
 import errorMiddleware from './middlewares/error.middleware';
+import './models/User.model'; // Import model User
+import './models/Event.model'; // Import model Event
+import './models/Participation.model'; // Import model Participation
+
 
 // Tải biến môi trường
 dotenv.config();

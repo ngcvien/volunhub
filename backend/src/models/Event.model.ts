@@ -1,6 +1,6 @@
 // backend/src/models/Event.model.ts
 import { DataTypes, Model, Optional } from 'sequelize';
-import { sequelize } from '../services/database.service';
+import { sequelize } from '../config/database.config';
 import User from './User.model'; // Import User model để tạo quan hệ
 import Participation from './Participation.model';
 // Interface mô tả thuộc tính Event
@@ -83,21 +83,6 @@ Event.init(
 // --- Định nghĩa mối quan hệ: Một Event thuộc về một User (Creator) ---
 // Điều này sẽ tự động thêm phương thức như event.getUser(), user.getEvents() sau này
 // Và cũng đảm bảo foreign key 'creator_id' tồn tại
-Event.belongsTo(User, {
-    foreignKey: 'creatorId', // field trong model Event liên kết với User
-    as: 'creator' // Đặt tên định danh cho mối quan hệ (optional)
-});
-User.hasMany(Event, { // Quan hệ ngược lại (optional nhưng nên có)
-    foreignKey: 'creatorId',
-    as: 'createdEvents'
-});
-// --- Kết thúc định nghĩa mối quan hệ ---
 
-Event.belongsToMany(User, {
-  through: Participation, // Thông qua bảng trung gian Participation
-  foreignKey: 'eventId', // Khóa ngoại trong bảng Participation tham chiếu đến Event
-  otherKey: 'userId', // Khóa ngoại trong bảng Participation tham chiếu đến User
-  as: 'participants' // Tên định danh để lấy danh sách người tham gia (vd: event.getParticipants())
-});
 
 export default Event;
