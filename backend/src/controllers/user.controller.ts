@@ -35,6 +35,28 @@ class UserController {
       next(error);
     }
   }
+  async login(req: Request, res: Response, next: NextFunction) {
+    // // Validation đã được xử lý bởi middleware loginValidator
+    // const errors = validationResult(req);
+    // if (!errors.isEmpty()) {
+    //   // Middleware đã xử lý và trả về lỗi 400 rồi
+    //   // Không cần return ở đây nữa nếu dùng handleValidationErrors
+    // }
+
+    const { email, password } = req.body;
+
+    try {
+      const { token, user } = await userService.loginUser({ email, password });
+      res.status(200).json({
+        message: 'Đăng nhập thành công!',
+        token,
+        user
+      });
+    } catch (error) {
+      // Chuyển lỗi đến middleware xử lý lỗi tập trung
+      next(error);
+    }
+  }
 
   // Hàm login controller sẽ thêm sau
 }

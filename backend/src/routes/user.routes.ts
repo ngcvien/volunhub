@@ -1,16 +1,23 @@
+// backend/src/routes/user.routes.ts
 import { Router } from 'express';
 import userController from '../controllers/user.controller';
-// import { registerValidator } from '../middlewares/validation.middleware'; // Thêm sau
+import { registerValidator, loginValidator } from '../middlewares/validation.middleware'; // Import thêm loginValidator
 
 const router = Router();
 
-// Định nghĩa route POST /api/users/register
+// Route đăng ký (giữ nguyên)
 router.post(
   '/register',
-  // registerValidator, // Thêm middleware validate dữ liệu ở đây sau
-  userController.register // Gọi đến hàm register trong controller
+  registerValidator, // Dùng validator đăng ký
+  userController.register
 );
 
-// Thêm route cho login sau: router.post('/login', ...);
+// --- THÊM ROUTE ĐĂNG NHẬP ---
+router.post(
+  '/login',
+  loginValidator, // Dùng validator đăng nhập
+  userController.login // Gọi đến hàm login trong controller
+);
+// --- KẾT THÚC THÊM ROUTE ---
 
 export default router;

@@ -1,8 +1,11 @@
 import User, { UserAttributes } from '../models/User.model';
 import bcrypt from 'bcryptjs';
+import { signToken } from '../utils/jwt.util'; // Import hàm tạo token
+
 
 // Kiểu dữ liệu đầu vào cho hàm register, bỏ qua id và password_hash, thêm password thường
 type RegisterUserInput = Omit<UserAttributes, 'id' | 'password_hash' | 'createdAt' | 'updatedAt'> & { password?: string };
+type LoginUserInput = Pick<UserAttributes, 'email'> & { password?: string };
 
 class UserService {
   async registerUser(userData: RegisterUserInput): Promise<User> {
@@ -45,6 +48,36 @@ class UserService {
       }
       throw new Error('Không thể tạo người dùng vào lúc này.');
     }
+  }
+  async loginUser(userData: LoginUserInput): Promise<{ token: string; user: Omit<UserAttributes, 'password_hash'> }> {
+    // 1. Tìm user bằng email
+    const user = await User.findOne({ where: { email: userData.email } });
+    if (!user) {
+      throw new Error('Email hoặc mật khẩu không chính xác.'); // Thông báo chung chung để bảo mật
+    }
+
+    // 2. Kiểm tra mật khẩu
+    if (!userData.password) {
+        throw new Error('Vui lòng nhập mật khẩu.');
+    }
+    const isPasswordMatch = await user.comparePassword(userData.password); // Dùng hàm trong Model
+    if (!isPasswordMatch) {
+      throw new Error('Email hoặc mật khẩu không chính xác.');
+    }
+
+    // 3. Tạo JWT token
+    const token = signToken({ userId: user.id, email: user.email });
+
+    // 4. Chuẩn bị thông tin user trả về (loại bỏ password_hash)
+    const userResponse: Omit<UserAttributes, 'password_hash'> = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+    };
+
+    return { token, user: userResponse };
   }
 
   // Các hàm khác như loginUser, getUserById... sẽ thêm sau
