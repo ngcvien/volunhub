@@ -20,6 +20,7 @@ export interface EventType {
     createdAt: string;
     updatedAt: string;
     creator: EventCreator; // Thông tin người tạo lồng vào
+    isParticipating?: boolean;
 }
 
 // Kiểu dữ liệu cho response từ API get all events
