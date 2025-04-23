@@ -8,7 +8,7 @@ const connectDB = async () => {
 
     setupAssociations();
 
-    await sequelize.sync({ alter: true });
+    // await sequelize.sync({ alter: true });
     console.log("Models synchronized successfully.");
 
   } catch (error) {
