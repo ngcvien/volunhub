@@ -51,11 +51,8 @@ const HomePage = () => {
 
         // Hiển thị danh sách sự kiện dùng Grid và EventCard
         return (
-            // Sử dụng Row và Col của React Bootstrap để tạo lưới responsive
-            // lg={4}: 3 card trên dòng màn hình lớn
-            // md={6}: 2 card trên dòng màn hình vừa
-            // xs={12}: 1 card trên dòng màn hình nhỏ
-            <Row xs={12} md={6} lg={2} className="g-4 mt-3"> {/* g-4 tạo khoảng cách giữa các card */}
+            
+            <Row xs={4} md={4} lg={2} className="g-4 mt-3"> {/* g-4 tạo khoảng cách giữa các card */}
                 {events.map((event) => (
                     <Col key={event.id}>
                         <EventCard event={event} />
@@ -66,9 +63,9 @@ const HomePage = () => {
     };
 
     return (
-        <Container>
-            <h1 className="my-4">Sự kiện sắp diễn ra</h1>
-            {/* TODO: Thêm bộ lọc, tìm kiếm, nút Tạo sự kiện mới ở đây */}
+        <Container className='p-4'>
+            <h1 className="my-4 t-2" >Sự kiện sắp diễn ra</h1>
+            
             {renderContent()}
         </Container>
     );

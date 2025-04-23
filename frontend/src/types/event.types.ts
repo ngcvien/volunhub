@@ -21,6 +21,7 @@ export interface EventType {
     updatedAt: string;
     creator: EventCreator; // Thông tin người tạo lồng vào
     isParticipating?: boolean;
+    imageUrl?: string; // URL của ảnh sự kiện (nếu có)
 }
 
 // Kiểu dữ liệu cho response từ API get all events

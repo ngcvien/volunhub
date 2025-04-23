@@ -27,27 +27,18 @@ const formatDateTime = (isoString: string): string => {
 
 
 const EventCard: React.FC<EventCardProps> = ({ event , onActionComplete  }) => {
-    const { user } = useAuth(); // Chỉ cần lấy user để kiểm tra đăng nhập
+    const { user } = useAuth(); 
 
-    // State quản lý hành động (Join hoặc Leave)
     const [isLoadingAction, setIsLoadingAction] = useState(false);
     const [actionError, setActionError] = useState<string | null>(null);
 
-    // Sử dụng trực tiếp prop event.isParticipating để quyết định hiển thị nút nào
-    // Không cần state hasJoinedLocally nữa
-
-    // --- THÊM STATE CỤC BỘ ĐỂ HIỂN THỊ NÚT ---
-    // Khởi tạo dựa trên prop ban đầu
+   
     const [displayParticipating, setDisplayParticipating] = useState(event.isParticipating ?? false);
 
-    // Thêm useEffect để cập nhật state cục bộ nếu prop từ HomePage thay đổi
-    // (Ví dụ: sau khi HomePage refresh thành công)
     useEffect(() => {
         setDisplayParticipating(event.isParticipating ?? false);
     }, [event.isParticipating]);
-    // --- KẾT THÚC THÊM STATE ---
-
-    // Hàm xử lý khi nhấn nút Tham gia
+   
     const handleJoin = async () => {
         if (!user) return;
         setIsLoadingAction(true);
@@ -82,24 +73,32 @@ const EventCard: React.FC<EventCardProps> = ({ event , onActionComplete  }) => {
             setIsLoadingAction(false);
         }
     };
+    const placeholderImageUrl = "/placeholder-event.png"; 
 
     return (
-        <Card className="h-100 shadow-sm">
-            {/* ... Card.Img ... */}
+        <Card className="h-100 shadow-sm" >
+            <Card.Img
+                variant="top" 
+                src={event.imageUrl || placeholderImageUrl}
+                alt={event.title} 
+                style={{ height: '260px', objectFit: 'cover', borderRadius: '0.25rem' }} 
+                onError={(e) => {
+                   const target = e.target as HTMLImageElement;
+                   if (target.src !== placeholderImageUrl) {
+                      target.src = placeholderImageUrl;
+                   }
+                   target.onerror = null; 
+                }}
+            />
             <Card.Body className="d-flex flex-column">
-                {/* ... Card.Title, Subtitle, Text ... */}
                 <Card.Title className="fw-bold">{event.title}</Card.Title>
-                {/* ... creator, description, time, location ... */}
-                {/* --- BẮT ĐẦU ĐOẠN CODE BỊ THIẾU --- */}
                 <Card.Subtitle className="mb-2 text-muted" style={{ fontSize: '0.9em' }}>
                     Tạo bởi: {event.creator?.username || 'Không rõ'}
                 </Card.Subtitle>
-                <Card.Text as="div" className="flex-grow-1"> {/* flex-grow-1 để text chiếm không gian */}
-                    {/* Hiển thị mô tả ngắn gọn */}
+                <Card.Text as="div" className="flex-grow-1">
                     <p style={{ fontSize: '0.95em' }}>
                         {event.description ? (event.description.length > 100 ? event.description.substring(0, 100) + '...' : event.description) : <i>Không có mô tả</i>}
                     </p>
-                    {/* Thông tin thời gian, địa điểm */}
                     <p className="mb-1" style={{ fontSize: '0.9em' }}>
                         <strong>Thời gian:</strong> {formatDateTime(event.eventTime)}
                     </p>
@@ -107,13 +106,10 @@ const EventCard: React.FC<EventCardProps> = ({ event , onActionComplete  }) => {
                         <strong>Địa điểm:</strong> {event.location || 'Chưa cập nhật'}
                     </p>
                 </Card.Text>
-                {/* --- KẾT THÚC ĐOẠN CODE BỊ THIẾU --- */}
 
 
-                {/* Hiển thị lỗi nếu có */}
                 {actionError && <Alert variant="danger" size="sm" className="mt-2 py-1" onClose={() => setActionError(null)} dismissible>{actionError}</Alert>}
 
-                {/* Nút hành động */}
                 <div className="mt-auto d-flex justify-content-between align-items-center pt-2"> {/* Thêm pt-2 */}
                     <Link to={`/events/${event.id}`} style={{ textDecoration: 'none' }}>
                         <Button variant="outline-secondary" size="sm">Xem chi tiết</Button> {/* Đổi màu nút chi tiết */}
@@ -122,7 +118,6 @@ const EventCard: React.FC<EventCardProps> = ({ event , onActionComplete  }) => {
                     {/* Chỉ hiển thị nút Join/Leave nếu user đã đăng nhập */}
                     {user && (
                         <>
-                            {/* --- SỬA ĐIỀU KIỆN RENDER DỰA VÀO displayParticipating --- */}
                             {displayParticipating ? (
                                 // Nếu (state cục bộ) ĐÃ tham gia -> Hiển thị nút Rời khỏi
                                 <Button
