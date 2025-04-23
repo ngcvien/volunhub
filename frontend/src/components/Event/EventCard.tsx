@@ -1,5 +1,5 @@
 // frontend/src/components/Event/EventCard.tsx
-import React, { useState } from 'react'; // <<<--- Đảm bảo có { useState } ở đây
+import React, { useState, useEffect } from 'react'; // <<<--- Đảm bảo có { useState } ở đây
 import { Card, Button, Spinner, Alert } from 'react-bootstrap'; // <<<--- KIỂM TRA DÒNG NÀY
 import { Link } from 'react-router-dom'; // Để tạo link đến chi tiết sự kiện sau này
 import { EventType } from '../../types/event.types'; // Import kiểu EventType
@@ -10,14 +10,15 @@ import { joinEventApi, leaveEventApi } from '../../api/event.api';
 // Định nghĩa props cho component
 interface EventCardProps {
     event: EventType;
+    onActionComplete?: () => void; 
 }
 
 // Hàm để định dạng ngày giờ cho dễ đọc hơn (ví dụ)
 const formatDateTime = (isoString: string): string => {
     try {
         const date = new Date(isoString);
-         // Bạn có thể dùng thư viện như date-fns hoặc moment.js để định dạng phức tạp hơn
-         // Ví dụ định dạng đơn giản: HH:mm Ngày DD Tháng MM Năm YYYY
+        // Bạn có thể dùng thư viện như date-fns hoặc moment.js để định dạng phức tạp hơn
+        // Ví dụ định dạng đơn giản: HH:mm Ngày DD Tháng MM Năm YYYY
         return `${date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} Ngày ${date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
     } catch (e) {
         return "Thời gian không hợp lệ";
@@ -25,7 +26,7 @@ const formatDateTime = (isoString: string): string => {
 };
 
 
-const EventCard: React.FC<EventCardProps> = ({ event /*, onParticipationChange */ }) => {
+const EventCard: React.FC<EventCardProps> = ({ event , onActionComplete  }) => {
     const { user } = useAuth(); // Chỉ cần lấy user để kiểm tra đăng nhập
 
     // State quản lý hành động (Join hoặc Leave)
@@ -35,22 +36,30 @@ const EventCard: React.FC<EventCardProps> = ({ event /*, onParticipationChange *
     // Sử dụng trực tiếp prop event.isParticipating để quyết định hiển thị nút nào
     // Không cần state hasJoinedLocally nữa
 
+    // --- THÊM STATE CỤC BỘ ĐỂ HIỂN THỊ NÚT ---
+    // Khởi tạo dựa trên prop ban đầu
+    const [displayParticipating, setDisplayParticipating] = useState(event.isParticipating ?? false);
+
+    // Thêm useEffect để cập nhật state cục bộ nếu prop từ HomePage thay đổi
+    // (Ví dụ: sau khi HomePage refresh thành công)
+    useEffect(() => {
+        setDisplayParticipating(event.isParticipating ?? false);
+    }, [event.isParticipating]);
+    // --- KẾT THÚC THÊM STATE ---
+
     // Hàm xử lý khi nhấn nút Tham gia
     const handleJoin = async () => {
-        if (!user) return; // Double check login
-
+        if (!user) return;
         setIsLoadingAction(true);
         setActionError(null);
         try {
-            await joinEventApi(event.id);
-            // TODO: Gọi callback để báo HomePage refresh list
-            // onParticipationChange?.();
-            // Tạm thời chỉ log hoặc không làm gì ở đây, UI sẽ chưa cập nhật ngay
+            await joinEventApi(event.id); // Gọi API
             console.log(`Successfully joined event ${event.id}`);
-            // Có thể set một state tạm thời để đổi nút ngay lập tức (nếu muốn UX tốt hơn mà chưa cần refresh)
-            // Ví dụ: setDidJustJoin(true); // Nhưng cách tốt nhất là refresh data gốc
+            setDisplayParticipating(true); // <<<--- THÊM DÒNG NÀY ĐỂ ĐỔI NÚT NGAY
+            onActionComplete?.();          // <<<--- Gọi callback báo HomePage (nếu có)
         } catch (err: any) {
             setActionError(err.message || "Lỗi khi tham gia.");
+            // Nếu lỗi thì KHÔNG đổi nút
         } finally {
             setIsLoadingAction(false);
         }
@@ -59,17 +68,16 @@ const EventCard: React.FC<EventCardProps> = ({ event /*, onParticipationChange *
     // Hàm xử lý khi nhấn nút Rời khỏi
     const handleLeave = async () => {
         if (!user) return;
-
         setIsLoadingAction(true);
         setActionError(null);
         try {
-            await leaveEventApi(event.id);
-            // TODO: Gọi callback để báo HomePage refresh list
-            // onParticipationChange?.();
+            await leaveEventApi(event.id); // Gọi API
             console.log(`Successfully left event ${event.id}`);
-            // Tương tự, cần refresh data gốc để UI cập nhật đúng isParticipating
+            setDisplayParticipating(false); // <<<--- THÊM DÒNG NÀY ĐỂ ĐỔI NÚT NGAY
+            onActionComplete?.();           // <<<--- Gọi callback báo HomePage (nếu có)
         } catch (err: any) {
             setActionError(err.message || "Lỗi khi rời sự kiện.");
+             // Nếu lỗi thì KHÔNG đổi nút
         } finally {
             setIsLoadingAction(false);
         }
@@ -79,30 +87,30 @@ const EventCard: React.FC<EventCardProps> = ({ event /*, onParticipationChange *
         <Card className="h-100 shadow-sm">
             {/* ... Card.Img ... */}
             <Card.Body className="d-flex flex-column">
-                 {/* ... Card.Title, Subtitle, Text ... */}
-                 <Card.Title className="fw-bold">{event.title}</Card.Title>
-                 {/* ... creator, description, time, location ... */}
-                 {/* --- BẮT ĐẦU ĐOẠN CODE BỊ THIẾU --- */}
-        <Card.Subtitle className="mb-2 text-muted" style={{ fontSize: '0.9em' }}>
-            Tạo bởi: {event.creator?.username || 'Không rõ'}
-        </Card.Subtitle>
-        <Card.Text as="div" className="flex-grow-1"> {/* flex-grow-1 để text chiếm không gian */}
-             {/* Hiển thị mô tả ngắn gọn */}
-            <p style={{ fontSize: '0.95em' }}>
-                {event.description ? (event.description.length > 100 ? event.description.substring(0, 100) + '...' : event.description) : <i>Không có mô tả</i>}
-            </p>
-             {/* Thông tin thời gian, địa điểm */}
-            <p className="mb-1" style={{ fontSize: '0.9em' }}>
-                <strong>Thời gian:</strong> {formatDateTime(event.eventTime)}
-            </p>
-            <p style={{ fontSize: '0.9em' }}>
-                <strong>Địa điểm:</strong> {event.location || 'Chưa cập nhật'}
-            </p>
-        </Card.Text>
-        {/* --- KẾT THÚC ĐOẠN CODE BỊ THIẾU --- */}
+                {/* ... Card.Title, Subtitle, Text ... */}
+                <Card.Title className="fw-bold">{event.title}</Card.Title>
+                {/* ... creator, description, time, location ... */}
+                {/* --- BẮT ĐẦU ĐOẠN CODE BỊ THIẾU --- */}
+                <Card.Subtitle className="mb-2 text-muted" style={{ fontSize: '0.9em' }}>
+                    Tạo bởi: {event.creator?.username || 'Không rõ'}
+                </Card.Subtitle>
+                <Card.Text as="div" className="flex-grow-1"> {/* flex-grow-1 để text chiếm không gian */}
+                    {/* Hiển thị mô tả ngắn gọn */}
+                    <p style={{ fontSize: '0.95em' }}>
+                        {event.description ? (event.description.length > 100 ? event.description.substring(0, 100) + '...' : event.description) : <i>Không có mô tả</i>}
+                    </p>
+                    {/* Thông tin thời gian, địa điểm */}
+                    <p className="mb-1" style={{ fontSize: '0.9em' }}>
+                        <strong>Thời gian:</strong> {formatDateTime(event.eventTime)}
+                    </p>
+                    <p style={{ fontSize: '0.9em' }}>
+                        <strong>Địa điểm:</strong> {event.location || 'Chưa cập nhật'}
+                    </p>
+                </Card.Text>
+                {/* --- KẾT THÚC ĐOẠN CODE BỊ THIẾU --- */}
 
 
-                 {/* Hiển thị lỗi nếu có */}
+                {/* Hiển thị lỗi nếu có */}
                 {actionError && <Alert variant="danger" size="sm" className="mt-2 py-1" onClose={() => setActionError(null)} dismissible>{actionError}</Alert>}
 
                 {/* Nút hành động */}
@@ -114,41 +122,31 @@ const EventCard: React.FC<EventCardProps> = ({ event /*, onParticipationChange *
                     {/* Chỉ hiển thị nút Join/Leave nếu user đã đăng nhập */}
                     {user && (
                         <>
-                            {event.isParticipating ? (
-                                // Nếu ĐÃ tham gia -> Hiển thị nút Rời khỏi
+                            {/* --- SỬA ĐIỀU KIỆN RENDER DỰA VÀO displayParticipating --- */}
+                            {displayParticipating ? (
+                                // Nếu (state cục bộ) ĐÃ tham gia -> Hiển thị nút Rời khỏi
                                 <Button
-                                    variant="outline-danger" // Nút rời khỏi màu đỏ outline
+                                    variant="outline-danger"
                                     size="sm"
                                     onClick={handleLeave}
                                     disabled={isLoadingAction}
                                 >
-                                    {isLoadingAction ? (
-                                        <Spinner size="sm" animation="border" />
-                                    ) : (
-                                        <>
-                                            <i className="bi bi-x-lg me-1"></i> {/* Icon (cần cài react-bootstrap-icons) */}
-                                            Rời khỏi
-                                        </>
-                                    )}
+                                    {/* ... Nội dung nút Rời khỏi (Spinner hoặc Icon+Text) ... */}
+                                    {isLoadingAction ? <Spinner size="sm" animation="border" /> : <><i className="bi bi-x-lg me-1"></i> Rời khỏi</>}
                                 </Button>
                             ) : (
-                                // Nếu CHƯA tham gia -> Hiển thị nút Tham gia
+                                // Nếu (state cục bộ) CHƯA tham gia -> Hiển thị nút Tham gia
                                 <Button
-                                    variant="success" // Nút tham gia màu xanh lá
+                                    variant="success"
                                     size="sm"
                                     onClick={handleJoin}
                                     disabled={isLoadingAction}
                                 >
-                                    {isLoadingAction ? (
-                                         <Spinner size="sm" animation="border" className="me-1" />
-                                    ) : (
-                                        <>
-                                            <i className="bi bi-check-lg me-1"></i> {/* Icon */}
-                                            Tham gia
-                                        </>
-                                    )}
+                                    {/* ... Nội dung nút Tham gia (Spinner hoặc Icon+Text) ... */}
+                                    {isLoadingAction ? <Spinner size="sm" animation="border" className="me-1" /> : <><i className="bi bi-check-lg me-1"></i> Tham gia</>}
                                 </Button>
                             )}
+                            {/* --- KẾT THÚC SỬA ĐIỀU KIỆN --- */}
                         </>
                     )}
                 </div>
