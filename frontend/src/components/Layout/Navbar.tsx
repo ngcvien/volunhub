@@ -1,14 +1,16 @@
 // frontend/src/components/Layout/Navbar.tsx
 import React from 'react';
-import { Navbar, Nav, Container } from 'react-bootstrap';
+import { Navbar, Nav, Container,NavDropdown, Image as RBImage } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { useAuth } from '../../contexts/AuthContext';
+
+const defaultAvatar = '/default-avatar.png';
+
 
 const AppNavbar = () => {
     const { user, logout } = useAuth();
 
     return (
-        // Bỏ variant="dark" và className="navbar-neon-gradient"
         <Navbar expand="lg" collapseOnSelect fixed="top" data-bs-theme={null}> {/* Có thể thêm data-bs-theme={null} để reset mặc định nếu cần */}
             <Container>
                 <LinkContainer to="/">
@@ -25,9 +27,41 @@ const AppNavbar = () => {
                         {user ? (
                             <>
                                 <Nav.Link disabled className="app-nav-link">Chào, {user.username}!</Nav.Link>
-                                <Nav.Link onClick={logout} style={{ cursor: 'pointer' }} className="app-nav-link">
-                                    Đăng xuất
-                                </Nav.Link>
+                                
+                                <NavDropdown
+                                title={
+                                    // Title của dropdown là Avatar và Username
+                                    <>
+                                        <RBImage
+                                            src={user.avatarUrl || defaultAvatar}
+                                            alt={user.username}
+                                            roundedCircle
+                                            width={30}
+                                            height={30}
+                                            className="me-2" // Thêm khoảng cách
+                                            style={{ objectFit: 'cover' }} // Đảm bảo ảnh tròn đẹp
+                                        />
+                                        {/* <span className="app-nav-link">{user.username}</span>  */}
+                                    </>
+                                }
+                                id="user-nav-dropdown"
+                                align="end" // Căn dropdown sang phải
+                            >
+                                {/* Item Hồ sơ */}
+                                <LinkContainer to="/profile/me">
+                                    <NavDropdown.Item>
+                                        <i className="bi bi-person-circle me-2"></i> Hồ sơ
+                                    </NavDropdown.Item>
+                                </LinkContainer>
+
+                                {/* TODO: Thêm các link khác nếu cần (Cài đặt,...) */}
+                                <NavDropdown.Divider />
+
+                                {/* Item Đăng xuất */}
+                                <NavDropdown.Item onClick={logout}>
+                                     <i className="bi bi-box-arrow-right me-2"></i> Đăng xuất
+                                </NavDropdown.Item>
+                            </NavDropdown>
                             </>
                         ) : (
                             <>

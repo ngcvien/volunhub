@@ -1,6 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import {getMeApi , registerUserApi, loginUserApi } from '../api/auth.api'; // Đổi tên hàm gọi API
-// import { User, RegisterUserInput, AuthContextType } from '../api/user.types'; // Import types
 import { User, RegisterUserInput, LoginUserInput, AuthContextType as ContextType } from '../types/user.types';
 
 
@@ -73,13 +72,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     checkAuthStatus();
-    // Mảng dependency rỗng [] để effect này chỉ chạy 1 lần duy nhất khi Provider được mount
 }, []);
-// --- KẾT THÚC USEEFFECT ---
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
-  // Hàm login (sẽ hoàn thiện sau)
   const login = async (loginData: LoginUserInput) => {
     try {
         console.log('Attempting login with:', loginData); // Log để debug
@@ -110,13 +106,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw error; // Ném lỗi ra để LoginPage có thể bắt và hiển thị
     }
 };
-
-  // Hàm logout (sẽ hoàn thiện sau)
+const updateUserContext = (newUserData: User) => {
+  // Chỉ cập nhật state user, không động đến token hay localStorage ở đây
+  setUser(newUserData);
+  console.log('AuthContext: User state updated locally:', newUserData);
+};
   const logout = () => {
     localStorage.removeItem('authToken');
     setToken(null);
     setUser(null);
-    // Có thể thêm điều hướng về trang login ở đây
   };
 
   // Hàm xử lý đăng ký
@@ -133,9 +131,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const value = { user, token, isLoading, login, logout, register, theme, toggleTheme };
+  const value: ContextType = { user, token, isLoading, login, logout, register, theme, toggleTheme, updateUserContext };
 
-  // Chỉ render children khi đã kiểm tra xong trạng thái auth ban đầu
   return (
     <AuthContext.Provider value={value}>
       {isLoading ? <div>Loading Application...</div> : children}

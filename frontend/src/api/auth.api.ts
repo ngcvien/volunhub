@@ -1,5 +1,5 @@
 import api from './index';
-import { User } from '../types/user.types';
+import { User, LoginUserInput, RegisterUserInput, AuthContextType } from '../types/user.types';
 
 // Kiểu dữ liệu cho response từ GET /api/users/me
 interface GetMeResponse {
@@ -67,5 +67,31 @@ export const loginUserApi = async (userData: LoginUserInput): Promise<LoginRespo
     } catch (error: any) {
         console.error("Lỗi API Đăng nhập:", error.response?.data || error.message);
         throw new Error(error.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại email hoặc mật khẩu.');
+    }
+};
+
+interface ProfileUpdateInput {
+    username?: string | null; // Có thể cho phép đổi username
+    fullName?: string | null;
+    bio?: string | null;
+    location?: string | null; // Sẽ là tên Tỉnh/TP
+    avatarUrl?: string | null;
+}
+
+// Kiểu dữ liệu response trả về user đã cập nhật
+interface UpdateProfileResponse {
+    message: string;
+    user: User; // Giả sử API trả về thông tin user mới nhất
+}
+
+export const updateProfileApi = async (updateData: ProfileUpdateInput): Promise<UpdateProfileResponse> => {
+    try {
+        // Request PUT đến /api/users/me
+        // Token được tự động thêm bởi interceptor
+        const response = await api.put<UpdateProfileResponse>('/users/me', updateData);
+        return response.data;
+    } catch (error: any) {
+        console.error("Lỗi API Cập nhật Profile:", error.response?.data || error.message);
+        throw new Error(error.response?.data?.message || 'Không thể cập nhật hồ sơ.');
     }
 };

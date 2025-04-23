@@ -8,6 +8,7 @@ import CreateEventPage from '../pages/CreateEventPage';
 import AppNavbar from '../components/Layout/Navbar'; // File sẽ tạo ở bước 9
 import { useAuth } from '../contexts/AuthContext';
 import { Container } from 'react-bootstrap'; // Import Container
+import ProfilePage from '../pages/ProfilePage';
 
 // Component để bảo vệ route, yêu cầu đăng nhập
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -41,10 +42,18 @@ const AppRoutes = () => {
             }
           />
           <Route path="*" element={<div className="text-center mt-5"><h2>404 Not Found</h2></div>} />
+          <Route
+            path="/profile/me" 
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Container>
     </>
-    // --- KẾT THÚC THAY ĐỔI ---
+    
   );
 };
 
