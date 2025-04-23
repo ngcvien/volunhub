@@ -35,7 +35,7 @@ class EventService {
                     {
                         model: User,
                         as: 'creator',
-                        attributes: ['id', 'username']
+                        attributes: ['id', 'username','avatarUrl'] 
                     }
                 ],
                 raw: true, // Lấy dữ liệu dạng plain object để dễ thêm thuộc tính

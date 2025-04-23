@@ -7,6 +7,7 @@ import { User } from './user.types'; // Giả sử bạn có file user.types.ts
 interface EventCreator {
     id: number;
     username: string;
+    avatarUrl?: string | null; 
 }
 
 // Kiểu dữ liệu chính cho một sự kiện trả về từ API list events

@@ -52,7 +52,7 @@ const HomePage = () => {
         // Hiển thị danh sách sự kiện dùng Grid và EventCard
         return (
             
-            <Row xs={4} md={4} lg={2} className="g-4 mt-3"> {/* g-4 tạo khoảng cách giữa các card */}
+            <Row xs={1} md={1} lg={1} className="g-4 mt-2 post-container" > {/* g-4 tạo khoảng cách giữa các card */}
                 {events.map((event) => (
                     <Col key={event.id}>
                         <EventCard event={event} />
@@ -64,7 +64,7 @@ const HomePage = () => {
 
     return (
         <Container className='p-4'>
-            <h1 className="my-4 t-2" >Sự kiện sắp diễn ra</h1>
+            {/* <h1 className="my-4 t-2" >Sự kiện sắp diễn ra</h1> */}
             
             {renderContent()}
         </Container>
