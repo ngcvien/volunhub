@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { registerUserApi, loginUserApi } from '../api/auth.api'; // Đổi tên hàm gọi API
+import {getMeApi , registerUserApi, loginUserApi } from '../api/auth.api'; // Đổi tên hàm gọi API
 // import { User, RegisterUserInput, AuthContextType } from '../api/user.types'; // Import types
 import { User, RegisterUserInput, LoginUserInput, AuthContextType as ContextType } from '../types/user.types';
 
@@ -42,26 +42,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('appTheme', theme);
   }, [theme]);
   // Effect kiểm tra trạng thái đăng nhập khi ứng dụng tải lần đầu
+  // --- USEEFFECT KIỂM TRA TOKEN KHI TẢI ỨNG DỤNG ---
   useEffect(() => {
-    const verifyToken = async () => {
-      if (token) {
-        try {
-          // TODO: Gọi API backend để xác thực token và lấy thông tin user
-          // Ví dụ: const userData = await verifyTokenApi(token);
-          // setUser(userData);
-          // Tạm thời chỉ giả lập là có user nếu có token
-          // setUser({ id: 1, username: 'tempUser', email: 'temp@example.com' }); // Xóa dòng này sau khi có API verify
-        } catch (error) {
-          // Token không hợp lệ -> logout
-          localStorage.removeItem('authToken');
-          setToken(null);
-          setUser(null);
+    const checkAuthStatus = async () => {
+        const storedToken = localStorage.getItem('authToken');
+        if (storedToken) {
+             // Đặt token state ngay lập tức nếu tìm thấy trong storage
+            setToken(storedToken);
+            try {
+                console.log('AuthContext: Found token, verifying...');
+                // Gọi API /users/me để xác thực token và lấy user data
+                const response = await getMeApi();
+                if (response.user) {
+                    setUser(response.user); // Cập nhật user state thành công
+                    console.log('AuthContext: User restored:', response.user);
+                } else {
+                     // Trường hợp lạ: API thành công nhưng không có user? -> Logout
+                    throw new Error('Dữ liệu người dùng không hợp lệ.');
+                }
+            } catch (error: any) {
+                // Lỗi xảy ra (token hết hạn, không hợp lệ, API /me lỗi) -> Logout
+                console.error('AuthContext: Failed to verify token or fetch user:', error);
+                localStorage.removeItem('authToken'); // Xóa token khỏi storage
+                setToken(null);                     // Xóa token khỏi state
+                setUser(null);                      // Xóa user khỏi state
+            }
         }
-      }
-      setIsLoading(false); // Hoàn tất kiểm tra
+         // Dù có token hay không, hoặc có lỗi, cũng phải kết thúc loading
+        setIsLoading(false);
     };
-    verifyToken();
-  }, [token]);
+
+    checkAuthStatus();
+    // Mảng dependency rỗng [] để effect này chỉ chạy 1 lần duy nhất khi Provider được mount
+}, []);
+// --- KẾT THÚC USEEFFECT ---
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };

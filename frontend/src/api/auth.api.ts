@@ -1,5 +1,23 @@
 import api from './index';
+import { User } from '../types/user.types';
 
+// Kiểu dữ liệu cho response từ GET /api/users/me
+interface GetMeResponse {
+    user: User; // Backend trả về object có key là user
+}
+
+export const getMeApi = async (): Promise<GetMeResponse> => {
+    try {
+        // Request GET đến /api/users/me
+        // Token được tự động thêm bởi interceptor đã cấu hình trong api/index.ts
+        const response = await api.get<GetMeResponse>('/users/me');
+        return response.data;
+    } catch (error: any) {
+        console.error("Lỗi API Get Me:", error.response?.data || error.message);
+        // Ném lỗi để AuthContext xử lý (ví dụ: logout nếu lỗi 401/403)
+        throw error;
+    }
+};
 // --- Giữ lại các interface và hàm registerUserApi từ trước ---
 interface RegisterUserInput {
     username?: string;

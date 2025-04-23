@@ -3,6 +3,7 @@ import { Router, Request, Response, NextFunction } from 'express'; // Thêm Requ
 import userController from '../controllers/user.controller';
 import { registerValidator, loginValidator } from '../middlewares/validation.middleware';
 import authenticateToken from '../middlewares/auth.middleware'; // <<<--- Import middleware xác thực
+import User from '../models/User.model'; // Import User model
 
 const router = Router();
 
@@ -18,6 +19,35 @@ router.post(
   '/login',
   loginValidator, // Dùng validator đăng nhập
   userController.login // Gọi đến hàm login trong controller
+);
+// --- THÊM HOẶC ĐẢM BẢO CÓ ROUTE NÀY ---
+// GET /api/users/me - Lấy thông tin user đang đăng nhập
+router.get(
+  '/me',
+  authenticateToken, // Bắt buộc phải xác thực
+  // Controller Handler (có thể đặt trong userController.ts)
+  async (req: Request, res: Response, next: NextFunction) => {
+      const userId = req.user?.userId; // Lấy userId từ middleware
+      if (!userId) {
+          // Middleware đã xử lý lỗi 401/403 nhưng phòng trường hợp lạ
+          return res.status(401).json({ message: 'Không tìm thấy thông tin người dùng được xác thực.' });
+      }
+      try {
+          // Tìm user trong DB bằng ID lấy từ token
+          const user = await User.findByPk(userId, {
+              // Chỉ lấy các thuộc tính cần thiết, loại bỏ password_hash
+              attributes: ['id', 'username', 'email', 'createdAt', 'updatedAt']
+          });
+          if (!user) {
+              // User có trong token nhưng không có trong DB? -> Lỗi hoặc user đã bị xóa
+               return res.status(404).json({ message: 'Người dùng không tồn tại.' });
+          }
+          // Trả về thông tin user tìm được
+          res.status(200).json({ user }); // Trả về object chứa key "user"
+      } catch(error) {
+          next(error); // Chuyển lỗi cho middleware chung
+      }
+  }
 );
 // --- KẾT THÚC THÊM ROUTE ---
 
