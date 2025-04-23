@@ -4,9 +4,12 @@ import User from '../models/User.model'; // Import model User để tạo quan h
 import Participation from '../models/Participation.model'; // <<<--- THÊM DÒNG NÀY
 
 
-// Kiểu dữ liệu đầu vào để tạo event (loại bỏ các trường tự động)
-type CreateEventInput = Omit<EventAttributes, 'id' | 'createdAt' | 'updatedAt'>;
+type CreateEventInput = Omit<EventAttributes, 'id' | 'createdAt' | 'updatedAt' >;
 
+type EventWithParticipationAndCreator = EventAttributes & {
+    isParticipating?: boolean;
+    creator?: { id: number; username: string; };
+};
 class EventService {
 
     async createEvent(eventData: CreateEventInput): Promise<Event> {
@@ -58,6 +61,7 @@ class EventService {
                     };
                 });
                 return eventsWithParticipation; // Trả về danh sách đã bổ sung
+
             }
 
             // Nếu không có userId, trả về danh sách sự kiện gốc

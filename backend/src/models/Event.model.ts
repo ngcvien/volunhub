@@ -10,13 +10,13 @@ export interface EventAttributes {
   title: string;
   description: string | null;
   location: string | null;
-  eventTime: Date; // Đổi tên thành eventTime (camelCase) cho nhất quán trong code TS
+  eventTime: Date; 
+  imageUrl: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-// Interface cho việc tạo Event (id, createdAt, updatedAt là optional)
-interface EventCreationAttributes extends Optional<EventAttributes, 'id' | 'description' | 'location' | 'createdAt' | 'updatedAt'> {}
+interface EventCreationAttributes extends Optional<EventAttributes, 'id' | 'description' | 'location' | 'imageUrl' | 'createdAt' | 'updatedAt'> {}
 
 class Event extends Model<EventAttributes, EventCreationAttributes> implements EventAttributes {
   public id!: number;
@@ -25,6 +25,7 @@ class Event extends Model<EventAttributes, EventCreationAttributes> implements E
   public description!: string | null;
   public location!: string | null;
   public eventTime!: Date;
+  public imageUrl!: string | null;
 
   // Timestamps
   public readonly createdAt!: Date;
@@ -69,6 +70,11 @@ Event.init(
       allowNull: false,
       field: 'event_time', // Chỉ rõ tên cột trong DB là snake_case
     },
+    imageUrl: {
+      type: DataTypes.STRING, // VARCHAR(255)
+      allowNull: true,
+      field: 'image_url' // Chỉ rõ tên cột DB nếu không muốn dựa hoàn toàn vào underscored
+    }
     // createdAt và updatedAt Sequelize tự quản lý nếu timestamps: true
     // và underscored: true sẽ tự ánh xạ sang created_at, updated_at
   },

@@ -1,5 +1,5 @@
 // backend/src/middlewares/validation.middleware.ts
-import { check, validationResult } from 'express-validator';
+import { check, validationResult, body } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 
 // Hàm xử lý lỗi validation chung (có thể tạo file riêng nếu muốn)
@@ -30,8 +30,9 @@ export const eventValidator = [
     check('title', 'Tiêu đề không được để trống').notEmpty().trim(),
     check('description', 'Mô tả nên là một chuỗi').optional().isString(), // optional() cho phép null/undefined
     check('location', 'Địa điểm nên là một chuỗi').optional().isString(),
-    check('eventTime', 'Thời gian sự kiện không hợp lệ').notEmpty().isISO8601().toDate(), // isISO8601 kiểm tra định dạng ngày giờ chuẩn, toDate() chuyển thành Date object
-    // Ví dụ định dạng ISO8601 hợp lệ: "2025-12-31T17:00:00.000Z" (UTC) hoặc "2025-12-31T23:30:00+07:00" (có timezone)
+    check('eventTime', 'Thời gian sự kiện không hợp lệ').notEmpty().isISO8601().toDate(), 
+    check('imageUrl', 'Image URL không hợp lệ').optional({ checkFalsy: true }).isURL(), // optional({ checkFalsy: true }) cho phép null, undefined, ""
+
     handleValidationErrors
 ]; 
 // Thêm các validator khác ở đây sau (ví dụ: eventValidator)

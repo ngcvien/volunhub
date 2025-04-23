@@ -6,17 +6,10 @@ import eventService from '../services/event.service';
 class EventController {
 
     async create(req: Request, res: Response, next: NextFunction) {
-        // Validation đã được xử lý bởi middleware eventValidator
-
-        // Lấy thông tin từ request body
-        const { title, description, location, eventTime } = req.body;
-
-        // Lấy creatorId từ thông tin user đã được middleware xác thực gắn vào req
+        const { title, description, location, eventTime, imageUrl } = req.body;
         const creatorId = req.user?.userId; // Nhớ thêm "?" để kiểm tra req.user có tồn tại không
 
-        // Kiểm tra xem creatorId có tồn tại không (dù middleware đã kiểm tra)
         if (!creatorId) {
-             // Lỗi này không nên xảy ra nếu authenticateToken hoạt động đúng
             return res.status(401).json({ message: 'Lỗi: Không tìm thấy thông tin người dùng đã xác thực.' });
         }
 
@@ -26,11 +19,12 @@ class EventController {
                 title,
                 description,
                 location,
-                eventTime: new Date(eventTime) // Đảm bảo eventTime là đối tượng Date
+                eventTime: new Date(eventTime),
+                imageUrl: imageUrl || null 
             });
             res.status(201).json({ message: 'Tạo sự kiện thành công!', event: newEvent });
         } catch (error) {
-            next(error); // Chuyển lỗi cho error middleware
+            next(error); 
         }
     }
 
@@ -50,7 +44,6 @@ class EventController {
         }
     }
 
-    // Thêm các hàm khác sau:  getById...
 }
 
 export default new EventController();
