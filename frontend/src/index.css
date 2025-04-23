@@ -84,17 +84,18 @@ button:focus-visible {
 }
 
 /* Áp dụng animation vào ảnh */
-.hover-effect-image { /* Vẫn dùng class cũ hoặc đổi tên nếu muốn */
+.hover-effect-image {
+  /* Vẫn dùng class cũ hoặc đổi tên nếu muốn */
   display: block; /* Đảm bảo transform hoạt động tốt */
   border-radius: var(--bs-border-radius); /* Giữ bo góc nếu có */
   /* Giữ các style khác như max-width, margin nếu cần */
 
   /* --- Áp dụng animation --- */
-  animation-name: breathe;                   /* Tên keyframes đã định nghĩa */
-  animation-duration: 3s;                  /* Thời gian hoàn thành 1 chu kỳ (0% -> 100%) - điều chỉnh tốc độ ở đây */
-  animation-timing-function: ease-in-out;  /* Kiểu chuyển động mượt mà */
-  animation-iteration-count: infinite;     /* Lặp lại vô hạn */
-  animation-direction: alternate;          /* Chạy từ 0% -> 100% rồi 100% -> 0% và lặp lại */
+  animation-name: breathe; /* Tên keyframes đã định nghĩa */
+  animation-duration: 3s; /* Thời gian hoàn thành 1 chu kỳ (0% -> 100%) - điều chỉnh tốc độ ở đây */
+  animation-timing-function: ease-in-out; /* Kiểu chuyển động mượt mà */
+  animation-iteration-count: infinite; /* Lặp lại vô hạn */
+  animation-direction: alternate; /* Chạy từ 0% -> 100% rồi 100% -> 0% và lặp lại */
 }
 
 /* Đảm bảo không còn các quy tắc :hover cũ gây xung đột */
@@ -104,7 +105,7 @@ button:focus-visible {
 }
 */
 
-.submit-button  {
+.submit-button {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.464);
   transition: transform 0.3s ease-in-out;
 }
@@ -119,15 +120,15 @@ button:focus-visible {
   background-color: transparent !important; /* Quan trọng: đảm bảo không có màu nền đơn sắc */
   background-image: none !important; /* Ghi đè background-image mặc định nếu có */
 
-  
   /* background: linear-gradient(to right, #007bff, #8a2be2, #ff00ff) !important; */
   /* background: linear-gradient(to right, #00ffff, #00ff7f) !important;  */
   /* background: linear-gradient(to right, #ff00ff, #ff4500) !important;  */
-  background: linear-gradient(90deg, rgba(58,123,213,1) 0%, rgba(0,210,255,1) 100%) !important; 
+  background: linear-gradient(90deg, rgba(58, 123, 213, 1) 0%, rgba(0, 210, 255, 1) 100%) !important;
 
   /* --- Tùy chọn: Thêm hiệu ứng Glow (Tỏa sáng) --- */
   /* Sử dụng box-shadow với màu sáng và mờ */
   /* Ví dụ với màu tím nhạt */
+
   /* box-shadow: 0 3px 20px -5px rgba(138, 43, 226, 0.6); */
   /* Ví dụ với màu xanh dương nhạt */
   box-shadow: 0 3px 20px -5px rgba(0, 123, 255, 0.5);
@@ -162,7 +163,7 @@ button:focus-visible {
 /* --- Style cho DARK MODE --- */
 html[data-bs-theme="dark"] .navbar {
   background-color: transparent !important; /* Bỏ màu nền đơn sắc */
-  background-image: linear-gradient(90deg, rgba(58,123,213,1) 0%, rgba(0,210,255,1) 100%);/* Gradient Neon */
+  background-image: linear-gradient(90deg, rgba(58, 123, 213, 1) 0%, rgba(0, 210, 255, 1) 100%); /* Gradient Neon */
   box-shadow: 0 3px 20px -5px rgba(138, 43, 226, 0.5); /* Hiệu ứng Glow */
   border-bottom: none;
 }
@@ -182,14 +183,13 @@ html[data-bs-theme="dark"] .navbar .navbar-toggler-icon {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
-
 /* --- Style cho LIGHT MODE --- */
 html[data-bs-theme="light"] .navbar {
   /* Nền sáng - Có thể dùng màu light mặc định hoặc màu trắng */
   background-color: var(--bs-body-bg, #fff); /* Dùng màu nền body (thường là trắng) */
   /* Hoặc dùng màu light của bootstrap: background-color: var(--bs-light-bg-subtle); */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Bóng đổ nhẹ cho nền sáng */
-  background-image: linear-gradient(90deg, rgba(58,123,213,1) 0%, rgba(0,210,255,1) 100%); /* Đảm bảo không có gradient */
+  background-image: linear-gradient(90deg, rgba(58, 123, 213, 1) 0%, rgba(0, 210, 255, 1) 100%); /* Đảm bảo không có gradient */
   border-bottom: 1px solid var(--bs-border-color-translucent); /* Thêm đường kẻ dưới nhẹ */
 }
 
@@ -198,13 +198,13 @@ html[data-bs-theme="light"] .navbar .navbar-brand,
 html[data-bs-theme="light"] .navbar .nav-link {
   /* Sử dụng màu primary của Bootstrap (xanh dương đậm) */
   /* color: var(--bs-primary); */
-  color: #003B71 !important;
+  color: #003b71 !important;
   /* Hoặc một màu xanh đậm cụ thể: color: #003B71; */
 }
 html[data-bs-theme="light"] .navbar .navbar-brand:hover,
 html[data-bs-theme="light"] .navbar .nav-link:hover,
 html[data-bs-theme="light"] .navbar .nav-link.active {
-   /* Có thể làm màu đậm hơn một chút khi hover/active */
+  /* Có thể làm màu đậm hơn một chút khi hover/active */
   color: var(--bs-primary-text-emphasis);
   /* Hoặc màu xanh đậm hơn: color: #00284d; */
 }
@@ -235,4 +235,221 @@ html[data-bs-theme="light"] .navbar .navbar-toggler-icon {
   /* object-fit: cover !important; */
 }
 .hr {
+}
+
+/* Thêm vào cuối file index.css */
+
+/* Styling cho trang HomePage (Newsfeed) */
+.events-feed {
+  margin-bottom: 2rem;
+}
+
+.event-card-wrapper {
+  transition: transform 0.2s ease-in-out;
+}
+
+.event-card-wrapper:hover {
+  transform: translateY(-3px);
+}
+
+.create-event-card {
+  transition: all 0.3s ease;
+}
+
+.create-event-card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.create-event-prompt {
+  transition: all 0.3s ease;
+}
+
+.create-event-card:hover .create-event-prompt {
+  background-color: #f0f2f5 !important;
+}
+
+/* Animate.css minimal classes */
+.animate__animated {
+  animation-duration: 0.8s;
+  animation-fill-mode: both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate__fadeIn {
+  animation-name: fadeIn;
+}
+
+/* Styling cho EventCard */
+.event-post-card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.event-post-card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.event-button-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.join-button {
+  transition: all 0.2s ease;
+  border-radius: 20px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.join-button:hover {
+  transform: scale(1.05);
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+  .container-fluid {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .event-post-card {
+    border-radius: 8px;
+    margin-left: -5px;
+    margin-right: -5px;
+    width: calc(100% + 10px);
+  }
+
+  .card-header,
+  .card-body,
+  .card-footer {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  /* Giảm padding cho các phần tử trong card */
+  .event-button-container {
+    padding: 0 !important;
+  }
+
+  /* Đảm bảo nút không bị quá nhỏ trên mobile */
+  .join-button {
+    min-width: 100px;
+  }
+}
+
+/* Cải thiện hiển thị EventCard */
+.event-post-card {
+  transition: all 0.3s ease;
+}
+
+.event-post-card .card-header {
+  background-color: transparent;
+}
+
+/* Đảm bảo text không bị tràn */
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Đảm bảo địa điểm không bị tràn */
+.location-text {
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+}
+
+/* Styling cho trang CreateEventPage */
+.image-upload-area {
+  transition: all 0.3s ease;
+}
+
+.image-upload-area:hover {
+  border-color: var(--bs-primary) !important;
+  background-color: rgba(var(--bs-primary-rgb), 0.05) !important;
+}
+
+.image-upload-area.has-image:hover {
+  background-color: transparent !important;
+}
+
+/* Step indicator styling */
+.step-circle {
+  transition: all 0.3s ease;
+}
+
+.step-label {
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+/* Form styling */
+.form-control:focus,
+.form-select:focus {
+  box-shadow: none;
+  border-color: var(--bs-primary);
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+  color: var(--bs-primary);
+}
+
+.form-control.border-bottom,
+.form-select.border-bottom,
+.input-group-text.border-bottom {
+  border-radius: 0;
+  border-width: 0 0 1px 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.form-control.border-bottom:focus,
+.form-select.border-bottom:focus {
+  box-shadow: 0 2px 0 0 var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+/* Button styling */
+.btn {
+  border-radius: 50rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  box-shadow: 0 4px 6px rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(var(--bs-primary-rgb), 0.3);
+}
+
+.btn-success {
+  box-shadow: 0 4px 6px rgba(var(--bs-success-rgb), 0.25);
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(var(--bs-success-rgb), 0.3);
 }
