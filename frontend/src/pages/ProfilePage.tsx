@@ -46,9 +46,9 @@ const ProfilePage = () => {
     return (
         // Thêm padding dưới cùng mb-5
         <Container className="mt-4 mb-5" >
-            <Row className="justify-content-center">
+            <Row className="justify-content-center" >
                  {/* Có thể thu hẹp cột hơn nếu muốn */}
-                <Col md={12} lg={12} xl={12}>
+                <Col md={12} lg={12} xl={12} >
                     <Card className="shadow-sm">
                         {/* Tiêu đề Card thay đổi tùy theo chế độ */}
                         <Card.Header as="h3" className="p-3 text-center "> {/* Thêm nền sáng cho header */}
@@ -73,8 +73,9 @@ const ProfilePage = () => {
                                             roundedCircle // Bo tròn
                                             fluid       // Responsive
                                             thumbnail   // Thêm viền nhẹ
-                                            style={{ width: '200px', height: 'auto', objectFit: 'cover' }} // Kích thước cố định
+                                            style={{  objectFit: 'cover' }} // Kích thước cố định
                                             alt={user.username}
+                                            className='avatar-img'
                                         />
                                     </Col>
                                     {/* Cột Thông tin */}
@@ -83,7 +84,7 @@ const ProfilePage = () => {
                                         <h4>{user.fullName || user.username}</h4>
                                          {/* Hiển thị username nếu khác fullName */}
                                         {user.fullName && <p className="text-muted">@{user.username}</p>}
-                                        <hr />
+                                        {/* <hr className='hr' /> */}
                                         <p className="mb-1">
                                             <strong>Email:</strong> {user.email}
                                         </p>

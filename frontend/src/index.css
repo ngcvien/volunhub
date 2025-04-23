@@ -229,3 +229,10 @@ html[data-bs-theme="light"] .navbar .navbar-toggler-icon {
   max-width: 750px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+.avatar-img {
+  max-width: 200px !important;
+  aspect-ratio: 1 / 1 !important;
+  /* object-fit: cover !important; */
+}
+.hr {
+}
