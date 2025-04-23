@@ -6,6 +6,7 @@ import { signToken } from '../utils/jwt.util'; // Import hàm tạo token
 // Kiểu dữ liệu đầu vào cho hàm register, bỏ qua id và password_hash, thêm password thường
 type RegisterUserInput = Omit<UserAttributes, 'id' | 'password_hash' | 'createdAt' | 'updatedAt'> & { password?: string };
 type LoginUserInput = Pick<UserAttributes, 'email'> & { password?: string };
+type UserProfileUpdateInput = Partial<Pick<UserAttributes, 'username' | 'fullName' | 'bio' | 'location' | 'avatarUrl'>>;
 
 class UserService {
   async registerUser(userData: RegisterUserInput): Promise<User> {
@@ -79,6 +80,51 @@ class UserService {
 
     return { token, user: userResponse };
   }
+
+  async updateUserProfile(userId: number, updateData: UserProfileUpdateInput): Promise<Omit<UserAttributes, 'password_hash'>> {
+    try {
+        const user = await User.findByPk(userId);
+        if (!user) {
+            throw new Error('Người dùng không tồn tại.');
+        }
+
+        // Chỉ cập nhật các trường được phép (tránh cập nhật email, password ở đây)
+        // Chúng ta có thể lọc các key không mong muốn hoặc chỉ lấy các key mong muốn
+        const allowedUpdates: (keyof UserProfileUpdateInput)[] = ['username', 'fullName', 'bio', 'location', 'avatarUrl'];
+        const dataToUpdate: Partial<UserAttributes> = {};
+
+        for (const key of allowedUpdates) {
+             // Chỉ cập nhật nếu key đó có trong updateData và khác giá trị hiện tại (tùy chọn)
+             if (updateData[key] !== undefined /* && updateData[key] !== user[key] */) {
+                // Gán trực tiếp giá trị vào đối tượng dataToUpdate
+                 (dataToUpdate as any)[key] = updateData[key];
+             }
+        }
+
+        // Kiểm tra xem có gì để cập nhật không
+         if (Object.keys(dataToUpdate).length === 0) {
+             // Có thể trả về user hiện tại hoặc báo không có gì thay đổi
+             // return user.get({ plain: true }) as Omit<UserAttributes, 'password_hash'>;
+         }
+
+         // Cập nhật các trường đã lọc
+        await user.update(dataToUpdate);
+
+        // Lấy lại thông tin user đã cập nhật để trả về (loại bỏ password_hash)
+        // dùng get({ plain: true }) để lấy object thường thay vì Sequelize instance
+        const updatedUser = user.get({ plain: true }) as UserAttributes;
+        delete updatedUser.password_hash; // Xóa trường nhạy cảm
+        return updatedUser;
+
+    } catch (error: any) {
+        console.error(`Lỗi khi cập nhật profile cho user ${userId}:`, error);
+        if (error instanceof Error && (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError')) {
+             // Xử lý lỗi unique username nếu có
+            throw new Error(`Lỗi validation khi cập nhật: ${error.message}`);
+        }
+        throw new Error('Không thể cập nhật hồ sơ người dùng vào lúc này.');
+    }
+}
 
   // Các hàm khác như loginUser, getUserById... sẽ thêm sau
 }

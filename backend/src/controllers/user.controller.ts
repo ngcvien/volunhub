@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import userService from '../services/user.service';
-// import { validationResult } from 'express-validator'; // Dùng sau khi thêm validation middleware
+import User from '../models/User.model';
 
 class UserController {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -36,12 +36,6 @@ class UserController {
     }
   }
   async login(req: Request, res: Response, next: NextFunction) {
-    // // Validation đã được xử lý bởi middleware loginValidator
-    // const errors = validationResult(req);
-    // if (!errors.isEmpty()) {
-    //   // Middleware đã xử lý và trả về lỗi 400 rồi
-    //   // Không cần return ở đây nữa nếu dùng handleValidationErrors
-    // }
 
     const { email, password } = req.body;
 
@@ -53,12 +47,51 @@ class UserController {
         user
       });
     } catch (error) {
-      // Chuyển lỗi đến middleware xử lý lỗi tập trung
       next(error);
     }
   }
+  async updateProfile(req: Request, res: Response, next: NextFunction) {
+    const userId = req.user?.userId;
+    // Dữ liệu cần cập nhật lấy từ body (đã qua optional validation)
+    const updateData = req.body;
 
-  // Hàm login controller sẽ thêm sau
+    if (!userId) {
+        return res.status(401).json({ message: 'Yêu cầu xác thực không thành công.' });
+    }
+
+    // Loại bỏ các trường không mong muốn hoặc null/undefined nếu cần thiết
+    // Ví dụ: không cho phép đổi email qua đây
+    delete updateData.email;
+    delete updateData.password;
+    // Có thể lọc thêm các key không hợp lệ khác
+
+    try {
+        const updatedUser = await userService.updateUserProfile(userId, updateData);
+        res.status(200).json({ message: 'Cập nhật hồ sơ thành công!', user: updatedUser });
+    } catch (error) {
+        next(error);
+    }
+  }
+  async getMe(req: Request, res: Response, next: NextFunction) {
+    const userId = req.user?.userId;
+    if (!userId) {
+        return res.status(401).json({ message: 'Không tìm thấy thông tin người dùng được xác thực.' });
+    }
+    try {
+        // Tìm user trong DB bằng ID lấy từ token
+        const user = await User.findByPk(userId, {
+            // Lấy cả các trường profile mới, loại bỏ password_hash
+            attributes: ['id', 'username', 'email', 'fullName', 'bio', 'location', 'avatarUrl', 'createdAt', 'updatedAt']
+        });
+        if (!user) {
+            return res.status(404).json({ message: 'Người dùng không tồn tại.' });
+        }
+        // Trả về thông tin user tìm được
+        res.status(200).json({ user }); // Trả về object chứa key "user"
+    } catch(error) {
+        next(error);
+    }
+  }
 }
 
 export default new UserController();

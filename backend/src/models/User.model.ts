@@ -8,20 +8,28 @@ export interface UserAttributes {
   id: number;
   username: string;
   email: string;
-  password_hash: string; // Sẽ lưu mật khẩu đã được băm
+  password_hash: string; 
+  fullName: string | null;  
+  bio: string | null;        
+  location: string | null;  
+  avatarUrl: string | null; 
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 // Interface cho việc tạo User (id là optional)
 // Omit dùng để loại bỏ các trường không cần thiết khi tạo mới từ UserAttributes
-interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
+interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'fullName' | 'bio' | 'location' | 'avatarUrl' | 'createdAt' | 'updatedAt'> {}
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   public id!: number; // '!' khẳng định rằng thuộc tính này sẽ được Sequelize khởi tạo
   public username!: string;
   public email!: string;
   public password_hash!: string;
+  public fullName!: string | null;    
+  public bio!: string | null;       
+  public location!: string | null;    
+  public avatarUrl!: string | null; 
 
   // Timestamps tự động
   public readonly createdAt!: Date;
@@ -57,6 +65,24 @@ User.init(
       type: new DataTypes.STRING(255), // Lưu trữ chuỗi hash
       allowNull: false,
     },
+    fullName: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      field: 'full_name' // Chỉ định rõ nếu muốn chắc chắn
+    },
+    bio: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    location: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    avatarUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      field: 'avatar_url'
+    }
     // Sequelize sẽ tự động thêm createdAt và updatedAt nếu không cấu hình timestamps: false
   },
   {

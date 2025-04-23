@@ -35,4 +35,15 @@ export const eventValidator = [
 
     handleValidationErrors
 ]; 
+
+export const updateProfileValidator = [
+    // Các trường đều là optional vì user có thể chỉ muốn cập nhật 1 vài thông tin
+    check('username', 'Tên đăng nhập phải là chuỗi').optional().isString().trim().notEmpty().withMessage('Tên đăng nhập không được trống'),
+    check('fullName', 'Tên đầy đủ phải là chuỗi').optional({ checkFalsy: true }).isString().trim(), // checkFalsy cho phép gửi "" để xóa
+    check('bio', 'Tiểu sử phải là chuỗi').optional({ checkFalsy: true }).isString().trim(),
+    check('location', 'Địa điểm phải là chuỗi').optional({ checkFalsy: true }).isString().trim(),
+    check('avatarUrl', 'Avatar URL không hợp lệ').optional({ checkFalsy: true }).isURL(),
+    // Không validate email, password ở đây
+    handleValidationErrors
+];
 // Thêm các validator khác ở đây sau (ví dụ: eventValidator)
