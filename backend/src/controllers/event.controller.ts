@@ -14,7 +14,7 @@ class EventController {
 
         try {
             const newEvent = await eventService.createEvent({
-                creatorId, // Gán ID người dùng hiện tại làm người tạo
+                creatorId,
                 title,
                 description,
                 location,
