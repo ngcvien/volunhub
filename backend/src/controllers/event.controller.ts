@@ -7,8 +7,7 @@ class EventController {
 
     async create(req: Request, res: Response, next: NextFunction) {
         const { title, description, location, eventTime, imageUrl } = req.body;
-        const creatorId = req.user?.userId; // Nhớ thêm "?" để kiểm tra req.user có tồn tại không
-
+        const creatorId = req.user?.userId; 
         if (!creatorId) {
             return res.status(401).json({ message: 'Lỗi: Không tìm thấy thông tin người dùng đã xác thực.' });
         }
