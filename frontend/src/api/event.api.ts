@@ -26,6 +26,7 @@ export const getAllEventsApi = async (): Promise<GetAllEventsResponse> => {
     try {
         // Gọi đến GET /api/events của backend
         const response = await api.get<GetAllEventsResponse>('/events');
+        console.log('API Response:', response.data); // Log để kiểm tra dữ liệu trả về
         return response.data;
     } catch (error: any) {
         console.error("Lỗi API Lấy danh sách sự kiện:", error.response?.data || error.message);

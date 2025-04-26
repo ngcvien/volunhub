@@ -4,15 +4,15 @@ import eventController from '../controllers/event.controller';
 import participationController from '../controllers/participation.controller';
 import authenticateToken from '../middlewares/auth.middleware'; // Đảm bảo đã import
 import { eventValidator } from '../middlewares/validation.middleware';
+import optionalAuthenticateToken from '../middlewares/optionalAuth.middleware'; // Đảm bảo đã import
 
 const router = Router();
 
 // --- Event Routes ---
 
-// GET /api/events/ (Lấy danh sách - TẠM THỜI yêu cầu đăng nhập để test)
 router.get(
     '/',
-    // authenticateToken,
+    optionalAuthenticateToken, // Sử dụng middleware này để cho phép người dùng không đăng nhập cũng có thể xem sự kiện
     eventController.getAll
 );
 

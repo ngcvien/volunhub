@@ -28,16 +28,15 @@ class EventController {
     }
 
     // --- THÊM HÀM GET ALL ---
-    async getAll(req: Request, res: Response, next: NextFunction) {
+        async getAll(req: Request, res: Response, next: NextFunction) {
         try {
-            // Lấy userId từ req.user nếu người dùng đã đăng nhập và được xác thực
-            // Nếu không đăng nhập, req.user sẽ là undefined, và userId cũng vậy
             const userId = req.user?.userId;
-
-            // Gọi service và truyền userId (có thể là undefined)
             const events = await eventService.getAllEvents(userId);
-
-            res.status(200).json({ message: 'Lấy danh sách sự kiện thành công!', events });
+    
+            res.status(200).json({ 
+                message: 'Lấy danh sách sự kiện thành công!', 
+                events 
+            });
         } catch (error) {
             next(error);
         }

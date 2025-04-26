@@ -41,7 +41,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
 
   useEffect(() => {
     setDisplayParticipating(event.isParticipating ?? false)
-  }, [event.isParticipating])
+  }, [event.isParticipating]);
 
   const handleJoin = async () => {
     if (!user) return

@@ -23,23 +23,23 @@ const HomePage = () => {
   }
 
   // useEffect để gọi API khi component được mount hoặc refreshKey thay đổi
-  useEffect(() => {
-    const fetchEvents = async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const response = await getAllEventsApi()
-        setEvents(response.events)
-      } catch (err: any) {
-        setError(err.message || "Không thể tải dữ liệu sự kiện.")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchEvents()
-  }, [refreshKey]) // Thêm refreshKey vào dependencies
-
+    useEffect(() => {
+      const fetchEvents = async () => {
+          setLoading(true);
+          setError(null);
+          try {
+              const response = await getAllEventsApi();
+              setEvents(response.events);
+          } catch (err: any) {
+              setError(err.message || "Không thể tải dữ liệu sự kiện.");
+          } finally {
+              setLoading(false);
+          }
+      };
+  
+      fetchEvents();
+  }, [refreshKey]); // Thêm user vào dependencies nếu cần reload khi user thay đổi
+  
   // --- Phần hiển thị ---
   const renderContent = () => {
     if (loading) {
