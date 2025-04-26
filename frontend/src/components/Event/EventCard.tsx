@@ -35,7 +35,6 @@ interface EventCardProps {
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
-  console.log(`EventCard ${event.id} rendering with likeCount:`, event.likeCount, 'isLiked:', event.isLiked);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -265,8 +264,8 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
               // Truyền các props cần thiết khác mà UserPopup cần
               username={event.creator?.username || 'Người dùng ẩn'}
               avatarUrl={event.creator?.avatarUrl}
-            // fullName={event.creator?.fullName} // Cần thêm vào EventType nếu muốn
-            // bio={event.creator?.bio} // Cần thêm vào EventType nếu muốn
+            fullName={event.creator?.fullName} 
+            // bio={event.creator?.bio} 
             />
             {/* --- Kết thúc UserPopup --- */}
           </div>
