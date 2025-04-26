@@ -11,6 +11,7 @@ import AppNavbar from "../components/Layout/Navbar" // File sẽ tạo ở bư�
 import { useAuth } from "../contexts/AuthContext"
 import { Container } from "react-bootstrap" // Import Container
 import ProfilePage from "../pages/ProfilePage"
+import UserProfilePage from "../pages/UserProfilePage"
 
 // Component để bảo vệ route, yêu cầu đăng nhập
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -59,6 +60,7 @@ const AppRoutes = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="/profile/:userId" element={<UserProfilePage />} />
         </Routes>
       </Container>
     </>
