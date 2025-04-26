@@ -104,7 +104,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
 
   const handleLike = async () => {
     if (!user) {
-      setLikeError("Vui lòng đăng nhập để thích sự kiện.");
+      alert("Vui lòng đăng nhập để thích sự kiện.");
       navigate("/login"); 
       return;
     }
