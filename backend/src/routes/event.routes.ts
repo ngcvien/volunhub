@@ -2,24 +2,21 @@
 import { Router } from 'express';
 import eventController from '../controllers/event.controller';
 import participationController from '../controllers/participation.controller';
-import authenticateToken from '../middlewares/auth.middleware'; // Đảm bảo đã import
+import authenticateToken from '../middlewares/auth.middleware'; 
 import { eventValidator } from '../middlewares/validation.middleware';
-import optionalAuthenticateToken from '../middlewares/optionalAuth.middleware'; // Đảm bảo đã import
+import optionalAuthenticateToken from '../middlewares/optionalAuth.middleware';
 
 const router = Router();
 
-// --- Event Routes ---
 
 router.get(
     '/',
-    optionalAuthenticateToken, // Sử dụng middleware này để cho phép người dùng không đăng nhập cũng có thể xem sự kiện
+    optionalAuthenticateToken, 
     eventController.getAll
 );
 
-// POST /api/events/ (Tạo sự kiện - giữ nguyên private)
 router.post('/', authenticateToken, eventValidator, eventController.create);
 
-// --- Participation Routes (giữ nguyên) ---
 router.post('/:eventId/join', authenticateToken, participationController.join);
 router.delete('/:eventId/leave', authenticateToken, participationController.leave);
 
