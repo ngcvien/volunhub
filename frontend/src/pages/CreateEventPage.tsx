@@ -1,4 +1,4 @@
-"use client"
+// "use client"
 
 import type React from "react"
 
@@ -41,6 +41,7 @@ enum FormStep {
 
 const CreateEventPage = () => {
   const navigate = useNavigate()
+  
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Form fields
@@ -309,10 +310,7 @@ const CreateEventPage = () => {
 
         <Form.Group className="mb-4" controlId="eventTime">
           <FloatingLabel label="Thời gian diễn ra *">
-            <InputGroup>
-              <InputGroup.Text className="bg-transparent border-0 border-bottom rounded-0">
-                <Calendar2Check className="text-primary" />
-              </InputGroup.Text>
+            
               <Form.Control
                 type="datetime-local"
                 value={eventTime}
@@ -321,9 +319,9 @@ const CreateEventPage = () => {
                 isInvalid={touched.eventTime && !!validationErrors.eventTime}
                 required
                 disabled={isSubmitting}
-                className="border-0 border-bottom rounded-0 shadow-none"
+                // className="border-0 border-bottom rounded-0 shadow-none"
               />
-            </InputGroup>
+            
             {touched.eventTime && validationErrors.eventTime && (
               <div className="text-danger small mt-1">{validationErrors.eventTime}</div>
             )}
@@ -341,14 +339,12 @@ const CreateEventPage = () => {
 
         <Form.Group className="mb-4" controlId="eventLocation">
           <FloatingLabel label="Địa điểm">
-            <InputGroup>
-              <InputGroup.Text className="bg-transparent border-0 border-bottom rounded-0">
-                <GeoAlt className="text-primary" />
-              </InputGroup.Text>
+            
               {locationLoading ? (
                 <Form.Control
                   placeholder="Đang tải danh sách địa điểm..."
                   disabled
+                  required
                   className="border-0 border-bottom rounded-0 shadow-none"
                 />
               ) : (
@@ -368,27 +364,25 @@ const CreateEventPage = () => {
                     ))}
                 </Form.Select>
               )}
-            </InputGroup>
+            
           </FloatingLabel>
         </Form.Group>
 
         <Form.Group className="mb-4" controlId="eventDescription">
           <FloatingLabel label="Mô tả chi tiết">
-            <InputGroup>
-              <InputGroup.Text className="bg-transparent border-0 border-bottom rounded-0">
-                <FileEarmarkText className="text-primary" />
-              </InputGroup.Text>
+              
               <Form.Control
                 as="textarea"
                 rows={5}
-                placeholder="Nhập mô tả chi tiết về sự kiện"
+                placeholder="Nhập mô tả chi tiết về sự kiện" 
                 value={description}
+                required
                 onChange={(e) => setDescription(e.target.value)}
                 disabled={isSubmitting}
                 className="border-0 border-bottom rounded-0 shadow-none"
                 style={{ minHeight: "120px" }}
               />
-            </InputGroup>
+           
           </FloatingLabel>
           <Form.Text className="text-muted">
             Mô tả chi tiết giúp người tham gia hiểu rõ hơn về sự kiện của bạn

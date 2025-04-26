@@ -6,6 +6,7 @@
     transition: all 0.3s ease;
     border: none;
     margin-bottom: 1.5rem;
+    padding: 2% !important;
   }
   
   .event-card:hover {
