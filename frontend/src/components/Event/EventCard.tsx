@@ -22,6 +22,8 @@ import {
 } from "react-bootstrap-icons"
 import "./EventCard.css"
 import UserPopup from "../User/UserPopup"
+import { useNavigate } from "react-router-dom";
+
 
 // Ảnh mặc định
 const defaultAvatar = '/default-avatar.png'; // Đảm bảo file này có trong /public
@@ -33,7 +35,9 @@ interface EventCardProps {
 }
 
 const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
+  console.log(`EventCard ${event.id} rendering with likeCount:`, event.likeCount, 'isLiked:', event.isLiked);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   // State cho các hành động Join/Leave/Like...
   const [isLoadingAction, setIsLoadingAction] = useState(false);
@@ -50,6 +54,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
   const triggerRef = useRef<HTMLSpanElement>(null); // Ref cho vùng trigger (avatar + tên)
   const popupTimerRef = useRef<NodeJS.Timeout | null>(null); // Ref cho timer ẩn/hiện popup
 
+  const [displayLikeCount, setDisplayLikeCount] = useState(event.likeCount || 0);
+
+  useEffect(() => {
+    setDisplayLikeCount(event.likeCount || 0);
+  }, [event.likeCount]);
   // Effect cập nhật trạng thái tham gia hiển thị khi prop thay đổi
   useEffect(() => {
     setDisplayParticipating(event.isParticipating ?? false);
@@ -69,7 +78,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
     try {
       await joinEventApi(event.id);
       setDisplayParticipating(true); // Cập nhật UI ngay
-      onActionComplete?.(); // Báo cho cha refresh (nếu có)
+      // onActionComplete?.(); 
     } catch (err: any) {
       setActionError(err.message || "Lỗi khi tham gia.");
     } finally {
@@ -85,7 +94,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
     try {
       await leaveEventApi(event.id);
       setDisplayParticipating(false); // Cập nhật UI ngay
-      onActionComplete?.(); // Báo cho cha refresh (nếu có)
+      // onActionComplete?.(); 
     } catch (err: any) {
       setActionError(err.message || "Lỗi khi rời sự kiện.");
     } finally {
@@ -93,33 +102,30 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
     }
   };
 
-  // Hàm xử lý Like (chỉ là giả lập)
   const handleLike = async () => {
     if (!user) {
       setLikeError("Vui lòng đăng nhập để thích sự kiện.");
+      navigate("/login"); 
       return;
-    };
-
+    }
+  
     setIsLoadingLike(true);
     setLikeError(null);
-    const currentLikedStatus = displayLiked; // Lấy trạng thái hiện tại trước khi gọi API
-
+    const currentLikedStatus = displayLiked;
+  
     try {
       if (currentLikedStatus) {
-        // Nếu đang là đã thích -> gọi API unlike
         await unlikeEventApi(event.id);
-        setDisplayLiked(false); // Cập nhật UI ngay
-        // setDisplayLikeCount(prev => prev - 1); // Cập nhật count tạm thời nếu muốn
+        setDisplayLiked(false);
+        setDisplayLikeCount((prev) => prev - 1); // cập nhật ngay
       } else {
-        // Nếu đang là chưa thích -> gọi API like
         await likeEventApi(event.id);
-        setDisplayLiked(true); // Cập nhật UI ngay
-        // setDisplayLikeCount(prev => prev + 1); // Cập nhật count tạm thời nếu muốn
+        setDisplayLiked(true);
+        setDisplayLikeCount((prev) => prev + 1); // cập nhật ngay
       }
-      // onActionComplete?.(); // Gọi callback để báo HomePage refresh nền (quan trọng cho sự đồng bộ cuối cùng)
+      // Không cần gọi onActionComplete ở đây nữa
     } catch (err: any) {
       setActionError(err.message || `Lỗi khi ${currentLikedStatus ? 'bỏ thích' : 'thích'} sự kiện.`);
-      // Không revert state cục bộ displayLiked ở đây vội, chờ refresh từ cha
     } finally {
       setIsLoadingLike(false);
     }
@@ -342,22 +348,22 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
 
           {/* Các nút tương tác khác */}
           <div className="d-flex">
-          <OverlayTrigger placement="top" overlay={<Tooltip>{displayLiked ? "Bỏ thích" : "Thích"}</Tooltip>}>
-                         <Button
-                              type="button"
-                             variant="light" // Giữ variant light
-                             size="sm"
-                             className="action-button d-flex align-items-center  me-2 mb-1 like-button"
-                             onClick={handleLike} // Gắn hàm xử lý mới
-                             disabled={isLoadingLike || !user} // Disable khi đang xử lý Like hoặc chưa đăng nhập
-                         >
-                             {isLoadingLike ? <Spinner size="sm" animation="border" variant="primary" /> :
-                                 (displayLiked ? <HandThumbsUpFill className="text-primary me-1" /> : <HandThumbsUp className="me-1" />) // Icon thay đổi theo displayLiked
-                             }
-                              {/* Hiển thị likeCount từ prop event (hoặc 0 nếu chưa có) */}
-                             <span className="small ms-1">{event.likeCount || 0}</span>
-                         </Button>
-                     </OverlayTrigger>
+            <OverlayTrigger placement="top" overlay={<Tooltip>{displayLiked ? "Bỏ thích" : "Thích"}</Tooltip>}>
+              <Button
+                type="button"
+                variant="light" // Giữ variant light
+                size="sm"
+                className="action-button d-flex align-items-center  me-2 mb-1 like-button"
+                onClick={handleLike} // Gắn hàm xử lý mới
+                disabled={isLoadingLike} // Disable khi đang xử lý Like 
+              >
+                {isLoadingLike ? <Spinner size="sm" animation="border" variant="primary" /> :
+                  (displayLiked ? <HandThumbsUpFill className="text-primary me-1" /> : <HandThumbsUp className="me-1" />) // Icon thay đổi theo displayLiked
+                }
+                {/* Hiển thị likeCount từ prop event (hoặc 0 nếu chưa có) */}
+                <span className="small ms-1">{displayLikeCount || 0}</span>
+              </Button>
+            </OverlayTrigger>
 
             <OverlayTrigger placement="top" overlay={<Tooltip>Bình luận</Tooltip>}>
               <Button variant="light" size="sm" className="action-button me-1 mb-2">
