@@ -7,6 +7,7 @@ import { signToken } from '../utils/jwt.util'; // Import hàm tạo token
 type RegisterUserInput = Omit<UserAttributes, 'id' | 'password_hash' | 'createdAt' | 'updatedAt'> & { password?: string };
 type LoginUserInput = Pick<UserAttributes, 'email'> & { password?: string };
 type UserProfileUpdateInput = Partial<Pick<UserAttributes, 'username' | 'fullName' | 'bio' | 'location' | 'avatarUrl'>>;
+type PublicUserProfile = Omit<UserAttributes, 'password_hash' | 'email' | 'updatedAt'>; 
 
 class UserService {
   async registerUser(userData: RegisterUserInput): Promise<User> {
@@ -124,6 +125,34 @@ class UserService {
         }
         throw new Error('Không thể cập nhật hồ sơ người dùng vào lúc này.');
     }
+}
+async getUserProfileById(userId: number): Promise<PublicUserProfile | null> {
+  try {
+      const user = await User.findByPk(userId, {
+          // Chỉ định rõ các thuộc tính công khai muốn lấy
+          attributes: [
+              'id',
+              'username',
+              'fullName',
+              'bio',
+              'location',
+              'avatarUrl',
+              'createdAt' // Lấy cả ngày tham gia
+          ]
+      });
+
+      if (!user) {
+          // Trả về null nếu không tìm thấy user
+          return null;
+      }
+
+      // Trả về dữ liệu dạng plain object
+      return user.get({ plain: true });
+
+  } catch (error) {
+      console.error(`Lỗi khi lấy profile cho user ${userId}:`, error);
+      throw new Error('Không thể lấy thông tin hồ sơ người dùng vào lúc này.');
+  }
 }
 
   // Các hàm khác như loginUser, getUserById... sẽ thêm sau

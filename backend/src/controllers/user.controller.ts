@@ -92,6 +92,31 @@ class UserController {
         next(error);
     }
   }
+  async getUserProfile(req: Request, res: Response, next: NextFunction) {
+    try {
+        // Lấy userId từ URL parameter
+        const userId = parseInt(req.params.userId, 10);
+
+        // Validate userId có phải là số hợp lệ không
+        if (isNaN(userId)) {
+            return res.status(400).json({ message: 'User ID không hợp lệ.' });
+        }
+
+        // Gọi service để lấy thông tin profile
+        const userProfile = await userService.getUserProfileById(userId);
+
+        // Nếu không tìm thấy user
+        if (!userProfile) {
+            return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
+        }
+
+        // Trả về thông tin profile tìm được
+        res.status(200).json({ user: userProfile }); // Trả về object chứa key "user"
+
+    } catch (error) {
+        next(error); // Chuyển lỗi cho middleware chung
+    }
+  }
 }
 
 export default new UserController();
