@@ -38,7 +38,7 @@ class EventService {
                 include: [{
                     model: User,
                     as: 'creator',
-                    attributes: ['id', 'username', 'avatarUrl'] // Lấy đủ thông tin creator cần thiết
+                    attributes: ['id', 'username', 'avatarUrl', 'fullName', 'bio'] // Lấy đủ thông tin creator cần thiết
                 }]
                 // Không dùng raw: true ở đây để dễ làm việc với instance
             });

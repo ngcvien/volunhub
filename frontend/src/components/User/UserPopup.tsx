@@ -13,7 +13,6 @@ interface UserPopupProps {
   location?: string | null
   volunCredit?: number
 }
-
 const UserPopup: React.FC<UserPopupProps> = ({
   userId,
   username,
@@ -78,5 +77,7 @@ const UserPopup: React.FC<UserPopupProps> = ({
     </Popover>
   )
 }
+
+
 
 export default UserPopup
