@@ -15,12 +15,14 @@ interface EventCreator {
     title: string
     description: string | null
     location: string | null
-    eventTime: string // API trả về dạng chuỗi ISO 8601
+    eventTime: string 
     createdAt: string
     updatedAt: string
-    creator: EventCreator // Thông tin người tạo lồng vào
+    creator: EventCreator 
     isParticipating?: boolean
-    imageUrl?: string // URL của ảnh sự kiện (nếu có)
+    isLiked?: boolean 
+    likeCount?: number
+    imageUrl?: string 
   }
   
   // Kiểu dữ liệu cho response từ API get all events
