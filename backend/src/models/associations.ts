@@ -2,6 +2,7 @@
 import User from './User.model';
 import Event from './Event.model';
 import Participation from './Participation.model';
+import EventLike from './EventLike.model'; // Import model EventLike
 
 const setupAssociations = () => {
     console.log('Setting up database associations...'); // Thêm log để kiểm tra
@@ -35,6 +36,21 @@ const setupAssociations = () => {
             foreignKey: 'eventId',      // Tên cột trong Participation trỏ về Event
             otherKey: 'userId',         // Tên cột trong Participation trỏ về User
             as: 'participants'        // Định danh khi lấy danh sách người tham gia từ Event
+        });
+
+        User.belongsToMany(Event, {
+            through: EventLike,         // Qua bảng EventLike
+            foreignKey: 'userId',       // Khóa trong EventLike trỏ về User
+            otherKey: 'eventId',        // Khóa trong EventLike trỏ về Event
+            as: 'likedEvents',        // Lấy các Event đã like bởi User
+            timestamps: false         // Không cần timestamps trong bảng nối khi định nghĩa qhệ
+        });
+        Event.belongsToMany(User, {
+            through: EventLike,         // Qua bảng EventLike
+            foreignKey: 'eventId',      // Khóa trong EventLike trỏ về Event
+            otherKey: 'userId',         // Khóa trong EventLike trỏ về User
+            as: 'likers',             // Lấy các User đã like Event
+            timestamps: false
         });
 
         // --- (Tùy chọn) Định nghĩa quan hệ rõ ràng cho bảng nối Participation ---

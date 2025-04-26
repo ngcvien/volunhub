@@ -1,9 +1,12 @@
 import api from './index';
 import { User, LoginUserInput, RegisterUserInput, AuthContextType } from '../types/user.types';
 
-// Kiểu dữ liệu cho response từ GET /api/users/me
 interface GetMeResponse {
-    user: User; // Backend trả về object có key là user
+    user: User; 
+}
+
+interface GetUserProfileResponse {
+    user: User; 
 }
 
 export const getMeApi = async (): Promise<GetMeResponse> => {
@@ -46,7 +49,6 @@ export const registerUserApi = async (userData: RegisterUserInput): Promise<Regi
   }
 };
 
-// --- THÊM HÀM LOGIN ---
 interface LoginUserInput {
     email?: string;
     password?: string;
@@ -61,7 +63,6 @@ interface LoginResponse {
 
 export const loginUserApi = async (userData: LoginUserInput): Promise<LoginResponse> => {
     try {
-        // Gọi đến POST /api/users/login của backend (cần tạo API này)
         const response = await api.post<LoginResponse>('/users/login', userData);
         return response.data;
     } catch (error: any) {
@@ -93,5 +94,25 @@ export const updateProfileApi = async (updateData: ProfileUpdateInput): Promise<
     } catch (error: any) {
         console.error("Lỗi API Cập nhật Profile:", error.response?.data || error.message);
         throw new Error(error.response?.data?.message || 'Không thể cập nhật hồ sơ.');
+    }
+};
+/**
+ * Lấy thông tin profile công khai của người dùng theo ID
+ * @param userId ID của người dùng cần lấy thông tin
+ * @returns Promise chứa thông tin profile người dùng
+ */
+export const getUserProfileApi = async (userId: string | number): Promise<GetUserProfileResponse> => {
+    try {
+        // Request GET đến /api/users/:userId
+        // API này là public, không cần token, nhưng interceptor sẽ tự thêm nếu có cũng không sao
+        const response = await api.get<GetUserProfileResponse>(`/users/${userId}`);
+        return response.data;
+    } catch (error: any) {
+        console.error(`Lỗi API Get User Profile (ID: ${userId}):`, error.response?.data || error.message);
+        // Ném lỗi để component xử lý (ví dụ: hiển thị trang 404 Not Found)
+        if (error.response?.status === 404) {
+             throw new Error('Không tìm thấy người dùng.');
+        }
+        throw new Error(error.response?.data?.message || 'Không thể tải hồ sơ người dùng.');
     }
 };

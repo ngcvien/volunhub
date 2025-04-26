@@ -1,7 +1,6 @@
-"use client"
 
 // frontend/src/pages/HomePage.tsx
-import { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from 'react';
 import { Alert, Spinner, Button, Card } from "react-bootstrap"
 import { getAllEventsApi } from "../api/event.api"
 import type { EventType } from "../types/event.types"
@@ -28,17 +27,18 @@ const HomePage = () => {
           setLoading(true);
           setError(null);
           try {
-              const response = await getAllEventsApi();
+              const response = await getAllEventsApi(Date.now()); // Gọi API để lấy danh sách sự kiện
               setEvents(response.events);
+              console.log('HomePage: Updated events state with data:', response.events);
           } catch (err: any) {
               setError(err.message || "Không thể tải dữ liệu sự kiện.");
           } finally {
               setLoading(false);
           }
-      };
+      } ;
   
       fetchEvents();
-  }, [refreshKey]); // Thêm user vào dependencies nếu cần reload khi user thay đổi
+  }, [refreshKey, user?.id]); // Thêm user vào dependencies nếu cần reload khi user thay đổi
   
   // --- Phần hiển thị ---
   const renderContent = () => {

@@ -30,4 +30,9 @@ router.put(
     updateProfileValidator,   
     userController.updateProfile 
 );
+
+router.get(
+  '/:userId', 
+  userController.getUserProfile // Gọi hàm controller mới
+);
 export default router;
