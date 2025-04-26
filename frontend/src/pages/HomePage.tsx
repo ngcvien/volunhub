@@ -2,7 +2,7 @@
 
 // frontend/src/pages/HomePage.tsx
 import { useState, useEffect } from "react"
-import { Container, Row, Col, Alert, Spinner, Button, Card } from "react-bootstrap"
+import { Alert, Spinner, Button, Card } from "react-bootstrap"
 import { getAllEventsApi } from "../api/event.api"
 import type { EventType } from "../types/event.types"
 import EventCard from "../components/Event/EventCard"
@@ -98,160 +98,157 @@ const HomePage = () => {
   }
 
   return (
-    <Container fluid className="py-4 px-md-4 px-2">
-      <Row className="gx-md-4 gx-2">
-        {/* Sidebar bên trái (hiển thị trên màn hình lớn) */}
-        <Col lg={3} className="d-none d-lg-block">
-          <div className="position-sticky" style={{ top: "80px" }}>
-            <Card className="shadow-sm border-0 mb-4">
-              <Card.Body>
-                <Card.Title className="d-flex align-items-center mb-3">
-                  <Calendar2CheckFill className="me-2 text-primary" />
-                  <span>VolunHub</span>
-                </Card.Title>
-                <p className="text-muted small">
-                  Khám phá và tham gia các sự kiện tình nguyện gần bạn. Cùng nhau tạo nên những thay đổi tích cực!
-                </p>
-                {user && (
-                  <Link to="/events/new" className="text-decoration-none">
-                    <Button variant="primary" className="w-100 mt-2">
-                      <PlusCircleFill className="me-2" /> Tạo sự kiện
-                    </Button>
-                  </Link>
-                )}
-              </Card.Body>
-            </Card>
-
-            <Card className="shadow-sm border-0">
-              <Card.Body>
-                <Card.Title className="d-flex align-items-center mb-3">
-                  {/* <TrendingUp className="me-2 text-primary" /> */}
-                  <span>Xu hướng</span>
-                </Card.Title>
-                <div className="trending-tags">
-                  <Button variant="outline-secondary" size="sm" className="me-2 mb-2">
-                    #MôiTrường
+    <div className="homepage-container">
+      {/* Sidebar bên trái */}
+      <div className="sidebar-left">
+        <div className="position-sticky" style={{ top: "80px" }}>
+          <Card className="shadow-sm border-0 mb-4">
+            <Card.Body>
+              <Card.Title className="d-flex align-items-center mb-3">
+                <Calendar2CheckFill className="me-2 text-primary" />
+                <span>VolunHub</span>
+              </Card.Title>
+              <p className="text-muted small">
+                Khám phá và tham gia các sự kiện tình nguyện gần bạn. Cùng nhau tạo nên những thay đổi tích cực!
+              </p>
+              {user && (
+                <Link to="/events/new" className="text-decoration-none">
+                  <Button variant="primary" className="w-100 mt-2">
+                    <PlusCircleFill className="me-2" /> Tạo sự kiện
                   </Button>
-                  <Button variant="outline-secondary" size="sm" className="me-2 mb-2">
-                    #GiáoDục
-                  </Button>
-                  <Button variant="outline-secondary" size="sm" className="me-2 mb-2">
-                    #CộngĐồng
-                  </Button>
-                  <Button variant="outline-secondary" size="sm" className="me-2 mb-2">
-                    #TrồngCây
-                  </Button>
-                  <Button variant="outline-secondary" size="sm" className="me-2 mb-2">
-                    #HiếnMáu
-                  </Button>
-                </div>
-              </Card.Body>
-            </Card>
-          </div>
-        </Col>
-
-        {/* Phần chính - Newsfeed */}
-        <Col lg={6} md={12} sm={12} className="px-md-3 px-1">
-          {/* Phần tạo sự kiện (chỉ hiển thị khi đăng nhập) */}
-          {user && (
-            <Card className="shadow-sm border-0 mb-4 create-event-card">
-              <Card.Body className="d-flex align-items-center">
-                <img
-                  src={user.avatarUrl || "/default-avatar.png"}
-                  alt={user.username}
-                  className="rounded-circle me-3"
-                  width="40"
-                  height="40"
-                  style={{ objectFit: "cover" }}
-                />
-                <Link to="/events/new" className="flex-grow-1 text-decoration-none">
-                  <div className="create-event-prompt p-2 rounded-pill bg-light text-muted ps-3">
-                    Bạn muốn tạo sự kiện tình nguyện mới?
-                  </div>
                 </Link>
-              </Card.Body>
-            </Card>
-          )}
+              )}
+            </Card.Body>
+          </Card>
 
-          {/* Tiêu đề bảng tin */}
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <h4 className="m-0">Bảng tin sự kiện</h4>
-            <Button variant="outline-primary" size="sm" onClick={refreshEvents} disabled={loading}>
-              <i className="bi bi-arrow-clockwise me-1"></i> Làm mới
-            </Button>
-          </div>
+          <Card className="shadow-sm border-0">
+            <Card.Body>
+              <Card.Title className="d-flex align-items-center mb-3">
+                <span>Xu hướng</span>
+              </Card.Title>
+              <div className="trending-tags">
+                <Button variant="outline-secondary" size="sm" className="me-2 mb-2">
+                  #MôiTrường
+                </Button>
+                <Button variant="outline-secondary" size="sm" className="me-2 mb-2">
+                  #GiáoDục
+                </Button>
+                <Button variant="outline-secondary" size="sm" className="me-2 mb-2">
+                  #CộngĐồng
+                </Button>
+                <Button variant="outline-secondary" size="sm" className="me-2 mb-2">
+                  #TrồngCây
+                </Button>
+                <Button variant="outline-secondary" size="sm" className="me-2 mb-2">
+                  #HiếnMáu
+                </Button>
+              </div>
+            </Card.Body>
+          </Card>
+        </div>
+      </div>
 
-          {/* Nội dung chính */}
-          {renderContent()}
-        </Col>
+      {/* Phần chính - Newsfeed */}
+      <div className="main-content">
+        {/* Phần tạo sự kiện (chỉ hiển thị khi đăng nhập) */}
+        {user && (
+          <Card className="shadow-sm border-0 mb-4 create-event-card">
+            <Card.Body className="d-flex align-items-center">
+              <img
+                src={user.avatarUrl || "/default-avatar.png"}
+                alt={user.username}
+                className="rounded-circle me-3"
+                width="40"
+                height="40"
+                style={{ objectFit: "cover" }}
+              />
+              <Link to="/events/new" className="flex-grow-1 text-decoration-none">
+                <div className="create-event-prompt p-2 rounded-pill bg-light text-muted ps-3">
+                  Bạn muốn tạo sự kiện tình nguyện mới?
+                </div>
+              </Link>
+            </Card.Body>
+          </Card>
+        )}
 
-        {/* Sidebar bên phải (hiển thị trên màn hình lớn) */}
-        <Col lg={3} className="d-none d-lg-block">
-          <div className="position-sticky" style={{ top: "80px" }}>
-            <Card className="shadow-sm border-0 mb-4">
-              <Card.Body>
-                <Card.Title className="mb-3">Sự kiện sắp diễn ra</Card.Title>
-                <div className="upcoming-events">
-                  {events.slice(0, 3).map((event) => (
-                    <div key={`upcoming-${event.id}`} className="d-flex align-items-center mb-3 pb-2 border-bottom">
-                      <div className="event-date me-2 text-center">
-                        <div className="small fw-bold text-danger">
-                          {new Date(event.eventTime).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" })}
-                        </div>
-                      </div>
-                      <div className="event-info small">
-                        <div className="fw-semibold text-truncate" style={{ maxWidth: "180px" }}>
-                          {event.title}
-                        </div>
-                        <div className="text-muted">{event.location || "Chưa có địa điểm"}</div>
+        {/* Tiêu đề bảng tin */}
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h4 className="m-0">Bảng tin sự kiện</h4>
+          <Button variant="outline-primary" size="sm" onClick={refreshEvents} disabled={loading}>
+            <i className="bi bi-arrow-clockwise me-1"></i> Làm mới
+          </Button>
+        </div>
+
+        {/* Nội dung chính */}
+        {renderContent()}
+      </div>
+
+      {/* Sidebar bên phải */}
+      <div className="sidebar-right">
+        <div className="position-sticky" style={{ top: "80px" }}>
+          <Card className="shadow-sm border-0 mb-4">
+            <Card.Body>
+              <Card.Title className="mb-3">Sự kiện sắp diễn ra</Card.Title>
+              <div className="upcoming-events">
+                {events.slice(0, 3).map((event) => (
+                  <div key={`upcoming-${event.id}`} className="d-flex align-items-center mb-3 pb-2 border-bottom">
+                    <div className="event-date me-2 text-center">
+                      <div className="small fw-bold text-danger">
+                        {new Date(event.eventTime).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" })}
                       </div>
                     </div>
-                  ))}
-                </div>
-              </Card.Body>
-            </Card>
+                    <div className="event-info small">
+                      <div className="fw-semibold text-truncate" style={{ maxWidth: "180px" }}>
+                        {event.title}
+                      </div>
+                      <div className="text-muted">{event.location || "Chưa có địa điểm"}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card.Body>
+          </Card>
 
-            <Card className="shadow-sm border-0">
-              <Card.Body>
-                <Card.Title className="mb-3">Gợi ý kết nối</Card.Title>
-                <div className="suggested-connections">
-                  <div className="d-flex align-items-center mb-2">
-                    <img
-                      src="/default-avatar.png"
-                      alt="Người dùng"
-                      className="rounded-circle me-2"
-                      width="32"
-                      height="32"
-                    />
-                    <div className="small">Trung tâm Tình nguyện Quốc gia</div>
-                  </div>
-                  <div className="d-flex align-items-center mb-2">
-                    <img
-                      src="/default-avatar.png"
-                      alt="Người dùng"
-                      className="rounded-circle me-2"
-                      width="32"
-                      height="32"
-                    />
-                    <div className="small">Quỹ Bảo trợ Trẻ em Việt Nam</div>
-                  </div>
-                  <div className="d-flex align-items-center">
-                    <img
-                      src="/default-avatar.png"
-                      alt="Người dùng"
-                      className="rounded-circle me-2"
-                      width="32"
-                      height="32"
-                    />
-                    <div className="small">Hội Chữ thập đỏ Việt Nam</div>
-                  </div>
+          <Card className="shadow-sm border-0">
+            <Card.Body>
+              <Card.Title className="mb-3">Gợi ý kết nối</Card.Title>
+              <div className="suggested-connections">
+                <div className="d-flex align-items-center mb-2">
+                  <img
+                    src="/default-avatar.png"
+                    alt="Người dùng"
+                    className="rounded-circle me-2"
+                    width="32"
+                    height="32"
+                  />
+                  <div className="small">Trung tâm Tình nguyện Quốc gia</div>
                 </div>
-              </Card.Body>
-            </Card>
-          </div>
-        </Col>
-      </Row>
-    </Container>
+                <div className="d-flex align-items-center mb-2">
+                  <img
+                    src="/default-avatar.png"
+                    alt="Người dùng"
+                    className="rounded-circle me-2"
+                    width="32"
+                    height="32"
+                  />
+                  <div className="small">Quỹ Bảo trợ Trẻ em Việt Nam</div>
+                </div>
+                <div className="d-flex align-items-center">
+                  <img
+                    src="/default-avatar.png"
+                    alt="Người dùng"
+                    className="rounded-circle me-2"
+                    width="32"
+                    height="32"
+                  />
+                  <div className="small">Hội Chữ thập đỏ Việt Nam</div>
+                </div>
+              </div>
+            </Card.Body>
+          </Card>
+        </div>
+      </div>
+    </div>
   )
 }
 

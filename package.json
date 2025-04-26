@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "react-bootstrap-icons": "^1.11.5"
+    "@types/react-datepicker": "^6.2.0",
+    "react-bootstrap-icons": "^1.11.5",
+    "react-datepicker": "^8.3.0"
   }
 }

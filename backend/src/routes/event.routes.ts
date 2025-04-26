@@ -12,7 +12,7 @@ const router = Router();
 // GET /api/events/ (Lấy danh sách - TẠM THỜI yêu cầu đăng nhập để test)
 router.get(
     '/',
-    authenticateToken, // <<<--- THÊM MIDDLEWARE VÀO ĐÂY
+    // authenticateToken,
     eventController.getAll
 );
 
