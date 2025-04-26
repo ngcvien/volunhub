@@ -64,4 +64,41 @@ export const leaveEventApi = async (eventId: number): Promise<{ message: string 
         throw new Error(error.response?.data?.message || 'Không thể rời khỏi sự kiện.');
     }
 };
-// --- KẾT THÚC PHẦN THÊM VÀO ---
+
+// --- THÊM HÀM LIKE/UNLIKE EVENT API ---
+
+/**
+ * Gọi API để Thích một sự kiện
+ * @param eventId ID của sự kiện cần thích
+ * @returns Promise chứa message từ server
+ */
+export const likeEventApi = async (eventId: number): Promise<{ message: string }> => {
+    try {
+        // Request POST đến /api/events/:eventId/like
+        // Token được tự động thêm bởi interceptor
+        const response = await api.post<{ message: string }>(`/events/${eventId}/like`);
+        return response.data;
+    } catch (error: any) {
+        console.error(`Lỗi API Thích sự kiện (ID: ${eventId}):`, error.response?.data || error.message);
+        // Ném lại lỗi để component xử lý UI
+        throw new Error(error.response?.data?.message || 'Không thể thích sự kiện này.');
+    }
+};
+
+/**
+ * Gọi API để Bỏ thích một sự kiện
+ * @param eventId ID của sự kiện cần bỏ thích
+ * @returns Promise chứa message từ server
+ */
+export const unlikeEventApi = async (eventId: number): Promise<{ message: string }> => {
+    try {
+        // Request DELETE đến /api/events/:eventId/like
+        // Token được tự động thêm bởi interceptor
+        const response = await api.delete<{ message: string }>(`/events/${eventId}/like`);
+        return response.data;
+    } catch (error: any) {
+        console.error(`Lỗi API Bỏ thích sự kiện (ID: ${eventId}):`, error.response?.data || error.message);
+         // Ném lại lỗi để component xử lý UI
+        throw new Error(error.response?.data?.message || 'Không thể bỏ thích sự kiện này.');
+    }
+};

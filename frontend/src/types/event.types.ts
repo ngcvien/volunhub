@@ -22,7 +22,7 @@ interface EventCreator {
     isParticipating?: boolean
     isLiked?: boolean 
     likeCount?: number
-    imageUrl?: string 
+    imageUrl?: string || null
   }
   
   // Kiểu dữ liệu cho response từ API get all events
