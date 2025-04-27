@@ -39,4 +39,11 @@ router.delete(
     likeController.unlike // Gọi hàm unlike
 );
 
+router.get(
+    '/:eventId',
+    // Optional: Có thể thêm middleware xác thực *nhẹ* ở đây nếu muốn
+    // để lấy req.user mà không chặn request nếu không có token
+    eventController.getById
+);
+
 export default router;

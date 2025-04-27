@@ -1,7 +1,7 @@
 // backend/src/services/event.service.ts
 import {Sequelize} from 'sequelize';
 import Event, { EventAttributes } from '../models/Event.model';
-import User from '../models/User.model'; // Import model User để tạo quan hệ
+import User from '../models/User.model'; 
 import Participation from '../models/Participation.model'; 
 import EventLike from '../models/EventLike.model'; 
 
@@ -53,9 +53,9 @@ class EventService {
 
             // 2. Lấy số lượt thích cho các sự kiện này
             const likeCounts = await EventLike.count({
-                where: { eventId: eventIds }, // Đếm trong danh sách event ID này
-                group: ['eventId'],          // Nhóm theo eventId để đếm riêng cho từng event
-                raw: true                    // Kết quả count thường đơn giản hơn với raw
+                where: { eventId: eventIds }, 
+                group: ['eventId'],          
+                raw: true                    
             });
             // Chuyển đổi kết quả count thành Map { eventId: count } để dễ tra cứu
             const likeCountMap = new Map<number, number>();
@@ -102,6 +102,56 @@ class EventService {
         } catch (error) {
             console.error("Lỗi khi lấy danh sách sự kiện:", error);
             throw new Error('Không thể lấy danh sách sự kiện vào lúc này.');
+        }
+    }
+    async getEventById(eventId: number, userId?: number): Promise<any | null> { // Nên tạo Type cụ thể sau
+        try {
+            const event = await Event.findByPk(eventId, {
+                include: [
+                    { // Lấy thông tin người tạo
+                        model: User,
+                        as: 'creator',
+                        attributes: ['id', 'username', 'fullName', 'avatarUrl'] // Lấy các trường cần thiết
+                    },
+                    { // Lấy danh sách người tham gia
+                        model: User,
+                        as: 'participants', // Dùng alias đã định nghĩa trong association
+                        attributes: ['id', 'username', 'avatarUrl'], // Chỉ lấy thông tin công khai cần thiết
+                        through: { attributes: [] } // Không cần lấy thông tin từ bảng nối (Participation)
+                    }
+                    // Có thể include thêm EventLike (as 'likers') nếu muốn lấy danh sách người like
+                ]
+                // Không dùng raw: true ở đây để giữ cấu trúc object với association
+            });
+
+            if (!event) {
+                return null; // Trả về null nếu không tìm thấy
+            }
+
+            // Chuyển sang plain object để xử lý tiếp
+            const plainEvent = event.get({ plain: true });
+
+            plainEvent.isLiked = false;
+            plainEvent.isParticipating = false;
+            plainEvent.likeCount = await EventLike.count({ where: { eventId: eventId }}); // Đếm tổng số like
+
+            if (userId) {
+                const [userLike, userParticipation] = await Promise.all([
+                    EventLike.findOne({ where: { userId, eventId } }),
+                    Participation.findOne({ where: { userId, eventId } })
+                ]);
+                plainEvent.isLiked = !!userLike; // true nếu tìm thấy like
+                plainEvent.isParticipating = !!userParticipation; // true nếu tìm thấy participation
+            }
+
+            // Đảm bảo participants là một mảng (có thể là undefined nếu không ai tham gia)
+            plainEvent.participants = plainEvent.participants || [];
+
+            return plainEvent;
+
+        } catch (error) {
+            console.error(`Lỗi khi lấy chi tiết sự kiện ${eventId}:`, error);
+            throw new Error('Không thể lấy thông tin chi tiết sự kiện.');
         }
     }
 
