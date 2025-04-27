@@ -1,4 +1,5 @@
 // Kiểu dữ liệu cho thông tin người tạo rút gọn trả về từ API
+import {User} from './user.types';
 interface EventCreator {
     id: number
     username: string
@@ -7,6 +8,16 @@ interface EventCreator {
     bio?: string | null
     location?: string | null
   }
+
+  export interface EventPostType {
+    id: number;
+    eventId: number;
+    userId: number;
+    content: string;
+    createdAt: string; // ISO String
+    updatedAt: string; // ISO String
+    author: BasicUser; // Thông tin người đăng
+}
   
   // Kiểu dữ liệu chính cho một sự kiện trả về từ API list events
   export interface EventType {
@@ -23,6 +34,8 @@ interface EventCreator {
     isLiked?: boolean 
     likeCount?: number
     imageUrl?: string | null
+    participants?: BasicUser[]; // Dùng BasicUser
+    posts?: EventPostType[]; 
   }
   
   // Kiểu dữ liệu cho response từ API get all events

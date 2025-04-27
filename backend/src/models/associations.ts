@@ -2,7 +2,8 @@
 import User from './User.model';
 import Event from './Event.model';
 import Participation from './Participation.model';
-import EventLike from './EventLike.model'; // Import model EventLike
+import EventLike from './EventLike.model';
+import EventPost from './EventPost.model';
 
 const setupAssociations = () => {
     console.log('Setting up database associations...'); // Thêm log để kiểm tra
@@ -52,6 +53,13 @@ const setupAssociations = () => {
             as: 'likers',             // Lấy các User đã like Event
             timestamps: false
         });
+        // Một Bài viết thuộc về một Sự kiện
+        EventPost.belongsTo(Event, { foreignKey: 'eventId', as: 'event' });
+        Event.hasMany(EventPost, { foreignKey: 'eventId', as: 'posts' });
+
+        // Một Bài viết thuộc về một Người dùng (tác giả)
+        EventPost.belongsTo(User, { foreignKey: 'userId', as: 'author' });
+        User.hasMany(EventPost, { foreignKey: 'userId', as: 'eventPosts' });
 
         // --- (Tùy chọn) Định nghĩa quan hệ rõ ràng cho bảng nối Participation ---
         // Điều này hữu ích nếu bạn muốn truy vấn trực tiếp bảng Participation

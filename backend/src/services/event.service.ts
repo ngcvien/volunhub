@@ -4,6 +4,7 @@ import Event, { EventAttributes } from '../models/Event.model';
 import User from '../models/User.model'; 
 import Participation from '../models/Participation.model'; 
 import EventLike from '../models/EventLike.model'; 
+import EventPost from '../models/EventPost.model';
 
 
 type CreateEventInput = Omit<EventAttributes, 'id' | 'createdAt' | 'updatedAt' >;
@@ -118,6 +119,18 @@ class EventService {
                         as: 'participants', // Dùng alias đã định nghĩa trong association
                         attributes: ['id', 'username', 'avatarUrl'], // Chỉ lấy thông tin công khai cần thiết
                         through: { attributes: [] } // Không cần lấy thông tin từ bảng nối (Participation)
+                    },
+                    {
+                        model: EventPost,
+                        as: 'posts', // Alias đã định nghĩa trong association
+                        attributes: ['id', 'content', 'createdAt', 'userId'], // Lấy các trường cần thiết của post
+                        limit: 10, // Giới hạn số lượng bài viết lấy kèm (ví dụ: 10 bài mới nhất)
+                        order: [['createdAt', 'DESC']],
+                        include: [{ // Lấy kèm thông tin người đăng bài viết
+                            model: User,
+                            as: 'author',
+                            attributes: ['id', 'username', 'avatarUrl']
+                        }]
                     }
                     // Có thể include thêm EventLike (as 'likers') nếu muốn lấy danh sách người like
                 ]
@@ -144,7 +157,6 @@ class EventService {
                 plainEvent.isParticipating = !!userParticipation; // true nếu tìm thấy participation
             }
 
-            // Đảm bảo participants là một mảng (có thể là undefined nếu không ai tham gia)
             plainEvent.participants = plainEvent.participants || [];
 
             return plainEvent;

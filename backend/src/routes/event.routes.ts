@@ -6,6 +6,10 @@ import authenticateToken from '../middlewares/auth.middleware'; // Đảm bảo 
 import { eventValidator } from '../middlewares/validation.middleware';
 import optionalAuthenticateToken from '../middlewares/optionalAuth.middleware'; // Đảm bảo đã import
 import likeController from '../controllers/like.controller'; // Import controller cho like
+import eventPostController from '../controllers/eventPost.controller';
+import { eventValidator, eventPostValidator } from '../middlewares/validation.middleware';
+
+
 
 const router = Router();
 
@@ -44,6 +48,20 @@ router.get(
     // Optional: Có thể thêm middleware xác thực *nhẹ* ở đây nếu muốn
     // để lấy req.user mà không chặn request nếu không có token
     eventController.getById
+);
+
+router.get(
+    '/:eventId/posts',
+    // Có thể public hoặc private tùy yêu cầu
+    eventPostController.getPostsForEvent
+);
+
+// POST /api/events/:eventId/posts - Tạo bài viết mới trong sự kiện
+router.post(
+    '/:eventId/posts',
+    authenticateToken,   // Yêu cầu đăng nhập
+    eventPostValidator,  // Validate nội dung
+    eventPostController.createPost
 );
 
 export default router;

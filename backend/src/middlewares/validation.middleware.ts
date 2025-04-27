@@ -46,4 +46,9 @@ export const updateProfileValidator = [
     // Không validate email, password ở đây
     handleValidationErrors
 ];
+
+export const eventPostValidator = [
+    check('content', 'Nội dung bài viết không được để trống').notEmpty().trim().isLength({ min: 1 }).withMessage('Nội dung phải có ít nhất 1 ký tự'),
+    handleValidationErrors
+];
 // Thêm các validator khác ở đây sau (ví dụ: eventValidator)
