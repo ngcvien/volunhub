@@ -1,6 +1,6 @@
 // frontend/src/api/event.api.ts
 import api from './index';
-import { GetAllEventsResponse, EventType } from '../types/event.types'; // Import kiểu dữ liệu response
+import { GetAllEventsResponse, EventType, GetEventByIdResponse  } from '../types/event.types'; // Import kiểu dữ liệu response
 
 type CreateEventInputApi = Omit<EventType, 'id' | 'creatorId' | 'creator' | 'createdAt' | 'updatedAt'>;
 
@@ -103,5 +103,20 @@ export const unlikeEventApi = async (eventId: number): Promise<{ message: string
         console.error(`Lỗi API Bỏ thích sự kiện (ID: ${eventId}):`, error.response?.data || error.message);
          // Ném lại lỗi để component xử lý UI
         throw new Error(error.response?.data?.message || 'Không thể bỏ thích sự kiện này.');
+    }
+};
+
+export const getEventByIdApi = async (eventId: string | number): Promise<GetEventByIdResponse> => {
+    try {
+        // Request GET đến /api/events/:eventId
+        // Token sẽ tự được thêm nếu có (nhờ interceptor), giúp backend trả về isLiked/isParticipating
+        const response = await api.get<GetEventByIdResponse>(`/events/${eventId}`);
+        return response.data;
+    } catch (error: any) {
+        console.error(`Lỗi API Get Event By ID (${eventId}):`, error.response?.data || error.message);
+        if (error.response?.status === 404) {
+            throw new Error('Sự kiện không tồn tại.');
+        }
+        throw new Error(error.response?.data?.message || 'Không thể tải chi tiết sự kiện.');
     }
 };

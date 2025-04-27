@@ -502,6 +502,10 @@ html[data-bs-theme="light"] .navbar .navbar-toggler-icon {
   padding: 0 1rem;
 }
 
+.avt-creator {
+  height: 80px !important;
+  object-fit: cover !important;
+}
 /* Responsive */
 @media (max-width: 1199.98px) {
   .sidebar-left, .sidebar-right {
