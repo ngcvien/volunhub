@@ -4,6 +4,7 @@ import Event from './Event.model';
 import Participation from './Participation.model';
 import EventLike from './EventLike.model';
 import EventPost from './EventPost.model';
+import EventPostComment from './EventPostComment.model'; 
 
 const setupAssociations = () => {
     console.log('Setting up database associations...'); // Thêm log để kiểm tra
@@ -60,6 +61,28 @@ const setupAssociations = () => {
         // Một Bài viết thuộc về một Người dùng (tác giả)
         EventPost.belongsTo(User, { foreignKey: 'userId', as: 'author' });
         User.hasMany(EventPost, { foreignKey: 'userId', as: 'eventPosts' });
+
+        // Một Comment thuộc về một Post
+        EventPostComment.belongsTo(EventPost, { foreignKey: 'postId', as: 'post' });
+        EventPost.hasMany(EventPostComment, { foreignKey: 'postId', as: 'comments' });
+
+        // Một Comment thuộc về một User (tác giả)
+        EventPostComment.belongsTo(User, { foreignKey: 'userId', as: 'author' });
+        User.hasMany(EventPostComment, { foreignKey: 'userId', as: 'eventPostComments' });
+
+        // Quan hệ tự tham chiếu cho comment trả lời (nested/threaded)
+        // Một Comment có thể có nhiều Replies (là các Comment khác)
+        EventPostComment.hasMany(EventPostComment, {
+            foreignKey: 'parentId', // Cột trong bảng trỏ về comment cha
+            as: 'replies',        // Lấy các comment con
+            constraints: false    // Tắt ràng buộc tự động để tránh lỗi circular FK nếu có
+        });
+        // Một Comment (reply) thuộc về một Comment cha
+        EventPostComment.belongsTo(EventPostComment, {
+            foreignKey: 'parentId', // Cột trong bảng trỏ về comment cha
+            as: 'parentComment',  // Lấy comment cha
+            constraints: false
+        });
 
         // --- (Tùy chọn) Định nghĩa quan hệ rõ ràng cho bảng nối Participation ---
         // Điều này hữu ích nếu bạn muốn truy vấn trực tiếp bảng Participation
