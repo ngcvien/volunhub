@@ -1,5 +1,7 @@
 // Kiểu dữ liệu cho thông tin người tạo rút gọn trả về từ API
 import {User} from './user.types';
+import { EventPostCommentType } from './comment.types'; // Có thể import sau
+
 interface EventCreator {
     id: number
     username: string
@@ -16,7 +18,9 @@ interface EventCreator {
     content: string;
     createdAt: string; // ISO String
     updatedAt: string; // ISO String
-    author: BasicUser; // Thông tin người đăng
+    author: BasicUser; 
+    commentCount?: number;
+    comments?: EventPostCommentType[]; // Mảng các bình luận cho bài viết
 }
   
   // Kiểu dữ liệu chính cho một sự kiện trả về từ API list events
