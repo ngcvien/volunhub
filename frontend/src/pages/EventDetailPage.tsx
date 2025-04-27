@@ -8,6 +8,7 @@ import { EventType } from '../types/event.types';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { GeoAlt, Calendar2Event, Clock, PeopleFill } from 'react-bootstrap-icons';
+import EventPostItem from '../components/Event/EventPostItem'; 
 
 // Ảnh mặc định
 const defaultAvatar = '/default-avatar.png';
@@ -149,8 +150,24 @@ const EventDetailPage = () => {
                              <hr className='my-4'/>
                              <div>
                                  <h4 className="mb-3">Thảo luận / Cập nhật</h4>
-                                 <p className='text-muted'><i>(Tính năng đăng bài viết và bình luận cho sự kiện sẽ được phát triển sau.)</i></p>
-                                 {/* Form tạo bài viết và danh sách bài viết sẽ ở đây */}
+
+                                 {/* TODO: Thêm Form tạo bài viết ở đây (Bước sau) */}
+                                 {/* <CreateEventPostForm eventId={event.id} onPostCreated={fetchEventDetail} /> */}
+
+                                 {/* Danh sách bài viết */}
+                                 <div className="event-posts-list mt-4">
+                                     {event.posts && event.posts.length > 0 ? (
+                                         event.posts.map(post => (
+                                             <EventPostItem
+                                                 key={post.id}
+                                                 post={post}
+                                                 eventCreatorId={event.creator.id} // Truyền ID người tạo event
+                                             />
+                                         ))
+                                     ) : (
+                                         <p className="text-muted">Chưa có bài viết nào trong sự kiện này.</p>
+                                     )}
+                                 </div>
                              </div>
 
 
