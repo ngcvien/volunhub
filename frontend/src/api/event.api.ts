@@ -1,6 +1,6 @@
 // frontend/src/api/event.api.ts
 import api from './index';
-import { GetAllEventsResponse, EventType, GetEventByIdResponse  } from '../types/event.types'; // Import kiểu dữ liệu response
+import { GetAllEventsResponse, EventType, GetEventByIdResponse,EventPostType   } from '../types/event.types'; // Import kiểu dữ liệu response
 
 type CreateEventInputApi = Omit<EventType, 'id' | 'creatorId' | 'creator' | 'createdAt' | 'updatedAt'>;
 
@@ -118,5 +118,38 @@ export const getEventByIdApi = async (eventId: string | number): Promise<GetEven
             throw new Error('Sự kiện không tồn tại.');
         }
         throw new Error(error.response?.data?.message || 'Không thể tải chi tiết sự kiện.');
+    }
+};
+
+
+// Kiểu dữ liệu cho data gửi lên API khi tạo post
+interface CreateEventPostInput {
+    content: string;
+}
+
+// Kiểu dữ liệu cho response trả về từ API tạo post
+// Giả sử backend trả về bài post mới kèm thông tin author đã được include
+interface CreateEventPostResponse {
+    message: string;
+    post: EventPostType;
+}
+
+/**
+ * Gọi API để tạo bài viết mới trong một sự kiện
+ * @param eventId ID của sự kiện (kiểu string hoặc number từ URL)
+ * @param postData Dữ liệu bài viết (chỉ có content)
+ * @returns Promise chứa thông tin bài viết mới đã tạo
+ */
+export const createEventPostApi = async (
+    eventId: string | number,
+    postData: {content: string} 
+): Promise<CreateEventPostResponse> => {
+    try {
+        return api.post(`/events/${eventId}/posts`, postData);
+
+    } catch (error: any) {
+        console.error(`Lỗi API Tạo bài viết sự kiện (ID: ${eventId}):`, error.response?.data || error.message);
+        // Ném lỗi để component frontend (EventDetailPage) có thể bắt và xử lý
+        throw new Error(error.response?.data?.message || 'Không thể đăng bài viết của bạn vào lúc này.');
     }
 };
