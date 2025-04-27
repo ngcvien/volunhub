@@ -55,7 +55,11 @@ export const eventPostValidator = [
 export const commentValidator = [
     check('content', 'Nội dung bình luận không được để trống').trim().isLength({ min: 1 }),
     // parentId là optional, kiểm tra xem nó có phải là số không nếu được cung cấp
-    body('parentId').optional().isInt({ min: 1 }).withMessage('Parent Comment ID không hợp lệ.'),
+    body('parentId')
+    .optional({ nullable: true }) // Vẫn cho phép null hoặc không tồn tại
+    .if((value) => value !== null && value !== undefined) // Chỉ chạy validation tiếp theo NẾU giá trị không phải null/undefined
+    .isInt({ min: 1 }).withMessage('Parent Comment ID phải là một số nguyên dương.'),
+
     handleValidationErrors
 ];
 // Thêm các validator khác ở đây sau (ví dụ: eventValidator)

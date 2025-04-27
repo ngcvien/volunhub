@@ -2,6 +2,9 @@
 import EventPost, { EventPostAttributes } from '../models/EventPost.model';
 import Event from '../models/Event.model';
 import User from '../models/User.model';
+import EventPostComment from '../models/EventPostComment.model';
+import { Op } from 'sequelize'; 
+
 
 type CreatePostInput = Omit<EventPostAttributes, 'id' | 'createdAt' | 'updatedAt' | 'author' | 'event'>;
 
@@ -37,15 +40,48 @@ class EventPostService {
              throw Object.assign(new Error('Sự kiện không tồn tại.'), { statusCode: 404 });
          }
 
-        try {
-            return await EventPost.findAll({
+         try {
+            // Lấy tất cả các post của event
+            const posts = await EventPost.findAll({
                 where: { eventId: eventId },
                 include: [{
                     model: User,
                     as: 'author',
-                    attributes: ['id', 'username', 'avatarUrl'] // Lấy thông tin người đăng
+                    attributes: ['id', 'username', 'avatarUrl']
                 }],
-                order: [['createdAt', 'DESC']] // Sắp xếp bài mới nhất lên đầu
+                order: [['createdAt', 'DESC']]
+            });
+
+            // Lấy danh sách postId
+            const postIds = posts.map(post => post.id);
+
+            // Đếm số comment gốc cho mỗi post (parentId = null)
+            const commentCounts = await EventPostComment.findAll({
+                attributes: [
+                    'postId',
+                    [EventPostComment.sequelize!.fn('COUNT', EventPostComment.sequelize!.col('id')), 'count']
+                ],
+                where: {
+                    postId: { [Op.in]: postIds },
+                    parentId: null // chỉ đếm comment gốc
+                },
+                group: ['postId'],
+                raw: true
+            });
+
+            // Tạo map { postId: count }
+            const commentCountMap = new Map<number, number>();
+            commentCounts.forEach((item: any) => {
+                commentCountMap.set(item.postId, parseInt(item.count, 10) || 0);
+            });
+
+            // Gắn commentCount vào từng post
+            return posts.map(post => {
+                const plain = post.get({ plain: true });
+                return {
+                    ...plain,
+                    commentCount: commentCountMap.get(post.id) || 0
+                };
             });
         } catch (error) {
             console.error(`Lỗi khi lấy bài viết cho sự kiện ${eventId}:`, error);

@@ -11,6 +11,6 @@ export interface EventPostCommentType {
     createdAt: string; // ISO String
     updatedAt: string; // ISO String
     author: BasicUser; // Thông tin người bình luận
-    replies?: EventPostCommentType[]; // Mảng các bình luận con (sẽ dùng sau)
-    // Có thể thêm commentCount cho replies sau này
+    replies?: EventPostCommentType[];
+    commentCount?: number; // Số lượng bình luận con (nếu có)
 }

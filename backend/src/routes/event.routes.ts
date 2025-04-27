@@ -45,8 +45,7 @@ router.delete(
 
 router.get(
     '/:eventId',
-    // Optional: Có thể thêm middleware xác thực *nhẹ* ở đây nếu muốn
-    // để lấy req.user mà không chặn request nếu không có token
+    optionalAuthenticateToken,
     eventController.getById
 );
 

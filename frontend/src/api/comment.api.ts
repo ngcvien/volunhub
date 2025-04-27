@@ -1,6 +1,6 @@
 // frontend/src/api/comment.api.ts
 import api from './index';
-import { EventPostCommentType } from '../types/comment.types'; // Sẽ tạo ở Bước 2
+import { EventPostCommentType } from '../types/comment.types';
 
 // Kiểu dữ liệu cho response lấy danh sách comments
 interface GetCommentsResponse {
