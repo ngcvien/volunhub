@@ -1,9 +1,11 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import bcrypt from 'bcryptjs';
 import { sequelize } from '../config/database.config';
-import Event from './Event.model'; // Import Event
+import Event from './Event.model'; 
 import Participation from './Participation.model';
-// Interface mô tả các thuộc tính của User (cho TypeScript)
+import EventLike from './EventLike.model';
+import EventPostComment from './EventPostComment.model';
+
 export interface UserAttributes {
   id: number;
   username: string;
