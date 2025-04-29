@@ -78,7 +78,7 @@ const AppNavbar = () => {
                         className="nav-avatar"
                         style={{ objectFit: "cover" }}
                       />
-                      <span className="d-none d-lg-inline ms-2">{user.username}</span>
+                      <span className="d-none d-lg-inline ms-2">@{user.username}</span>
                     </div>
                   }
                   id="user-nav-dropdown"
@@ -90,13 +90,11 @@ const AppNavbar = () => {
                       <i className="bi bi-person-circle me-2"></i> Hồ sơ
                     </NavDropdown.Item>
                   </LinkContainer>
-
-                  <LinkContainer to="/events/my-events">
-                    <NavDropdown.Item className="dropdown-item-custom">
-                      <i className="bi bi-calendar-event me-2"></i> Sự kiện của tôi
+                  <LinkContainer to="/dashboard/my-events">
+                    <NavDropdown.Item>
+                      <i className="bi bi-gear me-2"></i>Quản lý Sự kiện
                     </NavDropdown.Item>
                   </LinkContainer>
-
                   <LinkContainer to="/settings">
                     <NavDropdown.Item className="dropdown-item-custom">
                       <i className="bi bi-gear me-2"></i> Cài đặt

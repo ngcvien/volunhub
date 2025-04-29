@@ -15,6 +15,7 @@ import UserProfilePage from "../pages/UserProfilePage"
 import EventDetailPage from '../pages/EventDetailPage';
 import AdminRoute from "../contexts/AdminRoute"
 import AdminUserManagementPage from "../pages/admin/AdminUserManagementPage"
+import CreatorDashboardPage from "../pages/dashboard/CreatorDashboardPage"
 
 // Component để bảo vệ route, yêu cầu đăng nhập
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -63,12 +64,21 @@ const AppRoutes = () => {
           />
           <Route path="/events/:eventId" element={<EventDetailPage />} />
           <Route path="/profile/:userId" element={<UserProfilePage />} />
-          
+
+          <Route
+            path="/dashboard/my-events"
+            element={
+              <ProtectedRoute> {/* Chỉ cần đăng nhập thường */}
+                <CreatorDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+
           <Route path="/admin/users" element={
             <AdminRoute>
               <AdminUserManagementPage />
             </AdminRoute>
-          }/>
+          } />
         </Routes>
       </Container>
     </>

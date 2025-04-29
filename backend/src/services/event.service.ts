@@ -1,11 +1,14 @@
 // backend/src/services/event.service.ts
-import { Sequelize } from 'sequelize';
+import { Sequelize, Model } from 'sequelize';
 import Event, { EventAttributes } from '../models/Event.model';
 import User from '../models/User.model';
 import Participation from '../models/Participation.model';
 import EventLike from '../models/EventLike.model';
 import EventPost from '../models/EventPost.model';
 
+interface EventWithCount extends EventAttributes {
+    participantCount: number;
+}
 
 type CreateEventInput = Omit<EventAttributes, 'id' | 'createdAt' | 'updatedAt' | 'status'>; // Chỉ định các thuộc tính cần thiết khi tạo mới
 
@@ -167,15 +170,50 @@ class EventService {
         }
     }
 
-    async getEventsByCreator(creatorId: number): Promise<Event[]> { // Trả về mảng Event instances
+    /**
+     * Lấy danh sách sự kiện được tạo bởi một người dùng cụ thể, kèm số người tham gia
+     * @param creatorId ID của người tạo
+     */
+    async getEventsByCreator(creatorId: number): Promise<EventWithCount[]> {
         try {
             const events = await Event.findAll({
                 where: { creatorId: creatorId },
-                order: [['eventTime', 'DESC']], // Sắp xếp theo thời gian diễn ra gần nhất lên đầu
-                // Không cần include creator vì đã biết creatorId
-                // Có thể include participant count hoặc like count nếu muốn hiển thị ở dashboard
+                attributes: [
+                    // Lấy tất cả các thuộc tính của Event model
+                    ...Object.keys(Event.getAttributes()),
+                    // Thêm thuộc tính ảo 'participantCount' bằng cách đếm trong bảng Participation
+                    [
+                        Sequelize.fn('COUNT', Sequelize.col('participants.id')), // Đếm ID user tham gia
+                        'participantCount'
+                    ]
+                ],
+                include: [
+                    // Include bảng nối Participation và User (nhưng không lấy attributes của User ở đây)
+                    // để có thể COUNT và GROUP BY
+                     {
+                         model: User,
+                         as: 'participants', // Dùng alias đã định nghĩa
+                         attributes: [], // Không cần lấy trường nào từ User ở đây
+                         through: { attributes: [] } // Không cần lấy trường nào từ bảng nối
+                     }
+                     // Lưu ý: Không include 'creator' ở đây để tránh group by phức tạp,
+                     // thông tin creator đã biết là người đang request.
+                ],
+                group: ['Event.id'], // Group theo ID của Event để COUNT hoạt động đúng cho mỗi event
+                order: [['eventTime', 'DESC']],
+                // SubQuery=false có thể cần thiết tùy phiên bản Sequelize/MySQL để tránh lỗi group by
+                // subQuery: false
             });
-            return events;
+
+             // Do COUNT trả về kiểu string trong một số trường hợp, cần parse lại
+             const eventsWithParsedCount = events.map(event => {
+                 const plainEvent = event.get({ plain: true }) as any; // Lấy plain object
+                 plainEvent.participantCount = parseInt(plainEvent.participantCount || '0', 10);
+                 return plainEvent as EventWithCount;
+             });
+
+             return eventsWithParsedCount;
+
         } catch (error) {
             console.error(`Lỗi khi lấy sự kiện cho creator ${creatorId}:`, error);
             throw new Error('Không thể lấy danh sách sự kiện đã tạo.');

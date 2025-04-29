@@ -153,3 +153,27 @@ export const createEventPostApi = async (
         throw new Error(error.response?.data?.message || 'Không thể đăng bài viết của bạn vào lúc này.');
     }
 };
+
+interface CreatedEvent extends Omit<EventType, 'participants' | 'posts' | 'isLiked' | 'isParticipating' | 'creator'> { // Loại bỏ các trường không cần thiết cho list này
+    participantCount: number;
+}
+
+interface GetMyCreatedEventsResponse {
+    message: string;
+    events: CreatedEvent[];
+}
+
+/**
+ * Lấy danh sách sự kiện do người dùng hiện tại tạo
+ */
+export const getMyCreatedEventsApi = async (): Promise<GetMyCreatedEventsResponse> => {
+    try {
+        // GET /api/users/me/events/created
+        // Token được tự động thêm bởi interceptor
+        const response = await api.get<GetMyCreatedEventsResponse>('/users/me/events/created');
+        return response.data;
+    } catch (error: any) {
+        console.error("Lỗi API Get My Created Events:", error.response?.data || error.message);
+        throw new Error(error.response?.data?.message || 'Không thể tải danh sách sự kiện đã tạo.');
+    }
+};
