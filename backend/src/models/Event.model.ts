@@ -3,6 +3,7 @@ import { DataTypes, Model, Optional } from 'sequelize';
 import { sequelize } from '../config/database.config';
 import User from './User.model'; // Import User model để tạo quan hệ
 import Participation from './Participation.model';
+import EventPost from './EventPost.model'; // Import EventPost model để tạo quan hệ
 // Interface mô tả thuộc tính Event
 export interface EventAttributes {
   id: number;
@@ -14,6 +15,20 @@ export interface EventAttributes {
   imageUrl: string | null;
   createdAt?: Date;
   updatedAt?: Date;
+  status: EventStatus;
+  creator?: User;
+  participants?: User[];
+  posts?: EventPost[];
+  isParticipating?: boolean;
+  isLiked?: boolean;
+  likeCount?: number;
+}
+
+export enum EventStatus {
+  UPCOMING = 'upcoming',
+  ONGOING = 'ongoing',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled'
 }
 
 interface EventCreationAttributes extends Optional<EventAttributes, 'id' | 'description' | 'location' | 'imageUrl' | 'createdAt' | 'updatedAt'> {}
@@ -26,7 +41,12 @@ class Event extends Model<EventAttributes, EventCreationAttributes> implements E
   public location!: string | null;
   public eventTime!: Date;
   public imageUrl!: string | null;
-
+  public status!: EventStatus;
+  public likeCount!: number; // Số lượng người thích sự kiện (tính toán từ EventLike)
+  public posts?: EventPost[] | undefined;
+  public creator?: User | undefined;
+  public participants?: User[] | undefined;
+  public isLiked?: boolean | undefined;
   // Timestamps
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -64,16 +84,19 @@ Event.init(
       type: new DataTypes.STRING(255),
       allowNull: true,
     },
-    // Đổi tên field trong model thành eventTime, ánh xạ sang cột event_time
     eventTime: {
-      type: DataTypes.DATE, // Kiểu DATETIME trong MySQL tương ứng với DATE trong Sequelize
-      allowNull: false,
-      field: 'event_time', // Chỉ rõ tên cột trong DB là snake_case
+      type: DataTypes.DATE, 
+      field: 'event_time', 
     },
     imageUrl: {
-      type: DataTypes.STRING, // VARCHAR(255)
+      type: DataTypes.STRING, 
       allowNull: true,
-      field: 'image_url' // Chỉ rõ tên cột DB nếu không muốn dựa hoàn toàn vào underscored
+      field: 'image_url' 
+    },
+    status: {
+      type: DataTypes.ENUM(...Object.values(EventStatus)),
+      allowNull: false,
+      defaultValue: EventStatus.UPCOMING
     }
     // createdAt và updatedAt Sequelize tự quản lý nếu timestamps: true
     // và underscored: true sẽ tự ánh xạ sang created_at, updated_at

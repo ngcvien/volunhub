@@ -35,4 +35,10 @@ router.get(
   '/:userId', 
   userController.getUserProfile // Gọi hàm controller mới
 );
+
+router.get(
+  '/me/events/created',
+  authenticateToken,
+  userController.getMyCreatedEvents 
+);
 export default router;

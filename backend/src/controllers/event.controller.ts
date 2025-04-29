@@ -19,7 +19,8 @@ class EventController {
                 description,
                 location,
                 eventTime: new Date(eventTime),
-                imageUrl: imageUrl || null 
+                imageUrl: imageUrl || null ,
+
             });
             res.status(201).json({ message: 'Tạo sự kiện thành công!', event: newEvent });
         } catch (error) {
@@ -60,6 +61,20 @@ class EventController {
 
             res.status(200).json({ message: 'Lấy chi tiết sự kiện thành công!', event: eventDetail });
 
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getMyCreatedEvents(req: Request, res: Response, next: NextFunction) {
+        const userId = req.user?.userId; // Lấy từ authenticateToken
+
+        if (!userId) {
+            return res.status(401).json({ message: 'Yêu cầu xác thực không thành công.' });
+        }
+        try {
+            const events = await eventService.getEventsByCreator(userId);
+            res.status(200).json({ message: 'Lấy danh sách sự kiện đã tạo thành công!', events });
         } catch (error) {
             next(error);
         }

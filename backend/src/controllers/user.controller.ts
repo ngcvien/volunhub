@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import userService from '../services/user.service';
 import User from '../models/User.model';
+import eventService from '../services/event.service';
 
 class UserController {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -150,6 +151,21 @@ class UserController {
       const updatedUser = await userService.updateUserStatusByAdmin(targetUserId, statusData);
       res.status(200).json({ message: `Cập nhật trạng thái cho user ${targetUserId} thành công!`, user: updatedUser });
 
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getMyCreatedEvents(req: Request, res: Response, next: NextFunction) {
+    const userId = req.user?.userId; // Lấy từ authenticateToken
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Yêu cầu xác thực không thành công.' });
+    }
+
+    try {
+      const events = await eventService.getEventsByCreator(userId);
+      res.status(200).json({ message: 'Lấy danh sách sự kiện đã tạo thành công!', events });
     } catch (error) {
       next(error);
     }

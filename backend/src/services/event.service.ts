@@ -1,13 +1,13 @@
 // backend/src/services/event.service.ts
-import {Sequelize} from 'sequelize';
+import { Sequelize } from 'sequelize';
 import Event, { EventAttributes } from '../models/Event.model';
-import User from '../models/User.model'; 
-import Participation from '../models/Participation.model'; 
-import EventLike from '../models/EventLike.model'; 
+import User from '../models/User.model';
+import Participation from '../models/Participation.model';
+import EventLike from '../models/EventLike.model';
 import EventPost from '../models/EventPost.model';
 
 
-type CreateEventInput = Omit<EventAttributes, 'id' | 'createdAt' | 'updatedAt' >;
+type CreateEventInput = Omit<EventAttributes, 'id' | 'createdAt' | 'updatedAt' | 'status'>; // Chỉ định các thuộc tính cần thiết khi tạo mới
 
 type EventWithParticipationAndCreator = EventAttributes & {
     creator?: { id: number; username: string; };
@@ -24,7 +24,7 @@ class EventService {
             return newEvent;
         } catch (error) {
             console.error("Lỗi khi tạo sự kiện:", error);
-             // Xử lý lỗi validation từ Sequelize nếu có
+            // Xử lý lỗi validation từ Sequelize nếu có
             if (error instanceof Error && error.name === 'SequelizeValidationError') {
                 throw new Error(`Lỗi validation: ${error.message}`);
             }
@@ -54,9 +54,9 @@ class EventService {
 
             // 2. Lấy số lượt thích cho các sự kiện này
             const likeCounts = await EventLike.count({
-                where: { eventId: eventIds }, 
-                group: ['eventId'],          
-                raw: true                    
+                where: { eventId: eventIds },
+                group: ['eventId'],
+                raw: true
             });
             // Chuyển đổi kết quả count thành Map { eventId: count } để dễ tra cứu
             const likeCountMap = new Map<number, number>();
@@ -146,7 +146,7 @@ class EventService {
 
             plainEvent.isLiked = false;
             plainEvent.isParticipating = false;
-            plainEvent.likeCount = await EventLike.count({ where: { eventId: eventId }}); // Đếm tổng số like
+            plainEvent.likeCount = await EventLike.count({ where: { eventId: eventId } }); // Đếm tổng số like
 
             if (userId) {
                 const [userLike, userParticipation] = await Promise.all([
@@ -164,6 +164,21 @@ class EventService {
         } catch (error) {
             console.error(`Lỗi khi lấy chi tiết sự kiện ${eventId}:`, error);
             throw new Error('Không thể lấy thông tin chi tiết sự kiện.');
+        }
+    }
+
+    async getEventsByCreator(creatorId: number): Promise<Event[]> { // Trả về mảng Event instances
+        try {
+            const events = await Event.findAll({
+                where: { creatorId: creatorId },
+                order: [['eventTime', 'DESC']], // Sắp xếp theo thời gian diễn ra gần nhất lên đầu
+                // Không cần include creator vì đã biết creatorId
+                // Có thể include participant count hoặc like count nếu muốn hiển thị ở dashboard
+            });
+            return events;
+        } catch (error) {
+            console.error(`Lỗi khi lấy sự kiện cho creator ${creatorId}:`, error);
+            throw new Error('Không thể lấy danh sách sự kiện đã tạo.');
         }
     }
 
