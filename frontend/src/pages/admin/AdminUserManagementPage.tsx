@@ -106,7 +106,7 @@ const AdminUserManagementPage = () => {
     if (error) return <Container><Alert variant="danger" className="mt-4">{error} <Button size="sm" variant="outline-danger" onClick={fetchUsers}>Thử lại</Button></Alert></Container>;
 
     return (
-        <Container fluid className="mt-4">
+        <Container fluid className="mt-4 admin-component-page">
             <h2>Quản lý Người dùng ({users.length})</h2>
             {updateError && <Alert variant="danger" onClose={() => setUpdateError(null)} dismissible>{updateError}</Alert>}
 

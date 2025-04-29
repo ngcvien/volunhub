@@ -61,7 +61,11 @@ router.post(
     eventPostController.createPost
 );
 
-
+router.post(
+    '/:eventId/participants/:participantUserId/confirm',
+    authenticateToken,          
+    participationController.confirmParticipant
+);
 
 
 export default router;

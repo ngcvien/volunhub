@@ -123,7 +123,11 @@ button:focus-visible {
   /* background: linear-gradient(to right, #007bff, #8a2be2, #ff00ff) !important; */
   /* background: linear-gradient(to right, #00ffff, #00ff7f) !important;  */
   /* background: linear-gradient(to right, #ff00ff, #ff4500) !important;  */
-  background: linear-gradient(90deg, rgba(58, 123, 213, 1) 0%, rgba(0, 210, 255, 1) 100%) !important;
+  background: linear-gradient(
+    90deg,
+    rgba(58, 123, 213, 1) 0%,
+    rgba(0, 210, 255, 1) 100%
+  ) !important;
 
   /* --- Tùy chọn: Thêm hiệu ứng Glow (Tỏa sáng) --- */
   /* Sử dụng box-shadow với màu sáng và mờ */
@@ -132,7 +136,6 @@ button:focus-visible {
   /* box-shadow: 0 3px 20px -5px rgba(138, 43, 226, 0.6); */
   /* Ví dụ với màu xanh dương nhạt */
   box-shadow: 0 3px 20px -5px rgba(0, 123, 255, 0.5);
-
 }
 
 /* Đảm bảo màu chữ vẫn sáng (variant="dark" thường đã xử lý việc này) */
@@ -162,7 +165,11 @@ button:focus-visible {
 /* --- Style cho DARK MODE --- */
 html[data-bs-theme="dark"] .navbar {
   background-color: transparent !important; /* Bỏ màu nền đơn sắc */
-  background-image: linear-gradient(90deg, rgba(58, 123, 213, 1) 0%, rgba(0, 210, 255, 1) 100%); /* Gradient Neon */
+  background-image: linear-gradient(
+    90deg,
+    rgba(58, 123, 213, 1) 0%,
+    rgba(0, 210, 255, 1) 100%
+  ); /* Gradient Neon */
   box-shadow: 0 3px 20px -5px rgba(138, 43, 226, 0.5); /* Hiệu ứng Glow */
   border-bottom: none;
 }
@@ -185,10 +192,17 @@ html[data-bs-theme="dark"] .navbar .navbar-toggler-icon {
 /* --- Style cho LIGHT MODE --- */
 html[data-bs-theme="light"] .navbar {
   /* Nền sáng - Có thể dùng màu light mặc định hoặc màu trắng */
-  background-color: var(--bs-body-bg, #fff); /* Dùng màu nền body (thường là trắng) */
+  background-color: var(
+    --bs-body-bg,
+    #fff
+  ); /* Dùng màu nền body (thường là trắng) */
   /* Hoặc dùng màu light của bootstrap: background-color: var(--bs-light-bg-subtle); */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Bóng đổ nhẹ cho nền sáng */
-  background-image: linear-gradient(90deg, rgba(58, 123, 213, 1) 0%, rgba(0, 210, 255, 1) 100%); /* Đảm bảo không có gradient */
+  background-image: linear-gradient(
+    90deg,
+    rgba(58, 123, 213, 1) 0%,
+    rgba(0, 210, 255, 1) 100%
+  ); /* Đảm bảo không có gradient */
   border-bottom: 1px solid var(--bs-border-color-translucent); /* Thêm đường kẻ dưới nhẹ */
 }
 
@@ -343,7 +357,7 @@ html[data-bs-theme="light"] .navbar .navbar-toggler-icon {
     padding-left: 12px;
     padding-right: 12px;
   }
-  .card-body{
+  .card-body {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
   }
@@ -431,8 +445,6 @@ html[data-bs-theme="light"] .navbar .navbar-toggler-icon {
   padding-right: 0;
 }
 
-
-
 /* Đảm bảo dropdown của datetime picker hiển thị */
 .form-control[type="datetime-local"]::-webkit-calendar-picker-indicator {
   /* position: absolute; */
@@ -477,11 +489,10 @@ html[data-bs-theme="light"] .navbar .navbar-toggler-icon {
   box-shadow: 0 6px 8px rgba(var(--bs-success-rgb), 0.3);
 }
 
-
 /* Layout mới cho HomePage */
 .homepage-container {
   display: flex;
-  
+
   width: 100%;
   padding: 1rem 0 !important;
   gap: 3rem;
@@ -489,8 +500,8 @@ html[data-bs-theme="light"] .navbar .navbar-toggler-icon {
   margin: 0 auto;
 }
 
-
-.sidebar-left, .sidebar-right {
+.sidebar-left,
+.sidebar-right {
   width: 320px;
   flex-shrink: 0;
   padding: 0 1rem;
@@ -507,28 +518,34 @@ html[data-bs-theme="light"] .navbar .navbar-toggler-icon {
   object-fit: cover !important;
 }
 
-.dashboard-page{
+.dashboard-page {
   padding-top: 20px;
-  }
+}
+
+.admin-component-page {
+  padding-top: 20px;
+}
 /* Responsive */
 @media (max-width: 1199.98px) {
-  .sidebar-left, .sidebar-right {
+  .sidebar-left,
+  .sidebar-right {
     display: none;
   }
-  
+
   .main-content {
     width: 100%;
     max-width: 800px;
     margin: 0 auto;
   }
-  
+
   .homepage-container {
     padding: 1rem;
   }
 }
 
 @media (min-width: 1200px) and (max-width: 1399.98px) {
-  .sidebar-left, .sidebar-right {
+  .sidebar-left,
+  .sidebar-right {
     width: 240px;
   }
 }
