@@ -5,12 +5,22 @@ import Event from './Event.model';
 import Participation from './Participation.model';
 import EventLike from './EventLike.model';
 import EventPostComment from './EventPostComment.model';
+import { ENUM } from 'sequelize';
+
+export enum UserRole {
+  USER = 'user',
+  ADMIN = 'admin',
+  VERIFIED_ORG = 'verified_org'
+}
 
 export interface UserAttributes {
   id: number;
   username: string;
   email: string;
   password_hash: string; 
+  role: UserRole; 
+  isVerified: boolean; 
+  isActive: boolean; 
   fullName: string | null;  
   bio: string | null;        
   location: string | null;  
@@ -28,6 +38,9 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public username!: string;
   public email!: string;
   public password_hash!: string;
+  public role!: UserRole;
+  public isVerified!: boolean;
+  public isActive!: boolean;
   public fullName!: string | null;    
   public bio!: string | null;       
   public location!: string | null;    
@@ -41,6 +54,11 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public async comparePassword(password: string): Promise<boolean> {
     return bcrypt.compare(password, this.password_hash);
   }
+  public readonly createdEvents?: Event[];
+  public readonly participatingEvents?: Event[];
+  public readonly likedEvents?: Event[];
+  public readonly eventPosts?: EventPost[];
+  public readonly eventPostComments?: EventPostComment[];
 }
 
 User.init(
@@ -84,13 +102,29 @@ User.init(
       type: DataTypes.STRING,
       allowNull: true,
       field: 'avatar_url'
+    },
+    role: {
+      type: DataTypes.ENUM(...Object.values(UserRole)), 
+      allowNull: false,
+      defaultValue: UserRole.USER
+    },
+    isVerified: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false, 
+      field: 'is_verified'
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+      field: 'is_active'
     }
-    // Sequelize sẽ tự động thêm createdAt và updatedAt nếu không cấu hình timestamps: false
   },
   {
-    tableName: 'users',       // Tên bảng trong database
-    sequelize,              // Truyền instance sequelize vào
-    timestamps: true,         // Bật timestamps tự động
+    tableName: 'users',       
+    sequelize,             
+    timestamps: true,       
     underscored: true 
   }
 );
