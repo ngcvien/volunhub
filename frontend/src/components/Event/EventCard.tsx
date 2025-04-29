@@ -224,7 +224,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
                 className="creator-name text-decoration-none" // Cần style cho class này trong CSS
                 style={{ pointerEvents: 'none' }}
               >
-                {event.creator?.username || "Người dùng ẩn"} {/* Bỏ @ nếu muốn */}
+                {event.creator?.fullName||event.creator?.username || "Người dùng ẩn"} {/* Bỏ @ nếu muốn */}
               </Link>
               <div className="text-muted small d-flex align-items-center">
                 <span>{formatTimeAgo(event.createdAt)}</span>
@@ -264,10 +264,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
               // Truyền các props cần thiết khác mà UserPopup cần
               username={event.creator?.username || 'Người dùng ẩn'}
               avatarUrl={event.creator?.avatarUrl}
-            fullName={event.creator?.fullName} 
+              fullName={event.creator?.fullName} 
             // bio={event.creator?.bio} 
             />
-            {/* --- Kết thúc UserPopup --- */}
+            
           </div>
         )}
       </Overlay>

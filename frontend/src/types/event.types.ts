@@ -1,4 +1,7 @@
 // Kiểu dữ liệu cho thông tin người tạo rút gọn trả về từ API
+import {User} from './user.types';
+import { EventPostCommentType } from './comment.types'; // Có thể import sau
+
 interface EventCreator {
     id: number
     username: string
@@ -7,6 +10,18 @@ interface EventCreator {
     bio?: string | null
     location?: string | null
   }
+
+  export interface EventPostType {
+    id: number;
+    eventId: number;
+    userId: number;
+    content: string;
+    createdAt: string; // ISO String
+    updatedAt: string; // ISO String
+    author: BasicUser; 
+    commentCount?: number;
+    comments?: EventPostCommentType[]; // Mảng các bình luận cho bài viết
+}
   
   // Kiểu dữ liệu chính cho một sự kiện trả về từ API list events
   export interface EventType {
@@ -22,7 +37,9 @@ interface EventCreator {
     isParticipating?: boolean
     isLiked?: boolean 
     likeCount?: number
-    imageUrl?: string || null
+    imageUrl?: string | null
+    participants?: BasicUser[]; // Dùng BasicUser
+    posts?: EventPostType[]; 
   }
   
   // Kiểu dữ liệu cho response từ API get all events
@@ -30,4 +47,9 @@ interface EventCreator {
     message: string
     events: EventType[]
   }
+
+  export interface GetEventByIdResponse {
+    message: string;
+    event: EventType; 
+}
   

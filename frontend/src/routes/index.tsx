@@ -12,6 +12,7 @@ import { useAuth } from "../contexts/AuthContext"
 import { Container } from "react-bootstrap" // Import Container
 import ProfilePage from "../pages/ProfilePage"
 import UserProfilePage from "../pages/UserProfilePage"
+import EventDetailPage from '../pages/EventDetailPage';
 
 // Component để bảo vệ route, yêu cầu đăng nhập
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -35,7 +36,6 @@ const AppRoutes = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/" element={<HomePage />} />
-          {/* --- THÊM ROUTE TẠO SỰ KIỆN (ĐƯỢC BẢO VỆ) --- */}
           <Route
             path="/events/new"
             element={
@@ -60,6 +60,7 @@ const AppRoutes = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="/events/:eventId" element={<EventDetailPage />} />
           <Route path="/profile/:userId" element={<UserProfilePage />} />
         </Routes>
       </Container>

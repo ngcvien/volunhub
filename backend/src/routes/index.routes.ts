@@ -2,12 +2,14 @@
 import { Router } from 'express';
 import userRoutes from './user.routes';
 import eventRoutes from './event.routes';
-import uploadRoutes from './upload.routes'; // <<<--- IMPORT UPLOAD ROUTES
+import uploadRoutes from './upload.routes'; 
+import postRoutes from './post.routes'; 
 
 const router = Router();
 
 router.use('/users', userRoutes);
 router.use('/events', eventRoutes);
-router.use('/uploads', uploadRoutes); // <<<--- SỬ DỤNG UPLOAD ROUTES VỚI TIỀN TỐ /uploads
+router.use('/uploads', uploadRoutes); 
+router.use('/posts', postRoutes);
 
 export default router;
