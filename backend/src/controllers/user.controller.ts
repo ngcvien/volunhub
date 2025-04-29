@@ -56,7 +56,7 @@ class UserController {
     const updateData = req.body;
 
     if (!userId) {
-        return res.status(401).json({ message: 'Yêu cầu xác thực không thành công.' });
+      return res.status(401).json({ message: 'Yêu cầu xác thực không thành công.' });
     }
 
     // Loại bỏ các trường không mong muốn hoặc null/undefined nếu cần thiết
@@ -66,55 +66,92 @@ class UserController {
     // Có thể lọc thêm các key không hợp lệ khác
 
     try {
-        const updatedUser = await userService.updateUserProfile(userId, updateData);
-        res.status(200).json({ message: 'Cập nhật hồ sơ thành công!', user: updatedUser });
+      const updatedUser = await userService.updateUserProfile(userId, updateData);
+      res.status(200).json({ message: 'Cập nhật hồ sơ thành công!', user: updatedUser });
     } catch (error) {
-        next(error);
+      next(error);
     }
   }
   async getMe(req: Request, res: Response, next: NextFunction) {
     const userId = req.user?.userId;
     if (!userId) {
-        return res.status(401).json({ message: 'Không tìm thấy thông tin người dùng được xác thực.' });
+      return res.status(401).json({ message: 'Không tìm thấy thông tin người dùng được xác thực.' });
     }
     try {
-        // Tìm user trong DB bằng ID lấy từ token
-        const user = await User.findByPk(userId, {
-            // Lấy cả các trường profile mới, loại bỏ password_hash
-            attributes: ['id', 'username', 'email', 'fullName', 'bio', 'location', 'avatarUrl', 'createdAt', 'updatedAt']
-        });
-        if (!user) {
-            return res.status(404).json({ message: 'Người dùng không tồn tại.' });
-        }
-        // Trả về thông tin user tìm được
-        res.status(200).json({ user }); // Trả về object chứa key "user"
-    } catch(error) {
-        next(error);
+      // Tìm user trong DB bằng ID lấy từ token
+      const user = await User.findByPk(userId, {
+        // Lấy cả các trường profile mới, loại bỏ password_hash
+        attributes: ['id', 'username', 'email', 'fullName', 'bio', 'location', 'avatarUrl', 'createdAt', 'updatedAt']
+      });
+      if (!user) {
+        return res.status(404).json({ message: 'Người dùng không tồn tại.' });
+      }
+      // Trả về thông tin user tìm được
+      res.status(200).json({ user }); // Trả về object chứa key "user"
+    } catch (error) {
+      next(error);
     }
   }
   async getUserProfile(req: Request, res: Response, next: NextFunction) {
     try {
-        // Lấy userId từ URL parameter
-        const userId = parseInt(req.params.userId, 10);
+      // Lấy userId từ URL parameter
+      const userId = parseInt(req.params.userId, 10);
 
-        // Validate userId có phải là số hợp lệ không
-        if (isNaN(userId)) {
-            return res.status(400).json({ message: 'User ID không hợp lệ.' });
-        }
+      // Validate userId có phải là số hợp lệ không
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: 'User ID không hợp lệ.' });
+      }
 
-        // Gọi service để lấy thông tin profile
-        const userProfile = await userService.getUserProfileById(userId);
+      // Gọi service để lấy thông tin profile
+      const userProfile = await userService.getUserProfileById(userId);
 
-        // Nếu không tìm thấy user
-        if (!userProfile) {
-            return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
-        }
+      // Nếu không tìm thấy user
+      if (!userProfile) {
+        return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
+      }
 
-        // Trả về thông tin profile tìm được
-        res.status(200).json({ user: userProfile }); // Trả về object chứa key "user"
+      // Trả về thông tin profile tìm được
+      res.status(200).json({ user: userProfile }); // Trả về object chứa key "user"
 
     } catch (error) {
-        next(error); // Chuyển lỗi cho middleware chung
+      next(error); // Chuyển lỗi cho middleware chung
+    }
+  }
+
+  /**
+    * Admin: Lấy danh sách tất cả user
+    */
+  async listUsers(req: Request, res: Response, next: NextFunction) {
+    try {
+      const users = await userService.getAllUsers();
+      res.status(200).json({ message: "Lấy danh sách người dùng thành công", users });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Admin: Cập nhật trạng thái của một user
+   */
+  async updateUserStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+      const targetUserId = parseInt(req.params.userId, 10); // Lấy ID user cần sửa từ URL param
+      const statusData = req.body; // Dữ liệu cập nhật từ body (đã qua validation)
+
+      if (isNaN(targetUserId)) {
+        return res.status(400).json({ message: 'User ID không hợp lệ.' });
+      }
+
+      // Có thể thêm kiểm tra không cho Admin tự sửa trạng thái của chính mình qua API này nếu muốn
+      // if (req.user?.userId === targetUserId) {
+      //    return res.status(403).json({ message: 'Không thể tự thay đổi trạng thái của chính mình qua API này.' });
+      // }
+
+      const updatedUser = await userService.updateUserStatusByAdmin(targetUserId, statusData);
+      res.status(200).json({ message: `Cập nhật trạng thái cho user ${targetUserId} thành công!`, user: updatedUser });
+
+    } catch (error) {
+      next(error);
     }
   }
 }

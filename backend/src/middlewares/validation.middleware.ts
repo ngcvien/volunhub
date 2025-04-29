@@ -1,6 +1,7 @@
 // backend/src/middlewares/validation.middleware.ts
 import { check, validationResult, body } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
+import { UserRole } from '../models/User.model';
 
 // Hàm xử lý lỗi validation chung (có thể tạo file riêng nếu muốn)
 const handleValidationErrors = (req: Request, res: Response, next: NextFunction) => {
@@ -62,4 +63,20 @@ export const commentValidator = [
 
     handleValidationErrors
 ];
-// Thêm các validator khác ở đây sau (ví dụ: eventValidator)
+
+export const updateUserStatusValidator = [
+    // Các trường đều là optional, chỉ validate nếu được cung cấp
+    body('role')
+        .optional()
+        .isIn(Object.values(UserRole)) // Phải là một trong các giá trị của Enum UserRole
+        .withMessage(`Vai trò không hợp lệ. Chỉ chấp nhận: ${Object.values(UserRole).join(', ')}`),
+    body('isVerified')
+        .optional()
+        .isBoolean()
+        .withMessage('Trạng thái xác minh phải là true hoặc false.'),
+    body('isActive')
+        .optional()
+        .isBoolean()
+        .withMessage('Trạng thái hoạt động phải là true hoặc false.'),
+    handleValidationErrors
+];
