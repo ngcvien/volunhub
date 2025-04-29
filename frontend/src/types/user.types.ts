@@ -1,26 +1,32 @@
 // frontend/src/types/user.types.ts
 
-// Kiểu dữ liệu cho thông tin User cơ bản trả về từ API (không chứa thông tin nhạy cảm)
+export enum UserRole {
+    USER = 'user',
+    ADMIN = 'admin',
+    VERIFIED_ORG = 'verified_org'
+}
+
 export interface User {
     id: number;
     username: string;
     email: string;
-    createdAt?: string; // Backend trả về dạng chuỗi ISO date qua JSON
+    role: UserRole;
+    isVerified?: boolean;
+    isActive?: boolean;
+    createdAt?: string; 
     updatedAt?: string;
-    avatarUrl?: string | null; // URL của ảnh đại diện (nếu có)
-    bio?: string | null; // Tiểu sử (nếu có)
-    fullName?: string | null; // Tên đầy đủ (nếu có)
-    location?: string | null; // Địa điểm (nếu có)
+    avatarUrl?: string | null; 
+    bio?: string | null;
+    fullName?: string | null; 
+    location?: string | null;
 }
 
-// Kiểu dữ liệu cho đầu vào của form/API đăng ký
 export interface RegisterUserInput {
-    username?: string; // Dùng optional (?) để dễ xử lý validation từng field
+    username?: string;
     email?: string;
     password?: string;
 }
 
-// Kiểu dữ liệu cho đầu vào của form/API đăng nhập
 export interface LoginUserInput {
     email?: string;
     password?: string;

@@ -1,6 +1,12 @@
 import api from './index';
 import { User, LoginUserInput, RegisterUserInput, AuthContextType } from '../types/user.types';
 
+
+export enum UserRole {
+    USER = 'user',
+    ADMIN = 'admin',
+    VERIFIED_ORG = 'verified_org'
+}
 interface GetMeResponse {
     user: User; 
 }
@@ -31,6 +37,9 @@ interface UserResponse {
     id: number;
     username: string;
     email: string;
+    role: UserRole;
+    isActive?: boolean;
+    isVerified?: boolean;
     createdAt: string;
     updatedAt: string;
 }
