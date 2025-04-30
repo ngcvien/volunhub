@@ -84,6 +84,9 @@ const setupAssociations = () => {
             constraints: false
         });
 
+        Participation.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+
         // --- (Tùy chọn) Định nghĩa quan hệ rõ ràng cho bảng nối Participation ---
         // Điều này hữu ích nếu bạn muốn truy vấn trực tiếp bảng Participation
         // Hoặc muốn Sequelize tự động thêm các ràng buộc khóa ngoại nếu chưa có

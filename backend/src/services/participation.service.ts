@@ -1,5 +1,5 @@
 // backend/src/services/participation.service.ts
-import Participation from '../models/Participation.model';
+import Participation, {ParticipationAttributes} from '../models/Participation.model';
 import Event from '../models/Event.model'; // Import Event để kiểm tra sự kiện tồn tại
 import User from '../models/User.model'; // Import User (có thể cần sau này)
 import { sequelize } from './database.service'; // Import sequelize nếu cần transaction
@@ -8,6 +8,18 @@ enum CompletionStatus {
     PENDING = 'pending',
     CONFIRMED = 'confirmed',
     ABSENT = 'absent'
+}
+interface ParticipantDetailBE {
+    userId: number;
+    eventId: number;
+    completionStatus: CompletionStatus;
+    createdAt: Date; // Hoặc string
+    user: { // Thông tin user kèm theo
+        id: number;
+        username: string;
+        avatarUrl: string | null;
+        fullName: string | null;
+    };
 }
 class ParticipationService {
 
@@ -140,7 +152,7 @@ class ParticipationService {
             // }
 
             // 7. Cập nhật trạng thái hoàn thành (Ví dụ: dùng cột completion_status)
-            // await participation.update({ completionStatus: CompletionStatus.CONFIRMED }, { transaction });
+            await participation.update({ completionStatus: CompletionStatus.CONFIRMED }, { transaction });
             // ---- HOẶC nếu chưa có cột status, bạn có thể trigger logic cộng điểm ngay ----
 
             // 8. Placeholder: Trigger logic cộng điểm VolunPoint
@@ -163,7 +175,47 @@ class ParticipationService {
         }
     }
 
-    // Có thể thêm các hàm khác: lấy danh sách sự kiện user tham gia, lấy danh sách user tham gia event...
+    /**
+     * Lấy danh sách người tham gia chi tiết của một sự kiện để quản lý
+     * @param eventId ID sự kiện
+     * @param requestingUserId ID của người yêu cầu (phải là người tạo sự kiện)
+     * @returns Danh sách chi tiết người tham gia
+     */
+    async getParticipantsForEventManagement(eventId: number, requestingUserId: number): Promise<ParticipantDetailBE[]> {
+        try {
+            // 1. Kiểm tra sự kiện tồn tại và người yêu cầu có phải là người tạo không
+            const event = await Event.findByPk(eventId);
+            if (!event) {
+                throw Object.assign(new Error('Sự kiện không tồn tại.'), { statusCode: 404 });
+            }
+            if (event.creatorId !== requestingUserId) {
+                 throw Object.assign(new Error('Forbidden: Bạn không có quyền quản lý người tham gia sự kiện này.'), { statusCode: 403 });
+            }
+
+            // 2. Lấy danh sách participation kèm thông tin user
+            const participations = await Participation.findAll({
+                where: { eventId: eventId },
+                include: [
+                    {
+                        model: User,
+                        as: 'user', // Dùng association đã định nghĩa ở associations.ts
+                        attributes: ['id', 'username', 'avatarUrl', 'fullName'] // Lấy các trường cần thiết của User
+                    }
+                ],
+                order: [['createdAt', 'ASC']] // Sắp xếp theo thời gian tham gia
+            });
+
+            // Map lại dữ liệu nếu cần để đúng định dạng ParticipantDetailBE
+             return participations.map(p => p.get({ plain: true })) as ParticipantDetailBE[];
+             // Lưu ý: Cần đảm bảo association 'user' được định nghĩa trong associations.ts
+             // cho model Participation: Participation.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+        } catch (error: any) {
+            console.error(`Lỗi khi lấy participants cho event ${eventId}:`, error);
+            throw new Error('Không thể lấy danh sách người tham gia.');
+        }
+    }
+
 }
 
 export default new ParticipationService();

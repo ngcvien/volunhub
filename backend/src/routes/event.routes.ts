@@ -67,5 +67,10 @@ router.post(
     participationController.confirmParticipant
 );
 
+router.get(
+    '/:eventId/participants/manage',
+    authenticateToken, // Yêu cầu đăng nhập
+    participationController.getParticipantsForManagement 
+);
 
 export default router;

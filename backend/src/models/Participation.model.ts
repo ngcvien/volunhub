@@ -8,15 +8,19 @@ import { sequelize } from '../config/database.config';
 export interface ParticipationAttributes {
   userId: number;
   eventId: number;
-  createdAt?: Date; // Sequelize sẽ tự quản lý nếu timestamps: true
-  updatedAt?: Date; // Sequelize sẽ tự quản lý nếu timestamps: true
+  completionStatus?: string; 
+  createdAt?: Date; 
+  updatedAt?: Date;
 }
+
+
 
 // Không cần CreationAttributes vì các trường đều là bắt buộc khi tạo
 
 class Participation extends Model<ParticipationAttributes> implements ParticipationAttributes {
   public userId!: number;
   public eventId!: number;
+  public completionStatus?: string | undefined;
 
   // Timestamps (nếu bật)
   public readonly createdAt!: Date;
@@ -39,6 +43,12 @@ Participation.init(
       field: 'event_id', // Ánh xạ sang snake_case
       // Không cần references ở đây vì sẽ định nghĩa qua association belongsToMany
     },
+    completionStatus: {
+      type: DataTypes.ENUM('pending', 'confirmed', 'absent'), // Enum phải khớp migration
+      allowNull: false,
+      defaultValue: 'pending',
+      field: 'completion_status'
+    }
     // Sequelize tự động thêm createdAt và updatedAt nếu timestamps: true
   },
   {

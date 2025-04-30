@@ -73,6 +73,22 @@ class ParticipationController {
             next(error); // Chuyển lỗi cho middleware
         }
     }
+
+    async getParticipantsForManagement(req: Request, res: Response, next: NextFunction) {
+        try {
+            const eventId = parseInt(req.params.eventId, 10);
+            const requestingUserId = req.user?.userId; // Lấy từ authenticateToken
+
+            if (!requestingUserId) return res.status(401).json({ message: 'Yêu cầu xác thực.' });
+            if (isNaN(eventId)) return res.status(400).json({ message: 'Event ID không hợp lệ.' });
+
+            const participants = await participationService.getParticipantsForEventManagement(eventId, requestingUserId);
+            res.status(200).json({ message: 'Lấy danh sách người tham gia thành công!', participants });
+
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export default new ParticipationController();
