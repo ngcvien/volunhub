@@ -1,18 +1,17 @@
-// frontend/src/components/Dashboard/ParticipantManagementModal.tsx
-import React, { useState, useEffect, useCallback } from 'react';
-import { Modal, Button, ListGroup, Image as RBImage, Spinner, Alert, Badge } from 'react-bootstrap';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { Modal, Button, ListGroup, Image, Spinner, Alert, Badge, Form, InputGroup, Row, Col, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { getParticipantsForEventManagementApi, confirmParticipantApi } from '../../api/event.api'; // Import API functions
-import { ParticipantDetail, CompletionStatus } from '../../types/participation.types'; // Import types
+import { Search, Download, CheckCircleFill, XCircleFill, Clock } from 'react-bootstrap-icons';
+import { getParticipantsForEventManagementApi, confirmParticipantApi } from '../../api/event.api';
+import { ParticipantDetail, CompletionStatus } from '../../types/participation.types';
 
 const defaultAvatar = '/default-avatar.png';
 
 interface ParticipantManagementModalProps {
-    show: boolean; // Trạng thái ẩn/hiện modal
-    onHide: () => void; // Hàm để đóng modal
-    eventId: number | null; // ID của sự kiện đang quản lý
-    eventName?: string; // Tên sự kiện để hiển thị trên title modal
-    // Optional: Callback để báo cho dashboard biết có thay đổi cần refresh list event (nếu cần)
+  show: boolean;
+  onHide: () => void;
+  eventId: number | null;
+  eventName?: string;
     onConfirmSuccess?: () => void;
 }
 
@@ -26,129 +25,259 @@ const ParticipantManagementModal: React.FC<ParticipantManagementModalProps> = ({
     const [participants, setParticipants] = useState<ParticipantDetail[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    // State để biết đang xác nhận user nào (hiển thị spinner trên nút)
     const [confirmingUserId, setConfirmingUserId] = useState<number | null>(null);
-    const [confirmError, setConfirmError] = useState<string | null>(null); // Lỗi khi xác nhận
+  const [confirmError, setConfirmError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [selectedParticipants, setSelectedParticipants] = useState<number[]>([]);
 
-    // Hàm fetch danh sách người tham gia
-    const fetchParticipants = useCallback(async () => {
-        if (!eventId) return; // Không fetch nếu không có eventId
+  // Statistics
+  const statistics = useMemo(() => {
+    return {
+      total: participants.length,
+      confirmed: participants.filter(p => p.completionStatus === CompletionStatus.CONFIRMED).length,
+      pending: participants.filter(p => p.completionStatus === CompletionStatus.PENDING).length,
+      absent: participants.filter(p => p.completionStatus === CompletionStatus.ABSENT).length
+    };
+  }, [participants]);
 
-        setLoading(true);
-        setError(null);
-        setConfirmError(null); // Reset lỗi confirm cũ
-        try {
-            console.log(`Fetching participants for event ${eventId}`);
-            const response = await getParticipantsForEventManagementApi(eventId);
-            setParticipants(response.participants);
-        } catch (err: any) {
-            setError(err.message || 'Lỗi tải danh sách người tham gia.');
-        } finally {
-            setLoading(false);
-        }
-    }, [eventId]); // Phụ thuộc vào eventId
+  const fetchParticipants = useCallback(async () => {
+    if (!eventId) return;
 
-    // Gọi fetchParticipants khi modal được mở hoặc eventId thay đổi
-    useEffect(() => {
-        if (show && eventId) {
-            fetchParticipants();
-        } else {
-            // Reset state khi modal đóng hoặc không có eventId
-            setParticipants([]);
-            setError(null);
-            setConfirmError(null);
-            setLoading(false);
-        }
-    }, [show, eventId, fetchParticipants]);
+    setLoading(true);
+    setError(null);
+    setConfirmError(null);
+    try {
+      const response = await getParticipantsForEventManagementApi(eventId);
+      setParticipants(response.participants);
+    } catch (err: any) {
+      setError(err.message || 'Lỗi tải danh sách người tham gia.');
+    } finally {
+      setLoading(false);
+    }
+  }, [eventId]);
 
-    // Hàm xử lý khi nhấn nút "Xác nhận"
-    const handleConfirm = async (participantUserId: number) => {
-        if (!eventId) return;
+  useEffect(() => {
+    if (show && eventId) {
+      fetchParticipants();
+    } else {
+      setParticipants([]);
+      setError(null);
+      setConfirmError(null);
+      setLoading(false);
+      setSearchTerm('');
+      setStatusFilter('all');
+      setSelectedParticipants([]);
+    }
+  }, [show, eventId, fetchParticipants]);
 
-        setConfirmingUserId(participantUserId); // Bắt đầu loading cho nút này
-        setConfirmError(null);
-        try {
-            await confirmParticipantApi(eventId, participantUserId);
-            // Tải lại danh sách participants trong modal để cập nhật trạng thái
-            await fetchParticipants();
-            // Thông báo cho component cha (dashboard) nếu cần cập nhật gì đó (vd: participant count)
-            onConfirmSuccess?.();
-        } catch (err: any) {
-            setConfirmError(err.message || `Lỗi xác nhận cho user ${participantUserId}.`);
-        } finally {
-            setConfirmingUserId(null); // Kết thúc loading cho nút này
-        }
+  const handleConfirm = async (participantUserId: number) => {
+    if (!eventId) return;
+
+    setConfirmingUserId(participantUserId);
+    setConfirmError(null);
+    try {
+      await confirmParticipantApi(eventId, participantUserId);
+      await fetchParticipants();
+      onConfirmSuccess?.();
+    } catch (err: any) {
+      setConfirmError(err.message || `Lỗi xác nhận cho user ${participantUserId}.`);
+    } finally {
+      setConfirmingUserId(null);
+    }
     };
 
-    // Render nội dung danh sách người tham gia
-    const renderParticipantList = () => {
-        if (loading) return <div className="text-center"><Spinner animation="border" size="sm" /> Đang tải...</div>;
-        if (error) return <Alert variant="danger">{error}</Alert>;
-        if (participants.length === 0) return <p className="text-muted text-center">Chưa có ai đăng ký tham gia sự kiện này.</p>;
+  const handleExport = () => {
+    // Implementation for exporting participant list
+    console.log('Exporting participants...');
+};
 
-        return (
-            <ListGroup variant="flush">
-                {participants.map((p) => (
-                    <ListGroup.Item key={p.userId} className="d-flex justify-content-between align-items-center">
-                        <div className="d-flex align-items-center">
-                            <Link to={`/profile/${p.user.id}`}>
-                                <RBImage
-                                    src={p.user.avatarUrl || defaultAvatar}
-                                    alt={p.user.username}
-                                    roundedCircle
-                                    width={35} height={35}
-                                    className="me-3"
-                                    style={{ objectFit: 'cover' }}
-                                />
-                            </Link>
-                            <Link to={`/profile/${p.user.id}`} className="text-decoration-none text-body fw-medium">
-                                {p.user.username}
-                            </Link>
-                        </div>
-                        <div>
-                            {/* Hiển thị trạng thái hoặc nút xác nhận */}
-                            {p.completionStatus === CompletionStatus.CONFIRMED ? (
-                                <Badge bg="success"><i className="bi bi-check-circle-fill me-1"></i> Đã xác nhận</Badge>
-                            ) : p.completionStatus === CompletionStatus.ABSENT ? (
-                                <Badge bg="secondary">Vắng mặt</Badge>
-                            ) : ( // Trạng thái PENDING
-                                <Button
-                                    variant="outline-success"
-                                    size="sm"
-                                    onClick={() => handleConfirm(p.userId)}
-                                    disabled={confirmingUserId === p.userId} // Disable khi đang xử lý user này
-                                >
-                                    {confirmingUserId === p.userId ? (
-                                        <Spinner animation="border" size="sm" />
-                                    ) : (
-                                        'Xác nhận'
-                                    )}
-                                </Button>
-                            )}
-                        </div>
-                    </ListGroup.Item>
-                ))}
-            </ListGroup>
-        );
-    };
+  const filteredParticipants = useMemo(() => {
+    return participants.filter(participant => {
+      const matchesSearch = 
+        participant.user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (participant.user.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
+      const matchesStatus = statusFilter === 'all' || participant.completionStatus === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [participants, searchTerm, statusFilter]);
 
+  const getStatusBadge = (status: CompletionStatus) => {
+    switch (status) {
+      case CompletionStatus.CONFIRMED:
+        return <Badge bg="success">Đã xác nhận</Badge>;
+      case CompletionStatus.ABSENT:
+        return <Badge bg="danger">Vắng mặt</Badge>;
+      default:
+        return <Badge bg="warning">Chờ xác nhận</Badge>;
+    }
+  };
 
-    return (
-        <Modal show={show} onHide={onHide} size="lg" centered>
-            <Modal.Header closeButton>
-                <Modal.Title>Quản lý Tình nguyện viên: {eventName || `Sự kiện #${eventId}`}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body style={{ minHeight: '200px' }}> {/* Đặt chiều cao tối thiểu */}
-                {confirmError && <Alert variant="warning" size="sm" className="mb-3">{confirmError}</Alert>}
-                {renderParticipantList()}
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={onHide}>
-                    Đóng
-                </Button>
-            </Modal.Footer>
-        </Modal>
-    );
+  return (
+    <Modal show={show} onHide={onHide} size="lg">
+      <Modal.Header closeButton>
+        <Modal.Title>
+          Quản lý TNV - {eventName || `Sự kiện #${eventId}`}
+        </Modal.Title>
+      </Modal.Header>
+
+      <Modal.Body className="p-4">
+        {/* Statistics Cards */}
+        <Row className="mb-4">
+          <Col md={3}>
+            <Card className="text-center h-100">
+              <Card.Body>
+                <h3 className="mb-1">{statistics.total}</h3>
+                <div className="text-muted">Tổng số TNV</div>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md={3}>
+            <Card className="text-center h-100">
+              <Card.Body>
+                <h3 className="mb-1 text-success">{statistics.confirmed}</h3>
+                <div className="text-muted">Đã xác nhận</div>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md={3}>
+            <Card className="text-center h-100">
+              <Card.Body>
+                <h3 className="mb-1 text-warning">{statistics.pending}</h3>
+                <div className="text-muted">Chờ xác nhận</div>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md={3}>
+            <Card className="text-center h-100">
+              <Card.Body>
+                <h3 className="mb-1 text-danger">{statistics.absent}</h3>
+                <div className="text-muted">Vắng mặt</div>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Search and Filter */}
+        <Row className="mb-4">
+          <Col md={6}>
+            <InputGroup>
+              <InputGroup.Text>
+                <Search />
+              </InputGroup.Text>
+              <Form.Control
+                placeholder="Tìm kiếm tình nguyện viên..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </InputGroup>
+          </Col>
+          <Col md={4}>
+            <Form.Select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="all">Tất cả trạng thái</option>
+              <option value={CompletionStatus.CONFIRMED}>Đã xác nhận</option>
+              <option value={CompletionStatus.PENDING}>Chờ xác nhận</option>
+              <option value={CompletionStatus.ABSENT}>Vắng mặt</option>
+            </Form.Select>
+          </Col>
+          <Col md={2}>
+            <Button
+              variant="outline-primary"
+              className="w-100"
+              onClick={handleExport}
+            >
+              <Download className="me-1" /> Xuất
+            </Button>
+          </Col>
+        </Row>
+
+        {confirmError && (
+          <Alert variant="danger" onClose={() => setConfirmError(null)} dismissible>
+            {confirmError}
+          </Alert>
+        )}
+
+        {loading ? (
+          <div className="text-center py-5">
+            <Spinner animation="border" variant="primary" />
+            <p className="mt-2 text-muted">Đang tải danh sách...</p>
+          </div>
+        ) : error ? (
+          <Alert variant="danger">{error}</Alert>
+        ) : filteredParticipants.length === 0 ? (
+          <Alert variant="info">
+            {searchTerm || statusFilter !== 'all'
+              ? 'Không tìm thấy tình nguyện viên phù hợp.'
+              : 'Chưa có tình nguyện viên nào tham gia.'}
+          </Alert>
+        ) : (
+          <ListGroup variant="flush">
+            {filteredParticipants.map((participant) => (
+              <ListGroup.Item
+                key={participant.userId}
+                className="d-flex align-items-center py-3"
+              >
+                <Link to={`/profile/${participant.userId}`} className="me-3">
+                  <Image
+                    src={participant.user.avatarUrl || defaultAvatar}
+                    roundedCircle
+                    width={40}
+                    height={40}
+                    className="object-fit-cover"
+                  />
+                </Link>
+                <div className="flex-grow-1">
+                  <div className="d-flex align-items-center">
+                    <Link
+                      to={`/profile/${participant.userId}`}
+                      className="text-decoration-none"
+                    >
+                      <strong>{participant.user.username}</strong>
+                    </Link>
+                    <span className="ms-2">
+                      {getStatusBadge(participant.completionStatus)}
+                    </span>
+                  </div>
+                  {participant.user.fullName && (
+                    <div className="text-muted small">{participant.user.fullName}</div>
+                  )}
+                </div>
+                {participant.completionStatus === CompletionStatus.PENDING && (
+                  <Button
+                    variant="success"
+                    size="sm"
+                    onClick={() => handleConfirm(participant.userId)}
+                    disabled={confirmingUserId === participant.userId}
+                  >
+                    {confirmingUserId === participant.userId ? (
+                      <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      'Xác nhận'
+                    )}
+                  </Button>
+                )}
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+        )}
+      </Modal.Body>
+
+      <Modal.Footer>
+        <Button variant="secondary" onClick={onHide}>
+          Đóng
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
 };
 
 export default ParticipantManagementModal;

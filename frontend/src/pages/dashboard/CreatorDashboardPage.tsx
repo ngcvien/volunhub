@@ -1,134 +1,332 @@
 // frontend/src/pages/dashboard/CreatorDashboardPage.tsx
-import React, { useState, useEffect } from 'react';
-import { Container, Table, Spinner, Alert, Button, Badge } from 'react-bootstrap';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Container, Row, Col, Card, Table, Button, Badge, Alert, Spinner, Form, InputGroup } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { Search, Filter, ThreeDots, Download, PeopleFill, Calendar2Check, ArrowUpCircleFill } from 'react-bootstrap-icons';
 import { getMyCreatedEventsApi } from '../../api/event.api'; 
 import { EventType } from '../../types/event.types';
 import ParticipantManagementModal from '../../components/Dashboard/ParticipantManagementModal';
-interface CreatedEvent extends Omit<EventType, 'participants' | 'posts' | 'isLiked' | 'isParticipating' | 'creator'> {
-    participantCount: number;
+import { format } from 'date-fns';
+import vi from 'date-fns/locale/vi';
+import './CreatorDashboardPage.css';
+
+interface CreatedEvent extends EventType {
+  participantCount?: number;
 }
 
 const CreatorDashboardPage = () => {
+  // State Management
     const [myEvents, setMyEvents] = useState<CreatedEvent[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedEvents, setSelectedEvents] = useState<number[]>([]);
     const [showManageModal, setShowManageModal] = useState(false);
     const [managingEventId, setManagingEventId] = useState<number | null>(null);
     const [managingEventName, setManagingEventName] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const eventsPerPage = 10;
 
-
-    const fetchMyEvents = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = await getMyCreatedEventsApi();
-            setMyEvents(response.events);
-        } catch (err: any) {
-            setError(err.message || 'Lỗi tải sự kiện của bạn.');
-        } finally {
-            setLoading(false);
-        }
+  // Calculate Statistics
+  const statistics = useMemo(() => {
+    return {
+      total: myEvents.length,
+      active: myEvents.filter(e => e.status === 'active').length,
+      completed: myEvents.filter(e => e.status === 'completed').length,
+      totalParticipants: myEvents.reduce((acc, event) => acc + (event.participantCount || 0), 0)
     };
+  }, [myEvents]);
 
+  // Fetch Events
     useEffect(() => {
-        fetchMyEvents();
-    }, []); // Fetch khi component mount
+    fetchEvents();
+  }, []);
 
-    // Hàm format ngày giờ (có thể dùng lại từ EventCard hoặc utils)
-    const formatEventDateTime = (isoString: string): string => {
-        try { return new Date(isoString).toLocaleString('vi-VN'); } catch (e) { return 'N/A'; }
+  const fetchEvents = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await getMyCreatedEventsApi();
+      setMyEvents(response.events);
+    } catch (err: any) {
+      setError(err.message || 'Không thể tải danh sách sự kiện.');
+    } finally {
+      setLoading(false);
+    }
     };
-    const handleOpenManageModal = (event: CreatedEvent) => {
-        setManagingEventId(event.id);
-        setManagingEventName(event.title);
+
+  // Filter and Search Events
+  const filteredEvents = useMemo(() => {
+    return myEvents.filter(event => {
+      const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || event.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [myEvents, searchTerm, statusFilter]);
+
+  // Pagination
+  const paginatedEvents = useMemo(() => {
+    const startIndex = (currentPage - 1) * eventsPerPage;
+    return filteredEvents.slice(startIndex, startIndex + eventsPerPage);
+  }, [filteredEvents, currentPage]);
+
+  const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
+
+  // Event Handlers
+  const handleManageParticipants = (eventId: number, eventName: string) => {
+    setManagingEventId(eventId);
+    setManagingEventName(eventName);
         setShowManageModal(true);
     };
 
-    const handleCloseManageModal = () => {
-        setShowManageModal(false);
-        setManagingEventId(null);
-        setManagingEventName('');
-        // Tùy chọn: Tự động refresh lại danh sách event trên dashboard sau khi đóng modal
-        // để cập nhật participantCount nếu cần (hoặc đợi refresh thủ công)
-        // fetchMyEvents();
+  const handleExportEvents = () => {
+    // Implementation for exporting events
+    console.log('Exporting events...');
     };
 
-    if (loading) return <Container className="text-center mt-5"><Spinner animation="border" /></Container>;
-    if (error) return <Container><Alert variant="danger" className="mt-4">{error} <Button size="sm" variant="outline-danger" onClick={fetchMyEvents}>Thử lại</Button></Alert></Container>;
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+};
 
+  const handleBulkAction = (action: string) => {
+    // Implementation for bulk actions
+    console.log(`Performing ${action} on selected events:`, selectedEvents);
+  };
+
+  // Utility Functions
+  const formatEventDateTime = (dateTimeStr: string) => {
+    return format(new Date(dateTimeStr), 'HH:mm - dd/MM/yyyy', { locale: vi });
+  };
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'active': return 'success';
+      case 'completed': return 'info';
+      case 'cancelled': return 'danger';
+      default: return 'secondary';
+    }
+  };
+
+  // Loading State
+  if (loading) {
     return (
-        <Container className="mt-4 mb-5 dashboard-page">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="mb-0">Quản lý Sự kiện của bạn</h2>
-                <Link to="/events/new">
-                    <Button variant="primary">Tạo Sự kiện mới</Button>
-                </Link>
-            </div>
-
-            {myEvents.length === 0 ? (
-                <Alert variant="info">Bạn chưa tạo sự kiện nào.</Alert>
-            ) : (
-                <Table striped bordered hover responsive className="align-middle">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Tiêu đề</th>
-                            <th>Trạng thái</th>
-                            <th>Thời gian diễn ra</th>
-                            <th>Địa điểm</th>
-                            <th>Tham gia</th>
-                            <th>Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {myEvents.map((event, index) => (
-                            <tr key={event.id}>
-                                <td>{index + 1}</td>
-                                <td>
-                                    <Link to={`/events/${event.id}`}>{event.title}</Link>
-                                </td>
-                                <td><Badge bg={event.status === 'completed' ? 'success' : (event.status === 'cancelled' ? 'danger' : 'primary')}>{event.status}</Badge></td>
-                                <td>{formatEventDateTime(event.eventTime)}</td>
-                                <td>{event.location || '-'}</td>
-                                <td className='text-center'>{event.participantCount}</td>
-                                <td>
-                                    {/* TODO: Thêm các nút Manage Participants, Edit, Cancel */}
-                                    <Button variant="outline-info" size="sm" className="me-2" title="Xem chi tiết" as={Link} to={`/events/${event.id}`}>
-                                        <i className="bi bi-eye-fill"></i>
-                                    </Button>
-                                    <Button variant="outline-warning" size="sm" className="me-2" title="Chỉnh sửa">
-                                        <i className="bi bi-pencil-fill"></i>
-                                    </Button>
-                                    {/* Nút Quản lý TNV sẽ quan trọng cho bước sau */}
-                                    <Button
-                                        variant="outline-success"
-                                        size="sm"
-                                        title="Quản lý tình nguyện viên"
-                                        onClick={() => handleOpenManageModal(event)} 
-                                        className="me-1" // Giữ lại hoặc bỏ me-1 tùy ý
-                                    >
-                                        <i className="bi bi-people-fill"></i>
-                                        {/* Có thể bỏ chữ nếu muốn */}
-                                        {/* <span className="d-none d-md-inline"> Quản lý TNV</span> */}
-                                    </Button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </Table>
-            )}
-
-            <ParticipantManagementModal
-                show={showManageModal}
-                onHide={handleCloseManageModal}
-                eventId={managingEventId}
-                eventName={managingEventName}
-            // onConfirmSuccess={fetchMyEvents} // Optional: Tự động refresh list event khi có xác nhận thành công
-            />
-        </Container>
+      <Container className="mt-4 text-center">
+        <Spinner animation="border" variant="primary" />
+        <p className="mt-2">Đang tải danh sách sự kiện...</p>
+      </Container>
     );
+  }
+
+  return (
+    <Container fluid className="dashboard-container py-4">
+      {/* Statistics Cards */}
+      <Row className="mb-4">
+        <Col md={3}>
+          <Card className="dashboard-stat-card">
+            <Card.Body>
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 className="text-muted mb-1">Tổng số sự kiện</h6>
+                  <h3 className="mb-0">{statistics.total}</h3>
+                </div>
+                <Calendar2Check size={24} className="text-primary" />
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={3}>
+          <Card className="dashboard-stat-card">
+            <Card.Body>
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 className="text-muted mb-1">Đang hoạt động</h6>
+                  <h3 className="mb-0">{statistics.active}</h3>
+                </div>
+                <ArrowUpCircleFill size={24} className="text-success" />
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={3}>
+          <Card className="dashboard-stat-card">
+            <Card.Body>
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 className="text-muted mb-1">Đã hoàn thành</h6>
+                  <h3 className="mb-0">{statistics.completed}</h3>
+                </div>
+                <Calendar2Check size={24} className="text-info" />
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={3}>
+          <Card className="dashboard-stat-card">
+            <Card.Body>
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 className="text-muted mb-1">Tổng số TNV</h6>
+                  <h3 className="mb-0">{statistics.totalParticipants}</h3>
+                </div>
+                <PeopleFill size={24} className="text-warning" />
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Toolbar */}
+      <Row className="mb-4">
+        <Col md={6} className="mb-3 mb-md-0">
+          <InputGroup>
+            <InputGroup.Text>
+              <Search />
+            </InputGroup.Text>
+            <Form.Control
+              placeholder="Tìm kiếm sự kiện..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </InputGroup>
+        </Col>
+        <Col md={3}>
+          <Form.Select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="mb-3 mb-md-0"
+          >
+            <option value="all">Tất cả trạng thái</option>
+            <option value="upcoming">Sắp diễn ra</option>
+            <option value="completed">Đã hoàn thành</option>
+            <option value="cancelled">Đã hủy</option>
+          </Form.Select>
+        </Col>
+        <Col md={3} className="text-end">
+          <Button 
+            variant="outline-primary" 
+            onClick={handleExportEvents} 
+            className="me-2"
+            title="Xuất danh sách sự kiện"
+          >
+            <Download className="me-1" /> Xuất
+          </Button>
+          <Link to="/events/new">
+            <Button variant="primary">Tạo sự kiện mới</Button>
+          </Link>
+        </Col>
+      </Row>
+
+      {/* Error Alert */}
+      {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
+
+      {/* Events Table */}
+      <Card className="shadow-sm">
+        <Card.Body className="p-0">
+          <Table responsive hover className="mb-0">
+            <thead className="bg-light">
+              <tr>
+                <th style={{ width: '40%' }}>Sự kiện</th>
+                <th className="text-center">Trạng thái</th>
+                <th>Thời gian</th>
+                <th>Địa điểm</th>
+                <th className="text-center">TNV</th>
+                <th className="text-center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedEvents.map(event => (
+                <tr key={event.id}>
+                  <td>
+                    <Link 
+                      to={`/events/${event.id}`} 
+                      className="text-decoration-none text-primary"
+                    >
+                      {event.title}
+                    </Link>
+                  </td>
+                  <td className="text-center">
+                    <Badge bg={getStatusBadgeVariant(event.status)}>
+                      {event.status === 'upcoming' ? 'Sắp diễn ra' :
+                       event.status === 'completed' ? 'Đã hoàn thành' : 'Đã hủy'}
+                    </Badge>
+                  </td>
+                  <td>{formatEventDateTime(event.eventTime)}</td>
+                  <td>{event.location}</td>
+                  <td className="text-center">
+                    <Badge bg="light" text="dark">
+                      {event.participantCount || 0}
+                    </Badge>
+                  </td>
+                  <td className="text-center">
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
+                      onClick={() => handleManageParticipants(event.id, event.title)}
+                      className="me-2"
+                      title="Quản lý tình nguyện viên"
+                    >
+                      Quản lý TNV
+                    </Button>
+                    <Button
+                      variant="light"
+                      size="sm"
+                      title="Thêm tùy chọn"
+                    >
+                      <ThreeDots />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Card.Body>
+      </Card>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="d-flex justify-content-center mt-4">
+          <Button
+            variant="outline-primary"
+            size="sm"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="me-2"
+          >
+            Trước
+          </Button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+            <Button
+              key={page}
+              variant={currentPage === page ? "primary" : "outline-primary"}
+              size="sm"
+              onClick={() => handlePageChange(page)}
+              className="me-2"
+            >
+              {page}
+            </Button>
+          ))}
+          <Button
+            variant="outline-primary"
+            size="sm"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Sau
+          </Button>
+        </div>
+      )}
+
+      {/* Participant Management Modal */}
+      <ParticipantManagementModal
+        show={showManageModal}
+        onHide={() => setShowManageModal(false)}
+        eventId={managingEventId}
+        eventName={managingEventName}
+        onConfirmSuccess={fetchEvents}
+      />
+    </Container>
+  );
 };
 
 export default CreatorDashboardPage;

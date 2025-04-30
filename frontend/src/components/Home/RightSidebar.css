@@ -1,0 +1,199 @@
+.right-sidebar {
+  position: sticky;
+  top: 90px;
+  height: calc(100vh - 90px);
+  overflow-y: auto;
+  padding-left: 10px;
+}
+
+.sidebar-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
+}
+
+[data-bs-theme="dark"] .sidebar-card {
+  background: rgba(33, 37, 41, 0.8);
+}
+
+.sidebar-title {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--bs-primary);
+}
+
+/* User Stats Section */
+.user-stats {
+  text-align: center;
+}
+
+.user-stats-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.user-avatar {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  margin-right: 1rem;
+}
+
+.user-info {
+  text-align: left;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+.stat-item {
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--bs-primary);
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--bs-secondary);
+}
+
+/* Top Volunteers Section */
+.volunteer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.volunteer-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  text-decoration: none;
+  color: var(--bs-body-color);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.volunteer-item:hover {
+  background: rgba(var(--bs-primary-rgb), 0.1);
+  transform: translateX(5px);
+}
+
+.volunteer-rank {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bs-primary);
+  color: white;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.volunteer-avatar {
+  width: 32px;
+  height: 32px;
+  margin-right: 0.5rem;
+  object-fit: cover;
+}
+
+.volunteer-info {
+  flex: 1;
+}
+
+.volunteer-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.volunteer-points {
+  font-size: 0.8rem;
+  color: var(--bs-secondary);
+}
+
+/* Upcoming Events Section */
+.upcoming-events {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.upcoming-event {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  text-decoration: none;
+  color: var(--bs-body-color);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.upcoming-event:hover {
+  background: rgba(var(--bs-primary-rgb), 0.1);
+  transform: translateX(5px);
+}
+
+.event-info {
+  flex: 1;
+}
+
+.event-title {
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.event-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: var(--bs-secondary);
+}
+
+.event-date,
+.event-participants {
+  display: flex;
+  align-items: center;
+}
+
+.event-arrow {
+  color: var(--bs-secondary);
+  transition: transform 0.2s ease;
+}
+
+.upcoming-event:hover .event-arrow {
+  transform: translateX(5px);
+  color: var(--bs-primary);
+}
+
+/* Custom Scrollbar */
+.right-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.right-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.right-sidebar::-webkit-scrollbar-thumb {
+  background: var(--bs-primary);
+  border-radius: 4px;
+}

@@ -1,0 +1,160 @@
+.event-post {
+  border: none;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+[data-bs-theme="dark"] .event-post {
+  background: rgba(33, 37, 41, 0.8);
+}
+
+.event-post:hover {
+  transform: translateY(-2px);
+}
+
+.post-avatar {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+}
+
+.creator-name {
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--bs-body-color);
+}
+
+.creator-name:hover {
+  text-decoration: underline;
+}
+
+.post-meta {
+  display: flex;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.event-title-link {
+  text-decoration: none;
+  color: var(--bs-body-color);
+}
+
+.event-title-link:hover h5 {
+  color: var(--bs-primary);
+}
+
+.event-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--bs-secondary);
+  font-size: 0.9rem;
+}
+
+.event-description {
+  font-size: 0.95rem;
+  white-space: pre-line;
+  margin: 1rem 0;
+}
+
+.event-image-container {
+  margin: 1rem -1.5rem;
+  position: relative;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  overflow: hidden;
+}
+
+.event-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.event-image:hover {
+  transform: scale(1.02);
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.action-button:hover {
+  transform: scale(1.1);
+}
+
+.comments-section {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 1rem 0;
+}
+
+.comment-form {
+  position: relative;
+}
+
+.comment-avatar {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+}
+
+.comment-actions {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.comment-actions button {
+  padding: 4px;
+}
+
+/* Custom Scrollbar */
+.comments-section::-webkit-scrollbar {
+  width: 4px;
+}
+
+.comments-section::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.comments-section::-webkit-scrollbar-thumb {
+  background: var(--bs-primary);
+  border-radius: 4px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .event-post {
+    margin: 0 -12px;
+    border-radius: 0;
+  }
+
+  .event-image-container {
+    margin: 1rem -1rem;
+  }
+
+  .detail-item {
+    font-size: 0.85rem;
+  }
+}

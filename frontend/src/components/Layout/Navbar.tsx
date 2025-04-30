@@ -1,130 +1,188 @@
 "use client"
-import { Navbar, Nav, Container, NavDropdown, Image as RBImage, Button } from "react-bootstrap"
-import { LinkContainer } from "react-router-bootstrap"
-import { useAuth } from "../../contexts/AuthContext"
-import { Bell, Search, PlusCircle } from "react-bootstrap-icons"
-import "./Navbar.css"
+import React, { useState, useEffect } from 'react';
+import { Navbar as BsNavbar, Nav, Container, Button, Image, Dropdown } from 'react-bootstrap';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { Bell, Person, BoxArrowRight, Gear, PlusCircle, Collection } from 'react-bootstrap-icons';
+import UserPopup from '../User/UserPopup';
+import "./Navbar.css";
 
-const defaultAvatar = "/default-avatar.png"
+const Navbar = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [showUserPopup, setShowUserPopup] = useState(false);
 
-const AppNavbar = () => {
-  const { user, logout, theme } = useAuth()
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      const offset = window.scrollY;
+      setIsScrolled(offset > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
 
   return (
-    <Navbar
-      expand="lg"
-      collapseOnSelect
+    <BsNavbar 
+      expand="lg" 
       fixed="top"
-      className="app-navbar shadow-sm py-2"
-      variant={theme === "dark" ? "dark" : "light"}
+      className={`custom-navbar ${isScrolled ? 'scrolled' : ''}`}
     >
-      <Container>
-        {/* Logo và Brand */}
-        <LinkContainer to="/">
-          <Navbar.Brand className="d-flex align-items-center">
-            {/* <HandHeart size={24} className="text-primary me-2" /> */}
-            <span className="fw-bold brand-text">VolunHub</span>
-          </Navbar.Brand>
-        </LinkContainer>
+      <Container fluid className="px-4">
+        {/* Logo and Brand */}
+        <BsNavbar.Brand as={Link} to="/" className="d-flex align-items-center">
+          {/* <Image
+            src="/logo.png"
+            width="40"
+            height="40"
+            className="d-inline-block align-top me-2"
+            alt="VolunHub Logo"
+          /> */}
+          <span className="brand-text">VolunHub</span>
+        </BsNavbar.Brand>
 
-        {/* Search Bar - Hiển thị trên màn hình lớn */}
-        <div className="d-none d-md-flex search-container mx-auto">
-          <div className="position-relative search-wrapper">
-            <input type="text" className="form-control search-input" placeholder="Tìm kiếm sự kiện..." />
-            <Search className="search-icon" />
-          </div>
-        </div>
+        <BsNavbar.Toggle aria-controls="basic-navbar-nav" />
+        
+        <BsNavbar.Collapse id="basic-navbar-nav">
+          {/* Main Navigation */}
+          <Nav className="me-auto">
+            <Nav.Link 
+              as={Link} 
+              to="/" 
+              className={`nav-link-custom ${isActive('/') ? 'active' : ''}`}
+            >
+              Trang chủ
+            </Nav.Link>
+            <Nav.Link 
+              as={Link} 
+              to="/events" 
+              className={`nav-link-custom ${isActive('/events') ? 'active' : ''}`}
+            >
+              Sự kiện
+            </Nav.Link>
+            <Nav.Link 
+              as={Link} 
+              to="/about" 
+              className={`nav-link-custom ${isActive('/about') ? 'active' : ''}`}
+            >
+              Giới thiệu
+            </Nav.Link>
+          </Nav>
 
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-
-        <Navbar.Collapse id="basic-navbar-nav">
-          {/* Search Bar - Hiển thị trên màn hình nhỏ */}
-          <div className="d-md-none my-2 w-100">
-            <div className="position-relative search-wrapper">
-              <input type="text" className="form-control search-input" placeholder="Tìm kiếm sự kiện..." />
-              <Search className="search-icon" />
-            </div>
-          </div>
-
-          <Nav className="ms-auto align-items-center">
+          {/* Right-side items */}
+          <Nav className="align-items-center">
             {user ? (
-              <>
-                {/* Nút tạo sự kiện */}
-                <LinkContainer to="/events/new">
-                  <Nav.Link className="nav-icon-link me-2">
-                    <div className="d-flex align-items-center">
-                      <PlusCircle size={20} className="me-1" />
-                      <span className="d-none d-lg-inline">Tạo sự kiện</span>
-                    </div>
-                  </Nav.Link>
-                </LinkContainer>
-
-                {/* Thông báo */}
-                <Nav.Link className="nav-icon-link position-relative me-2">
+              <div className="d-flex gap-2">
+                {/* Create Event Button */}
+                <Nav.Link 
+                  as={Link} 
+                  to="/events/new"
+                  className="me-3"
+                >
+                  <Button variant="primary" className="create-event-btn">
+                    <PlusCircle className="me-1" />
+                    Tạo sự kiện
+                </Button>
+                </Nav.Link>
+                {/* Dashboard Link */}
+                <Nav.Link 
+                  as={Link} 
+                  to="/dashboard/my-events"
+                  className="nav-icon-link me-3"
+                  title="Bảng điều khiển"
+                >
+                  <Collection size={20} />
+                </Nav.Link>
+                {/* Notifications */}
+                <div className="nav-icon-link me-3 position-relative">
                   <Bell size={20} />
                   <span className="notification-badge">3</span>
-                </Nav.Link>
+              </div>
 
-                {/* User Dropdown */}
-                <NavDropdown
-                  title={
-                    <div className="d-flex align-items-center">
-                      <RBImage
-                        src={user.avatarUrl || defaultAvatar}
-                        alt={user.username}
-                        roundedCircle
-                        width={32}
-                        height={32}
-                        className="nav-avatar"
-                        style={{ objectFit: "cover" }}
-                      />
-                      <span className="d-none d-lg-inline ms-2">@{user.username}</span>
+                {/* Theme Toggle */}
+                {/* Xóa đoạn này
+                <div className="me-3">
+                  <ThemeToggle />
+                </div>
+                */}
+
+                {/* User Menu */}
+                <Dropdown align="end">
+                  <Dropdown.Toggle 
+                    as="div" 
+                    className="user-dropdown-toggle"
+                    // onClick={() => setShowUserPopup(!showUserPopup)}
+                  >
+                    <Image
+                      src={user.avatarUrl || '/default-avatar.png'}
+                      width="35"
+                      height="35"
+                      roundedCircle
+                      className="user-avatar"
+                    />
+                  </Dropdown.Toggle>
+
+                  <Dropdown.Menu className="dropdown-menu-custom">
+                    <div className="px-3 py-2 mb-2">
+                      <div className="fw-bold">{user.username}</div>
+                      <div className="text-muted small">{user.email}</div>
                     </div>
-                  }
-                  id="user-nav-dropdown"
-                  align="end"
-                  className="user-dropdown"
-                >
-                  <LinkContainer to="/profile/me">
-                    <NavDropdown.Item className="dropdown-item-custom">
-                      <i className="bi bi-person-circle me-2"></i> Hồ sơ
-                    </NavDropdown.Item>
-                  </LinkContainer>
-                  <LinkContainer to="/dashboard/my-events">
-                    <NavDropdown.Item>
-                      <i className="bi bi-gear me-2"></i>Quản lý Sự kiện
-                    </NavDropdown.Item>
-                  </LinkContainer>
-                  <LinkContainer to="/settings">
-                    <NavDropdown.Item className="dropdown-item-custom">
-                      <i className="bi bi-gear me-2"></i> Cài đặt
-                    </NavDropdown.Item>
-                  </LinkContainer>
-
-                  <NavDropdown.Divider />
-
-                  <NavDropdown.Item onClick={logout} className="dropdown-item-custom text-danger">
-                    <i className="bi bi-box-arrow-right me-2"></i> Đăng xuất
-                  </NavDropdown.Item>
-                </NavDropdown>
-              </>
+                    <Dropdown.Divider />
+                    
+                    <Dropdown.Item as={Link} to="/profile/me">
+                      <Person className="me-2" /> Hồ sơ
+                    </Dropdown.Item>
+                    <Dropdown.Item as={Link} to="/settings">
+                      <Gear className="me-2" /> Cài đặt
+                    </Dropdown.Item>
+                    <Dropdown.Divider />
+                    <Dropdown.Item onClick={handleLogout}>
+                      <BoxArrowRight className="me-2" /> Đăng xuất
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </div>
             ) : (
-              <>
-                <LinkContainer to="/login">
-                  <Nav.Link className="me-2">Đăng nhập</Nav.Link>
-                </LinkContainer>
-                <LinkContainer to="/register">
-                  <Button variant="primary" size="sm" className="register-button">
-                    Đăng ký
-                  </Button>
-                </LinkContainer>
-              </>
+              // Login/Register buttons for non-authenticated users
+              <div className="d-flex gap-2">
+                <Button 
+                  variant="outline-primary" 
+                  as={Link} 
+                  to="/login"
+                  className="auth-btn"
+                >
+                  Đăng nhập
+                </Button>
+                <Button 
+                  variant="primary" 
+                  as={Link} 
+                  to="/register"
+                  className="auth-btn"
+                >
+                  Đăng ký
+                </Button>
+              </div>
             )}
           </Nav>
-        </Navbar.Collapse>
+        </BsNavbar.Collapse>
       </Container>
-    </Navbar>
-  )
-}
-
-export default AppNavbar
+    </BsNavbar>
+  );
+};
+export default Navbar;
