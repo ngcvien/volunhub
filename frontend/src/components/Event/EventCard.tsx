@@ -352,7 +352,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
             <OverlayTrigger placement="top" overlay={<Tooltip>{displayLiked ? "Bỏ thích" : "Thích"}</Tooltip>}>
               <Button
                 type="button"
-                variant="light" // Giữ variant light
+                variant="light" 
                 size="sm"
                 className="action-button d-flex align-items-center  me-2 mb-1 like-button"
                 onClick={handleLike} // Gắn hàm xử lý mới
@@ -361,10 +361,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
                 {isLoadingLike ? <Spinner size="sm" animation="border" variant="primary" /> :
                   (displayLiked ? <HandThumbsUpFill className="text-primary me-1" /> : <HandThumbsUp className="me-1" />) // Icon thay đổi theo displayLiked
                 }
-                {/* Hiển thị likeCount từ prop event (hoặc 0 nếu chưa có) */}
                 <span className="small ms-1">{displayLikeCount || 0}</span>
               </Button>
             </OverlayTrigger>
+            
 
             <OverlayTrigger placement="top" overlay={<Tooltip>Bình luận</Tooltip>}>
               <Button variant="light" size="sm" className="action-button me-1 mb-2" onClick={() => navigate(`/events/${event.id}#comments`)}>

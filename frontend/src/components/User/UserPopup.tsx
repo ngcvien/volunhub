@@ -26,7 +26,6 @@ const UserPopup: React.FC<UserPopupProps> = ({
     <Popover id={`user-popover-${userId}`} className="user-popup" >
       <Popover.Body className="p-0">
         <div className="user-popup-content">
-          {/* Header with background and avatar */}
           <div className="user-popup-header">
             <div className="user-popup-avatar-container">
               <Image

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Search, Download, CheckCircleFill, XCircleFill, Clock } from 'react-bootstrap-icons';
 import { getParticipantsForEventManagementApi, confirmParticipantApi } from '../../api/event.api';
 import { ParticipantDetail, CompletionStatus } from '../../types/participation.types';
+import './ParticipantManagementModal.css'
 
 const defaultAvatar = '/default-avatar.png';
 

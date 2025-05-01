@@ -1,5 +1,5 @@
 .dashboard-container {
-  background-color: #f8f9fa;
+  /* background-color: #f8f9fa; */
 }
 
 .dashboard-stat-card {
@@ -19,6 +19,13 @@
 
 .table td {
   vertical-align: middle;
+}
+
+.table tr{
+  transition:  cubic-bezier(0.075, 0.82, 0.165, 1) 2s !important;
+}
+.table tr:hover{
+  background-color: #2364a5 !important;
 }
 
 .badge {

@@ -158,7 +158,7 @@
 
 /* Buttons */
 .btn-primary {
-  height: 3.5rem;
+  /* height: 3.5rem; */
   font-weight: 500;
   background: linear-gradient(45deg, #2196F3, #1976D2);
   border: none;

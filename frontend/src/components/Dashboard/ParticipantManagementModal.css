@@ -1,20 +1,31 @@
-.modal-body {
-  background: rgba(255, 255, 255, 0.121) !important;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
+
 .modal-content {
-  background: rgba(255, 255, 255, 0.121) !important;
+  --bs-modal-bg: rgba(255, 255, 255, 0.5) !important;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
+
+
+/* .modal-content div:hover{
+  transform: scale(1.02);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+} */
+
 
 .list-group-item {
   transition: background-color 0.15s ease-in-out;
+  border-radius: 1rem !important;
+  transition: transform cubic-bezier(0.075, 0.82, 0.165, 1) 0.9s;
+}
+.modal-content .text-center{
+  transition: transform cubic-bezier(0.075, 0.82, 0.165, 1) 0.9s;
+  transition: cubic-bezier(0.075, 0.82, 0.165, 1)0.4s;
 }
 
-.list-group-item:hover {
+.list-group-item:hover,.modal-content .text-center:hover {
   background-color: #f8f9fa;
+  transform: translateY(-2px) scale(1.01);
+
 }
 
 .card {

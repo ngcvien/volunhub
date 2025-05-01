@@ -30,6 +30,7 @@
   color: var(--bs-body-color);
   border-radius: 8px;
   transition: all 0.2s ease;
+  transition: transform cubic-bezier(0.075, 0.82, 0.165, 1) 0.2s !important;
 }
 
 .sidebar-link:hover {
@@ -45,6 +46,10 @@
 .sidebar-link.active .badge {
   background: white !important;
   color: var(--bs-primary) !important;
+}
+
+.sidebar-link span{
+  margin-right: 1rem;
 }
 
 .sidebar-icon {
