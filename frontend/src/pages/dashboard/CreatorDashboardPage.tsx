@@ -1,9 +1,9 @@
 // frontend/src/pages/dashboard/CreatorDashboardPage.tsx
 import React, { useState, useEffect, useMemo } from 'react';
-import { Container, Row, Col, Card, Table, Button, Badge, Alert, Spinner, Form, InputGroup } from 'react-bootstrap';
+import { Container, Row, Col, Card, Table, Button, Badge, Alert, Spinner, Form, InputGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Search, Filter, ThreeDots, Download, PeopleFill, Calendar2Check, ArrowUpCircleFill } from 'react-bootstrap-icons';
-import { getMyCreatedEventsApi } from '../../api/event.api'; 
+import { getMyCreatedEventsApi } from '../../api/event.api';
 import { EventType } from '../../types/event.types';
 import ParticipantManagementModal from '../../components/Dashboard/ParticipantManagementModal';
 import { format } from 'date-fns';
@@ -16,15 +16,15 @@ interface CreatedEvent extends EventType {
 
 const CreatorDashboardPage = () => {
   // State Management
-    const [myEvents, setMyEvents] = useState<CreatedEvent[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+  const [myEvents, setMyEvents] = useState<CreatedEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedEvents, setSelectedEvents] = useState<number[]>([]);
-    const [showManageModal, setShowManageModal] = useState(false);
-    const [managingEventId, setManagingEventId] = useState<number | null>(null);
-    const [managingEventName, setManagingEventName] = useState<string>('');
+  const [showManageModal, setShowManageModal] = useState(false);
+  const [managingEventId, setManagingEventId] = useState<number | null>(null);
+  const [managingEventName, setManagingEventName] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 10;
 
@@ -39,7 +39,7 @@ const CreatorDashboardPage = () => {
   }, [myEvents]);
 
   // Fetch Events
-    useEffect(() => {
+  useEffect(() => {
     fetchEvents();
   }, []);
 
@@ -54,7 +54,7 @@ const CreatorDashboardPage = () => {
     } finally {
       setLoading(false);
     }
-    };
+  };
 
   // Filter and Search Events
   const filteredEvents = useMemo(() => {
@@ -77,17 +77,17 @@ const CreatorDashboardPage = () => {
   const handleManageParticipants = (eventId: number, eventName: string) => {
     setManagingEventId(eventId);
     setManagingEventName(eventName);
-        setShowManageModal(true);
-    };
+    setShowManageModal(true);
+  };
 
   const handleExportEvents = () => {
     // Implementation for exporting events
     console.log('Exporting events...');
-    };
+  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-};
+  };
 
   const handleBulkAction = (action: string) => {
     // Implementation for bulk actions
@@ -203,9 +203,9 @@ const CreatorDashboardPage = () => {
           </Form.Select>
         </Col>
         <Col md={3} className="text-end">
-          <Button 
-            variant="outline-primary" 
-            onClick={handleExportEvents} 
+          <Button
+            variant="outline-primary"
+            onClick={handleExportEvents}
             className="me-2"
             title="Xuất danh sách sự kiện"
           >
@@ -238,8 +238,8 @@ const CreatorDashboardPage = () => {
               {paginatedEvents.map(event => (
                 <tr key={event.id}>
                   <td>
-                    <Link 
-                      to={`/events/${event.id}`} 
+                    <Link
+                      to={`/events/${event.id}`}
                       className="text-decoration-none text-primary"
                     >
                       {event.title}
@@ -248,7 +248,7 @@ const CreatorDashboardPage = () => {
                   <td className="text-center">
                     <Badge bg={getStatusBadgeVariant(event.status)}>
                       {event.status === 'upcoming' ? 'Sắp diễn ra' :
-                       event.status === 'completed' ? 'Đã hoàn thành' : 'Đã hủy'}
+                        event.status === 'completed' ? 'Đã hoàn thành' : 'Đã hủy'}
                     </Badge>
                   </td>
                   <td>{formatEventDateTime(event.eventTime)}</td>
@@ -264,17 +264,17 @@ const CreatorDashboardPage = () => {
                       size="sm"
                       onClick={() => handleManageParticipants(event.id, event.title)}
                       className="me-2"
-                      title="Quản lý tình nguyện viên"
                     >
                       Quản lý TNV
                     </Button>
-                    <Button
-                      variant="light"
-                      size="sm"
-                      title="Thêm tùy chọn"
-                    >
-                      <ThreeDots />
-                    </Button>
+                    <OverlayTrigger placement="top" overlay={<Tooltip>Thêm tùy chọn</Tooltip>}>
+                      <Button
+                        variant="light"
+                        size="sm"
+                      >
+                        <ThreeDots />
+                      </Button>
+                    </OverlayTrigger>
                   </td>
                 </tr>
               ))}

@@ -161,21 +161,14 @@ const Navbar = () => {
             ) : (
               // Login/Register buttons for non-authenticated users
               <div className="d-flex gap-2">
-                <Button 
-                  variant="outline-primary" 
-                  as={Link} 
-                  to="/login"
-                  className="auth-btn"
-                >
-                  Đăng nhập
-                </Button>
+                
                 <Button 
                   variant="primary" 
                   as={Link} 
-                  to="/register"
+                  to="/auth"
                   className="auth-btn"
                 >
-                  Đăng ký
+                  Đăng nhập / Đăng ký
                 </Button>
               </div>
             )}

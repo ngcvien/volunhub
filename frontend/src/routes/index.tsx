@@ -16,6 +16,7 @@ import EventDetailPage from '../pages/EventDetailPage';
 import AdminRoute from "../contexts/AdminRoute"
 import AdminUserManagementPage from "../pages/admin/AdminUserManagementPage"
 import CreatorDashboardPage from "../pages/dashboard/CreatorDashboardPage"
+import AuthPage from "../pages/AuthPage"
 
 // Component để bảo vệ route, yêu cầu đăng nhập
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -38,6 +39,8 @@ const AppRoutes = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/" element={<HomePage />} />
+          <Route path="/auth" element={<AuthPage />} />
+
           <Route
             path="/events/new"
             element={
