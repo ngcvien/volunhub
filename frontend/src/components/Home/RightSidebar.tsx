@@ -23,9 +23,9 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ currentUser }) => {
   ];
 
   const upcomingEvents = [
-    { id: 1, title: 'Dọn dẹp bãi biển', date: '2024-05-01', participants: 15 },
-    { id: 2, title: 'Trồng cây xanh', date: '2024-05-05', participants: 25 },
-    { id: 3, title: 'Thăm trẻ em mồ côi', date: '2024-05-10', participants: 10 },
+    { id: 10, title: 'Dọn dẹp bãi biển', date: '2024-05-01', participants: 15 },
+    { id: 17, title: 'Trồng cây xanh', date: '2024-05-05', participants: 25 },
+    { id: 11, title: 'Thăm trẻ em mồ côi', date: '2024-05-10', participants: 10 },
   ];
 
   return (

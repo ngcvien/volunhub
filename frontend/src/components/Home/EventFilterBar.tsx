@@ -46,7 +46,7 @@ const EventFilterBar: React.FC<EventFilterBarProps> = ({
           <option value="upcoming">Sắp diễn ra</option>
         </Form.Select>
 
-        <ButtonGroup className="ms-2">
+        {/* <ButtonGroup className="ms-2">
           <Button
             variant={viewMode === 'card' ? 'primary' : 'outline-primary'}
             onClick={() => onViewModeChange('card')}
@@ -59,7 +59,7 @@ const EventFilterBar: React.FC<EventFilterBarProps> = ({
           >
             <List />
           </Button>
-        </ButtonGroup>
+        </ButtonGroup> */}
       </div>
     </div>
   );

@@ -104,14 +104,14 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
   const handleLike = async () => {
     if (!user) {
       alert("Vui lòng đăng nhập để thích sự kiện.");
-      navigate("/login"); 
+      navigate("/login");
       return;
     }
-  
+
     setIsLoadingLike(true);
     setLikeError(null);
     const currentLikedStatus = displayLiked;
-  
+
     try {
       if (currentLikedStatus) {
         await unlikeEventApi(event.id);
@@ -224,7 +224,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
                 className="creator-name text-decoration-none" // Cần style cho class này trong CSS
                 style={{ pointerEvents: 'none' }}
               >
-                {event.creator?.fullName||event.creator?.username || "Người dùng ẩn"} {/* Bỏ @ nếu muốn */}
+                {event.creator?.fullName || event.creator?.username || "Người dùng ẩn"} {/* Bỏ @ nếu muốn */}
               </Link>
               <div className="text-muted small d-flex align-items-center">
                 <span>{formatTimeAgo(event.createdAt)}</span>
@@ -264,38 +264,40 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
               // Truyền các props cần thiết khác mà UserPopup cần
               username={event.creator?.username || 'Người dùng ẩn'}
               avatarUrl={event.creator?.avatarUrl}
-              fullName={event.creator?.fullName} 
+              fullName={event.creator?.fullName}
             // bio={event.creator?.bio} 
             />
-            
+
           </div>
         )}
       </Overlay>
 
       {/* Card Body */}
       <Card.Body className="pt-2 pb-3"> {/* Giảm padding top */}
-        <Link to={`/events/${event.id}`} className="event-title-link text-decoration-none">
-          <h5 className="event-title mb-3">{event.title}</h5> {/* Thêm mb-3 */}
-        </Link>
+        
 
         <div className="event-meta mb-3">
-          {/* ... Thông tin thời gian, địa điểm (giữ nguyên) ... */}
           <div className="d-flex align-items-center mb-1">
             <Calendar2Event className="event-icon text-primary me-2" />
             <span>{formatEventDate(event.eventTime)}</span>
             <span className="time-remaining ms-2">{getTimeRemaining(event.eventTime)}</span>
           </div>
-          <div className="d-flex align-items-center mb-1">
-            <Clock className="event-icon text-primary me-2" />
-            <span>{formatEventTime(event.eventTime)}</span>
-          </div>
-          {event.location && (
-            <div className="d-flex align-items-center">
-              <GeoAlt className="event-icon text-primary me-2" />
-              <span>{event.location}</span>
+          <div className="time-and-location">
+            <div className="d-flex justify-content-end align-items-center mb-1">
+              <Clock className="event-icon text-primary me-2" />
+              <span>{formatEventTime(event.eventTime)}</span>
             </div>
-          )}
+            {event.location && (
+              <div className="d-flex align-items-center">
+                <GeoAlt className="event-icon text-primary me-2" />
+                <span>{event.location}</span>
+              </div>
+            )}
+          </div>
         </div>
+        <Link to={`/events/${event.id}`} className="event-title-link text-decoration-none">
+          <h5 className="event-title mb-3">{event.title}</h5> 
+        </Link>
 
         {event.description && (
           <div className="event-description mb-3">
@@ -365,7 +367,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
             </OverlayTrigger>
 
             <OverlayTrigger placement="top" overlay={<Tooltip>Bình luận</Tooltip>}>
-              <Button variant="light" size="sm" className="action-button me-1 mb-2">
+              <Button variant="light" size="sm" className="action-button me-1 mb-2" onClick={() => navigate(`/events/${event.id}#comments`)}>
                 <ChatLeftText />
               </Button>
             </OverlayTrigger>

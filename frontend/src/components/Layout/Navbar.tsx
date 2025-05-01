@@ -88,7 +88,7 @@ const Navbar = () => {
           {/* Right-side items */}
           <Nav className="align-items-center">
             {user ? (
-              <div className="d-flex gap-2">
+              <div className="d-flex right gap-2">
                 {/* Create Event Button */}
                 <Nav.Link 
                   as={Link} 
