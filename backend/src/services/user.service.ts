@@ -156,9 +156,36 @@ class UserService {
       throw new Error('Không thể lấy thông tin hồ sơ người dùng vào lúc này.');
     }
   }
-  /**
-       * Admin: Lấy danh sách tất cả người dùng (có thể thêm phân trang sau)
-       */
+
+  async getUserProfileByUsername(username: string): Promise<PublicUserProfile | null> {
+    try {
+      const user = await User.findOne({
+        where: { username },
+        attributes: [
+          'id',
+          'username',
+          'fullName',
+          'bio',
+          'location',
+          'avatarUrl',
+          'createdAt'
+        ] 
+      });
+
+      if (!user) {
+        // Trả về null nếu không tìm thấy user
+        return null;
+      }
+
+      // Trả về dữ liệu dạng plain object
+      return user.get({ plain: true });
+
+    } catch (error) {
+      console.error(`Lỗi khi lấy profile cho user ${username}:`, error);
+      throw new Error('Không thể lấy thông tin hồ sơ người dùng vào lúc này.');
+    }
+  }
+  
   async getAllUsers(): Promise<Omit<UserAttributes, 'password_hash'>[]> {
     try {
       const users = await User.findAll({

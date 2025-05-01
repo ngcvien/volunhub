@@ -33,7 +33,12 @@ router.put(
 
 router.get(
   '/:userId', 
-  userController.getUserProfile // Gọi hàm controller mới
+  userController.getUserProfile 
+);
+
+router.get(
+  '/username/:username', 
+  userController.getUserProfileByUsername 
 );
 
 router.get(
