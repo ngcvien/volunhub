@@ -93,7 +93,7 @@ class EventService {
                 include: [{ // Vẫn include người tạo
                     model: User,
                     as: 'creator',
-                    attributes: ['id', 'username', 'avatarUrl']
+                    attributes: ['id', 'username', 'avatarUrl', 'fullName']
                 }],
                 order: [['createdAt', 'DESC']], // Sắp xếp
                 limit: limit, // Giới hạn số lượng

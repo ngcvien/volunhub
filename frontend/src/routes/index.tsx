@@ -66,7 +66,7 @@ const AppRoutes = () => {
             }
           />
           <Route path="/events/:eventId" element={<EventDetailPage />} />
-          <Route path="/profile/:userId" element={<UserProfilePage />} />
+          <Route path="/profile/:userId" element={<UserProfilePage/>} />
 
           <Route
             path="/dashboard/my-events"
