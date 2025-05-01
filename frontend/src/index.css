@@ -457,6 +457,11 @@ html[data-bs-theme="light"] .navbar .navbar-toggler-icon {
 .admin-component-page {
   padding-top: 20px;
 }
+
+.reaction-btn {
+  text-decoration: none !important;
+}
+
 /* Responsive */
 @media (max-width: 1199.98px) {
   .sidebar-left,

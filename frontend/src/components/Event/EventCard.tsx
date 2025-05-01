@@ -366,7 +366,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
             </OverlayTrigger>
             
 
-            <OverlayTrigger placement="top" overlay={<Tooltip>Bình luận</Tooltip>}>
+            <OverlayTrigger placement="top" overlay={<Tooltip>Thảo luận</Tooltip>}>
               <Button variant="light" size="sm" className="action-button me-1 mb-2" onClick={() => navigate(`/events/${event.id}#comments`)}>
                 <ChatLeftText />
               </Button>

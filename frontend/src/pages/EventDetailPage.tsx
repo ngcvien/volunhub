@@ -112,7 +112,29 @@ const EventDetailPage = () => {
 
   useEffect(() => {
     fetchEventDetail()
-  }, [eventId])
+  }, [eventId]);
+
+  useEffect(() => {
+    if (location.hash) {
+      const el = document.getElementById(location.hash.replace("#", ""));
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }, [location.hash]);
+
+  useEffect(() => {
+    if (location.hash === "#comments") {
+      
+      setShowPostForm(false); 
+      setTimeout(() => {
+        const el = document.getElementById("comments");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 200); 
+    }
+  }, [location.hash]);
 
   // Hàm xử lý Tham gia sự kiện
   const handleJoin = async () => {
@@ -391,8 +413,8 @@ const EventDetailPage = () => {
             </Card>
 
             {/* Phần thảo luận */}
-            <Card className="shadow-sm mb-3">
-              <Card.Header className="bg-white py-2">
+            <Card  className="shadow-sm mb-3" id='comments'>
+              <Card.Header className=" py-2">
                 <div className="d-flex justify-content-between align-items-center">
                   <h5 className="mb-0">Thảo luận</h5>
                   {user && !showPostForm && (
@@ -501,7 +523,7 @@ const EventDetailPage = () => {
           <Col lg={4}>
             {/* Thông tin người tổ chức */}
             <Card className="shadow-sm mb-3">
-              <Card.Header className="bg-white py-2">
+              <Card.Header className=" py-2">
                 <h5 className="mb-0">Người tổ chức</h5>
               </Card.Header>
               <Card.Body className="p-3">
@@ -543,7 +565,7 @@ const EventDetailPage = () => {
 
             {/* Danh sách người tham gia */}
             <Card className="shadow-sm mb-3">
-              <Card.Header className="bg-white py-2">
+              <Card.Header className=" py-2">
                 <h5 className="mb-0">Người tham gia ({event.participants?.length || 0})</h5>
               </Card.Header>
               <Card.Body className="p-0">
@@ -587,7 +609,7 @@ const EventDetailPage = () => {
 
             {/* Sự kiện liên quan - ẩn trên mobile */}
             <Card className="shadow-sm d-none d-lg-block">
-              <Card.Header className="bg-white py-2">
+              <Card.Header className=" py-2">
                 <h5 className="mb-0">Sự kiện liên quan</h5>
               </Card.Header>
               <Card.Body className="p-0">

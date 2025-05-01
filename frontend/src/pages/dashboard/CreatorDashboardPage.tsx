@@ -221,7 +221,7 @@ const CreatorDashboardPage = () => {
       {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
 
       {/* Events Table */}
-      <Card className="shadow-sm">
+      <Card className="shadow-sm" id='table'>
         <Card.Body className="p-0">
           <Table responsive hover className="mb-0">
             <thead className="bg-light">
