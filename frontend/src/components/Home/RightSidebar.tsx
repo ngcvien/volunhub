@@ -1,11 +1,12 @@
-import React from 'react';
-import { Card, Button, Image, Badge } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Card, Button, Image, Badge, Offcanvas } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { 
   Trophy, 
   Calendar2Check, 
   PeopleFill,
-  ArrowRight 
+  ArrowRight,
+  InfoCircle
 } from 'react-bootstrap-icons';
 import { User } from '../../types/user.types';
 import './RightSidebar.css';
@@ -15,6 +16,8 @@ interface RightSidebarProps {
 }
 
 const RightSidebar: React.FC<RightSidebarProps> = ({ currentUser }) => {
+  const [showMobileInfo, setShowMobileInfo] = useState(false);
+
   // Mock data for top volunteers and upcoming events
   const topVolunteers = [
     { id: 1, username: 'NguyenVanA', points: 150, avatar: '/default-avatar.png' },
@@ -28,8 +31,8 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ currentUser }) => {
     { id: 11, title: 'Thăm trẻ em mồ côi', date: '2024-05-10', participants: 10 },
   ];
 
-  return (
-    <div className="right-sidebar">
+  const SidebarContent = () => (
+    <>
       {currentUser && (
         <Card className="sidebar-card mb-4">
           <Card.Body>
@@ -133,7 +136,41 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ currentUser }) => {
           </Button>
         </Card.Body>
       </Card>
-    </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop Sidebar */}
+      <div className="right-sidebar d-none d-md-block">
+        <SidebarContent />
+      </div>
+
+      {/* Mobile Info Button */}
+      <Button
+        variant="primary"
+        className="d-md-none mobile-info-toggle"
+        onClick={() => setShowMobileInfo(true)}
+      >
+        <InfoCircle size={20} className="me-2" />
+        Thông tin
+      </Button>
+
+      {/* Mobile Info Sidebar */}
+      <Offcanvas
+        show={showMobileInfo}
+        onHide={() => setShowMobileInfo(false)}
+        placement="end"
+        className="mobile-info-sidebar"
+      >
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Thông tin</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <SidebarContent />
+        </Offcanvas.Body>
+      </Offcanvas>
+    </>
   );
 };
 

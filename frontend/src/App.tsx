@@ -10,7 +10,7 @@ function App() {
     <AuthProvider>
       <Router>
         <AppRoutes />
-        <ThemeToggle /> {/* <<<--- ĐẶT NÚT Ở ĐÂY */}
+        <ThemeToggle /> 
       </Router>
     </AuthProvider>
   );

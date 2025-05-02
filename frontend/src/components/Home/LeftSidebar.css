@@ -4,6 +4,7 @@
   height: calc(100vh - 90px);
   overflow-y: auto;
   padding-right: 10px;
+  min-width: 280px;
 }
 
 .sidebar-card {
@@ -30,7 +31,8 @@
   color: var(--bs-body-color);
   border-radius: 8px;
   transition: all 0.2s ease;
-  transition: transform cubic-bezier(0.075, 0.82, 0.165, 1) 0.2s !important;
+  min-height: 45px;
+  white-space: nowrap;
 }
 
 .sidebar-link:hover {
@@ -55,12 +57,22 @@
 .sidebar-icon {
   width: 20px;
   height: 20px;
+  min-width: 20px;
   margin-right: 12px;
 }
 
 .sidebar-text {
   flex: 1;
   font-size: 0.95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Badge adjustments */
+.sidebar-link .badge {
+  min-width: 30px;
+  text-align: center;
 }
 
 /* Custom scrollbar for sidebar */
@@ -75,4 +87,70 @@
 .left-sidebar::-webkit-scrollbar-thumb {
   background: var(--bs-primary);
   border-radius: 4px;
+}
+
+/* Mobile Sidebar Toggle Button */
+.mobile-sidebar-toggle {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1030;
+  border-radius: 30px;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile Sidebar */
+.mobile-sidebar {
+  width: 280px !important;
+}
+
+.mobile-sidebar .offcanvas-body {
+  padding: 1rem;
+}
+
+/* Adjust the main sidebar for desktop */
+@media (min-width: 992px) {
+  .mobile-sidebar-toggle {
+    display: none;
+  }
+}
+
+/* Enhance mobile experience */
+@media (max-width: 991.98px) {
+  .mobile-sidebar .sidebar-card {
+    border-radius: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .mobile-sidebar .sidebar-link {
+    padding: 12px 16px;
+  }
+
+  .mobile-sidebar .sidebar-icon {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .left-sidebar {
+    min-width: 250px;
+  }
+
+  .sidebar-link {
+    padding: 0.6rem 0.8rem;
+  }
+
+  .sidebar-text {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .left-sidebar {
+    padding-right: 0;
+  }
 }

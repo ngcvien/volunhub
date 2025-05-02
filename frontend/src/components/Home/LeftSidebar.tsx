@@ -1,12 +1,13 @@
-import React from 'react';
-import { Nav, Card, Badge } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Nav, Card, Badge, Button, Offcanvas } from 'react-bootstrap';
 import { 
   Calendar2Event, 
   GeoAlt, 
   Tags, 
   BookmarkHeart,
   PeopleFill,
-  StarFill
+  StarFill,
+  List
 } from 'react-bootstrap-icons';
 import { User } from '../../types/user.types';
 import './LeftSidebar.css';
@@ -22,6 +23,8 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onFilterChange,
   currentFilters
 }) => {
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+
   const categories = [
     { id: 'all', name: 'Tất cả', icon: Calendar2Event, count: 150 },
     { id: 'education', name: 'Giáo dục', icon: PeopleFill, count: 45 },
@@ -31,8 +34,13 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
     { id: 'saved', name: 'Đã lưu', icon: BookmarkHeart, count: 12 },
   ];
 
-  return (
-    <div className="left-sidebar">
+  const handleCategoryClick = (categoryId: string) => {
+    onFilterChange({ ...currentFilters, category: categoryId });
+    setShowMobileMenu(false); // Close mobile menu after selection
+  };
+
+  const SidebarContent = () => (
+    <>
       <Card className="sidebar-card">
         <Card.Body>
           <h6 className="sidebar-title">Danh mục</h6>
@@ -41,7 +49,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
               <Nav.Link
                 key={category.id}
                 className={`sidebar-link ${currentFilters.category === category.id ? 'active' : ''}`}
-                onClick={() => onFilterChange({ ...currentFilters, category: category.id })}
+                onClick={() => handleCategoryClick(category.id)}
               >
                 <category.icon className="sidebar-icon" />
                 <span className="sidebar-text">{category.name}</span>
@@ -73,7 +81,41 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
           </Card.Body>
         </Card>
       )}
-    </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile Toggle Button */}
+      <Button
+        variant="primary"
+        className="d-lg-none mobile-sidebar-toggle"
+        onClick={() => setShowMobileMenu(true)}
+      >
+        <List size={20} className="me-2" />
+        Danh mục
+      </Button>
+
+      {/* Desktop Sidebar */}
+      <div className="left-sidebar d-none d-lg-block">
+        <SidebarContent />
+      </div>
+
+      {/* Mobile Sidebar */}
+      <Offcanvas
+        show={showMobileMenu}
+        onHide={() => setShowMobileMenu(false)}
+        placement="start"
+        className="mobile-sidebar"
+      >
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Danh mục</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <SidebarContent />
+        </Offcanvas.Body>
+      </Offcanvas>
+    </>
   );
 };
 

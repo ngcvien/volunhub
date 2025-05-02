@@ -31,6 +31,9 @@ const HomePage = () => {
     threshold: 0,
   });
 
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showMobileInfo, setShowMobileInfo] = useState(false);
+
   const refreshEvents = () => {
     setRefreshKey((oldKey) => oldKey + 1)
   }
@@ -133,10 +136,12 @@ const HomePage = () => {
         <Row>
           {/* Left Sidebar */}
           <Col lg={3} className="d-none d-lg-block">
-            <LeftSidebar
+            <LeftSidebar 
               currentUser={user}
               onFilterChange={handleFilterChange}
               currentFilters={filters}
+              showMobile={showMobileMenu}
+              onMobileClose={() => setShowMobileMenu(false)}
             />
           </Col>
 
@@ -165,7 +170,11 @@ const HomePage = () => {
 
           {/* Right Sidebar */}
           <Col lg={3} md={4} className="d-none d-md-block">
-            <RightSidebar currentUser={user} />
+            <RightSidebar 
+              currentUser={user}
+              showMobile={showMobileInfo}
+              onMobileClose={() => setShowMobileInfo(false)}
+            />
           </Col>
         </Row>
       </Container>
