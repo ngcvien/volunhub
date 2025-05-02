@@ -16,8 +16,9 @@ interface EventCreator {
     eventId: number;
     userId: number;
     content: string;
-    createdAt: string; // ISO String
-    updatedAt: string; // ISO String
+    imageUrl?: string | null;
+    createdAt: string; 
+    updatedAt: string; 
     author: BasicUser; 
     commentCount?: number;
     comments?: EventPostCommentType[]; // Mảng các bình luận cho bài viết

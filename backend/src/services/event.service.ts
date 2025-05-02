@@ -169,7 +169,7 @@ class EventService {
                     {
                         model: EventPost,
                         as: 'posts', // Alias đã định nghĩa trong association
-                        attributes: ['id', 'content', 'createdAt', 'userId'], // Lấy các trường cần thiết của post
+                        attributes: ['id', 'content', 'createdAt', 'userId', 'imageUrl'], // Lấy các trường cần thiết của post
                         limit: 10, // Giới hạn số lượng bài viết lấy kèm (ví dụ: 10 bài mới nhất)
                         order: [['createdAt', 'DESC']],
                         include: [{ // Lấy kèm thông tin người đăng bài viết

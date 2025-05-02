@@ -2,10 +2,11 @@
 
 // frontend/src/pages/EventDetailPage.tsx
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, ChangeEvent } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
 import { Form, Container, Row, Col, Card, Image as RBImage, Button, Spinner, Alert, Badge } from "react-bootstrap"
 import { useAuth } from "../contexts/AuthContext"
+import { uploadFileApi } from "../api/upload.api"
 import {
   getEventByIdApi,
   joinEventApi,
@@ -51,6 +52,12 @@ const EventDetailPage = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const postFileInputRef = useRef<HTMLInputElement>(null); // Ref cho input file ẩn
+  const [postImageFile, setPostImageFile] = useState<File | null>(null); // File đã chọn
+  const [postImageUrl, setPostImageUrl] = useState<string | null>(null); // URL ảnh đã upload
+  const [isUploadingPostImage, setIsUploadingPostImage] = useState(false); // Trạng thái upload ảnh
+  const [postImageError, setPostImageError] = useState<string | null>(null); // Lỗi upload ảnh
+
   // State cho nút Join/Leave
   const [isProcessingJoin, setIsProcessingJoin] = useState(false)
   const [joinError, setJoinError] = useState<string | null>(null)
@@ -90,25 +97,44 @@ const EventDetailPage = () => {
 
   // Xử lý đăng bài viết mới
   const handlePostSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!user || !eventId || !newPostContent.trim()) {
-      setPostError("Nội dung bài viết không được để trống.")
-      return
+      setPostError("Nội dung bài viết không được để trống.");
+      return;
+    }
+    // Kiểm tra nếu đang upload ảnh thì không cho submit
+    if (isUploadingPostImage) {
+      setPostError("Vui lòng chờ ảnh được tải lên hoàn tất.");
+      return;
     }
 
-    setIsPosting(true)
-    setPostError(null)
+    setIsPosting(true); // Đổi tên state loading chính thành isPosting (như code trước)
+    setPostError(null);
     try {
-      await createEventPostApi(eventId, { content: newPostContent })
-      setNewPostContent("")
-      setShowPostForm(false)
-      await fetchEventDetail()
+      // Chuẩn bị dữ liệu post, bao gồm cả imageUrl từ state
+      const postData = {
+        content: newPostContent,
+        imageUrl: postImageUrl // <<<--- Gửi URL ảnh đã upload (có thể là null)
+      };
+
+      await createEventPostApi(eventId, postData); // Gọi API tạo post
+
+      // Reset form và state ảnh
+      setNewPostContent('');
+      setPostImageFile(null);
+      setPostImageUrl(null);
+      setPostImageError(null);
+      setShowPostForm(false); // Ẩn form sau khi đăng thành công
+
+      // Fetch lại chi tiết sự kiện để cập nhật danh sách bài viết
+      await fetchEventDetail();
+
     } catch (err: any) {
-      setPostError(err.message || "Không thể đăng bài viết.")
+      setPostError(err.message || 'Không thể đăng bài viết.');
     } finally {
-      setIsPosting(false)
+      setIsPosting(false);
     }
-  }
+  };
 
   useEffect(() => {
     fetchEventDetail()
@@ -125,16 +151,47 @@ const EventDetailPage = () => {
 
   useEffect(() => {
     if (location.hash === "#comments") {
-      
-      setShowPostForm(false); 
+
+      setShowPostForm(false);
       setTimeout(() => {
         const el = document.getElementById("comments");
         if (el) {
           el.scrollIntoView({ behavior: "smooth", block: "start" });
         }
-      }, 200); 
+      }, 200);
     }
   }, [location.hash]);
+
+  const handlePostImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    setPostImageFile(file || null); // Lưu file (hoặc null)
+    setPostImageUrl(null);      // Reset URL cũ
+    setPostImageError(null);    // Reset lỗi cũ
+
+    if (file) {
+      // Hiển thị preview tạm thời (tùy chọn, có thể bỏ qua bước này)
+      const previewUrl = URL.createObjectURL(file);
+      setPostImageUrl(previewUrl); // Tạm thời hiển thị ảnh local
+
+      setIsUploadingPostImage(true);
+      try {
+        const uploadResult = await uploadFileApi(file); // Gọi API upload chung
+        setPostImageUrl(uploadResult.url); // Lưu URL từ Cloudinary
+        console.log('Post Image uploaded:', uploadResult.url);
+        // URL.revokeObjectURL(previewUrl); // Thu hồi preview nếu có dùng
+      } catch (err: any) {
+        setPostImageError(err.message || 'Lỗi tải ảnh lên.');
+        setPostImageFile(null); // Bỏ chọn file nếu lỗi
+        // setPostImageUrl(null); // Đã reset ở trên
+      } finally {
+        setIsUploadingPostImage(false);
+      }
+    }
+    // Reset input file để có thể chọn lại cùng file
+    if (event.target) {
+      event.target.value = '';
+    }
+  };
 
   // Hàm xử lý Tham gia sự kiện
   const handleJoin = async () => {
@@ -194,6 +251,8 @@ const EventDetailPage = () => {
       setIsProcessingLike(false)
     }
   }
+
+
 
   // Hiển thị trạng thái loading
   if (loading) {
@@ -413,7 +472,7 @@ const EventDetailPage = () => {
             </Card>
 
             {/* Phần thảo luận */}
-            <Card  className="shadow-sm mb-3" id='comments'>
+            <Card className="shadow-sm mb-3" id='comments'>
               <Card.Header className=" py-2">
                 <div className="d-flex justify-content-between align-items-center">
                   <h5 className="mb-0">Thảo luận</h5>
@@ -456,6 +515,48 @@ const EventDetailPage = () => {
                           className="border-0 bg-light p-2"
                           style={{ resize: "none" }}
                         />
+                      </Form.Group>
+
+                      <Form.Group controlId="postImageUpload" className="mb-3">
+                        {/* Input file ẩn */}
+                        <Form.Control
+                          type="file"
+                          accept="image/*"
+                          ref={postFileInputRef}
+                          onChange={handlePostImageChange}
+                          style={{ display: 'none' }}
+                          disabled={isUploadingPostImage || isPosting}
+                        />
+                        {/* Nút bấm để mở cửa sổ chọn file */}
+                        {!postImageUrl && !isUploadingPostImage && ( // Chỉ hiện nút chọn khi chưa có ảnh và không đang tải
+                          <Button
+                            variant="outline-secondary" size="sm"
+                            onClick={() => postFileInputRef.current?.click()}
+                            disabled={isUploadingPostImage || isPosting}
+                          >
+                            <i className="bi bi-image me-1"></i> Thêm ảnh
+                          </Button>
+                        )}
+
+                        {/* Hiển thị trạng thái Upload */}
+                        {isUploadingPostImage && <div className="mt-2"><Spinner size="sm" /> Đang tải ảnh...</div>}
+                        {postImageError && <Alert variant="danger" size="sm" className="mt-2 py-1">{postImageError}</Alert>}
+
+                        {/* Hiển thị Ảnh Preview và nút Xóa */}
+                        {postImageUrl && !postImageError && (
+                          <div className="mt-2 position-relative" style={{ maxWidth: '150px' }}>
+                            <RBImage src={postImageUrl} alt="Preview" thumbnail fluid />
+                            <Button
+                              variant="danger" size="sm"
+                              className="position-absolute top-0 end-0 m-1 p-0 px-1 lh-1"
+                              onClick={() => { setPostImageUrl(null); setPostImageFile(null); }}
+                              disabled={isPosting}
+                              title="Xóa ảnh"
+                            >
+                              &times; {/* Dấu X */}
+                            </Button>
+                          </div>
+                        )}
                       </Form.Group>
 
                       {postError && (
