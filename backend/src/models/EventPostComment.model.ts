@@ -10,6 +10,7 @@ export interface EventPostCommentAttributes {
     userId: number;
     parentId: number | null; // Đổi tên thành parentId cho camelCase
     content: string;
+    imageUrl?: string | null;
     createdAt?: Date;
     updatedAt?: Date;
 
@@ -27,6 +28,7 @@ class EventPostComment extends Model<EventPostCommentAttributes, CommentCreation
     public userId!: number;
     public parentId!: number | null;
     public content!: string;
+    public imageUrl!: string | null; 
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -48,6 +50,7 @@ EventPostComment.init(
         userId: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false, field: 'user_id' },
         parentId: { type: DataTypes.INTEGER.UNSIGNED, allowNull: true, field: 'parent_comment_id' },
         content: { type: DataTypes.TEXT, allowNull: false },
+        imageUrl: { type: DataTypes.STRING, allowNull: true, field: 'image_url' },
     },
     {
         tableName: 'event_post_comments',

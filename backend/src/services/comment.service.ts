@@ -4,7 +4,7 @@ import EventPost from '../models/EventPost.model';
 import User from '../models/User.model';
 
 // Kiểu dữ liệu đầu vào khi tạo comment
-type CreateCommentInput = Pick<EventPostCommentAttributes, 'content' | 'parentId'>; // parentId là optional
+type CreateCommentInput = Pick<EventPostCommentAttributes, 'content' | 'parentId' | 'imageUrl'>; // parentId là optional
 
 class CommentService {
 
@@ -41,7 +41,8 @@ class CommentService {
                 userId: userId,
                 postId: postId,
                 content: data.content,
-                parentId: data.parentId // Có thể là null
+                imageUrl: data.imageUrl || null, 
+                parentId: data.parentId || null 
             });
 
             // Lấy lại bình luận vừa tạo kèm thông tin author để trả về

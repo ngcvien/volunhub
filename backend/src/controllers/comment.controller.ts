@@ -9,7 +9,7 @@ class CommentController {
         try {
             const postId = parseInt(req.params.postId, 10); // Lấy từ URL param của route cha (/posts/:postId)
             const userId = req.user?.userId;                // Lấy từ middleware xác thực
-            const { content, parentId } = req.body;         // Lấy từ request body
+            const { content, parentId, image_url } = req.body;         // Lấy từ request body
 
             if (!userId) return res.status(401).json({ message: 'Yêu cầu xác thực.' });
             if (isNaN(postId)) return res.status(400).json({ message: 'Post ID không hợp lệ.' });
@@ -21,7 +21,7 @@ class CommentController {
                 return res.status(400).json({ message: 'Parent Comment ID không hợp lệ.' });
             }
 
-            const newComment = await commentService.createComment(userId, postId, { content, parentId: parentCommentId });
+            const newComment = await commentService.createComment(userId, postId, { content, parentId: parentCommentId || null, imageUrl: image_url || null });
             res.status(201).json({ message: 'Đăng bình luận thành công!', comment: newComment });
 
         } catch (error) {

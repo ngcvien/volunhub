@@ -49,7 +49,8 @@ export const updateProfileValidator = [
 ];
 
 export const eventPostValidator = [
-    check('content', 'Nội dung bài viết không được để trống').notEmpty().trim().isLength({ min: 1 }).withMessage('Nội dung phải có ít nhất 1 ký tự'),
+    check('content', 'Nội dung bài viết không được để trống').trim().isLength({ min: 1 }),
+    body('imageUrl').optional({ checkFalsy: true }).isURL().withMessage('Image URL không hợp lệ'), 
     handleValidationErrors
 ];
 
@@ -60,12 +61,11 @@ export const commentValidator = [
     .optional({ nullable: true }) // Vẫn cho phép null hoặc không tồn tại
     .if((value) => value !== null && value !== undefined) // Chỉ chạy validation tiếp theo NẾU giá trị không phải null/undefined
     .isInt({ min: 1 }).withMessage('Parent Comment ID phải là một số nguyên dương.'),
-
+    body('imageUrl').optional({ checkFalsy: true }).isURL().withMessage('Image URL không hợp lệ'), 
     handleValidationErrors
 ];
 
 export const updateUserStatusValidator = [
-    // Các trường đều là optional, chỉ validate nếu được cung cấp
     body('role')
         .optional()
         .isIn(Object.values(UserRole)) // Phải là một trong các giá trị của Enum UserRole
