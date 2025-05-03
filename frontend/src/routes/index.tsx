@@ -13,6 +13,11 @@ import { Container } from "react-bootstrap" // Import Container
 import ProfilePage from "../pages/ProfilePage"
 import UserProfilePage from "../pages/UserProfilePage"
 import EventDetailPage from '../pages/EventDetailPage';
+import AdminRoute from "../contexts/AdminRoute"
+import AdminUserManagementPage from "../pages/admin/AdminUserManagementPage"
+import CreatorDashboardPage from "../pages/dashboard/CreatorDashboardPage"
+import AuthPage from "../pages/AuthPage"
+import AboutPage from "../pages/AboutPage"
 
 // Component để bảo vệ route, yêu cầu đăng nhập
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -32,10 +37,11 @@ const AppRoutes = () => {
       <AppNavbar /> {/* Navbar vẫn ở đây */}
       <Container fluid className="mt-4 px-0">
         <Routes>
-          {/* Các Route vẫn giữ nguyên */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/" element={<HomePage />} />
+          <Route path="/auth" element={<AuthPage />} />
+
           <Route
             path="/events/new"
             element={
@@ -62,7 +68,27 @@ const AppRoutes = () => {
           />
           <Route path="/events/:eventId" element={<EventDetailPage />} />
           <Route path="/profile/:userId" element={<UserProfilePage />} />
+
+          <Route
+            path="/dashboard/my-events"
+            element={
+              <ProtectedRoute> {/* Chỉ cần đăng nhập thường */}
+                <CreatorDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="/admin/users" element={
+            <AdminRoute>
+              <AdminUserManagementPage />
+            </AdminRoute>
+          } />
+
+          <Route path="/about" element={<AboutPage />} />
+
         </Routes>
+
+
       </Container>
     </>
   )

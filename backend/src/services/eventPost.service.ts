@@ -47,7 +47,7 @@ class EventPostService {
                 include: [{
                     model: User,
                     as: 'author',
-                    attributes: ['id', 'username', 'avatarUrl']
+                    attributes: ['id', 'username', 'avatarUrl', 'imageUrl'],
                 }],
                 order: [['createdAt', 'DESC']]
             });

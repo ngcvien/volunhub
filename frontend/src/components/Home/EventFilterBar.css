@@ -1,0 +1,40 @@
+.event-filter-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+[data-bs-theme="dark"] .event-filter-bar {
+  background: rgba(33, 37, 41, 0.8);
+}
+
+.filter-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sort-select {
+  min-width: 150px;
+}
+
+@media (max-width: 768px) {
+  .event-filter-bar {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .filter-section {
+    width: 100%;
+  }
+
+  .sort-select {
+    flex: 1;
+  }
+}

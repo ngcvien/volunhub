@@ -9,6 +9,7 @@ export interface EventPostAttributes {
     eventId: number;
     userId: number;
     content: string;
+    imageUrl?: string;
     createdAt?: Date;
     updatedAt?: Date;
 
@@ -16,13 +17,14 @@ export interface EventPostAttributes {
     author?: User; // Để include thông tin người đăng
 }
 
-interface EventPostCreationAttributes extends Optional<EventPostAttributes, 'id' | 'createdAt' | 'updatedAt' | 'author'> {}
+interface EventPostCreationAttributes extends Optional<EventPostAttributes, 'id' | 'createdAt' | 'updatedAt' | 'author'| 'imageUrl'> {}
 
 class EventPost extends Model<EventPostAttributes, EventPostCreationAttributes> implements EventPostAttributes {
     public id!: number;
     public eventId!: number;
     public userId!: number;
     public content!: string;
+    public imageUrl!: string | null; 
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -52,6 +54,11 @@ EventPost.init(
         content: {
             type: DataTypes.TEXT,
             allowNull: false,
+        },
+        imageUrl: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            field: 'image_url'
         },
         // createdAt, updatedAt sẽ được underscored: true xử lý
     },

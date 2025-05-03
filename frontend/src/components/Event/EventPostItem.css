@@ -10,6 +10,10 @@
     max-height: 1000px; /* Giá trị đủ lớn để chứa nội dung */
     opacity: 1;
   }
+
+  .post-content{
+    text-align: left;
+  }
   
   /* Tối ưu hiển thị trên mobile */
   @media (max-width: 576px) {

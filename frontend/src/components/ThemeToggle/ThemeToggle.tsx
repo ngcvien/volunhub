@@ -1,21 +1,24 @@
 import React from 'react';
-import { Button } from 'react-bootstrap';
-import { SunFill, MoonFill } from 'react-bootstrap-icons'; // Import icons
-import { useAuth } from '../../contexts/AuthContext'; // Lấy theme và toggle từ context
-import './ThemeToggle.css'; // Import CSS để tạo kiểu floating
-
-const ThemeToggle = () => {
+import { useAuth } from '../../contexts/AuthContext';
+import { Sun, Moon } from 'react-bootstrap-icons';
+import './ThemeToggle.css';
+const   ThemeToggle = () => {
     const { theme, toggleTheme } = useAuth();
 
     return (
-        <Button
-            variant={theme === 'dark' ? 'outline-light' : 'outline-dark'} // Đổi màu nút theo theme
+    <div className="theme-toggle-wrapper">
+      <button 
+        className={`theme-toggle-btn ${theme}`} 
             onClick={toggleTheme}
-            className="theme-toggle-button" // Class CSS để định vị
-            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        aria-label="Toggle theme"
         >
-            {theme === 'dark' ? <SunFill size={20} /> : <MoonFill size={20} />} {/* Hiển thị icon phù hợp */}
-        </Button>
+        <div className="theme-toggle-icons">
+          <Sun className="sun-icon" />
+          <Moon className="moon-icon" />
+        </div>
+        <div className="theme-toggle-ball"></div>
+      </button>
+    </div>
     );
 };
 

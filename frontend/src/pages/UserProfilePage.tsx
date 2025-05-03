@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react"
 import { Container, Row, Col, Card, Image, Button, Spinner, Alert, Badge, Nav, Tab } from "react-bootstrap"
-import { useParams, Link } from "react-router-dom"
+import { useParams, Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 import { getUserProfileApi } from "../api/auth.api";
 import { PersonPlus, Envelope, GeoAlt, Calendar3, PersonBadge } from "react-bootstrap-icons"
@@ -20,6 +20,7 @@ const UserProfilePage = () => {
     const [error, setError] = useState<string | null>(null)
     const [activeTab, setActiveTab] = useState("about")
     const [isFollowing, setIsFollowing] = useState(false)
+    const navigate = useNavigate()
 
     // Dữ liệu giả cho thống kê (sau này sẽ lấy từ API)
     const stats = {
@@ -42,14 +43,19 @@ const UserProfilePage = () => {
                 setUser(null); // Đặt user về null
                 return;
             }
+            // if (profileUserId === currentUser?.id) {
+            //     // console.log("Đang xem profile của chính mình, chuyển hướng đến trang cá nhân.");
+            //     navigate("/profile/me"); 
+            //     return;
+            // }
 
             // Nếu xem profile của chính mình, có thể dùng API /me để lấy cả email (tùy chọn)
             // Hoặc đơn giản là vẫn gọi API /users/:userId
-            // if (currentUser && currentUser.id === profileUserId) {
-            //     setUser(currentUser); // Hiển thị data từ context ngay lập tức? Cân nhắc!
-            //     setLoading(false);
-            //     return;
-            // }
+            if (currentUser && currentUser.id === profileUserId) {
+                setUser(currentUser); 
+                setLoading(false);
+                return;
+            }
 
             setLoading(true);
             setError(null);

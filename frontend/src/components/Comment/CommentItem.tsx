@@ -60,7 +60,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, onReply }) => {
           />
         </Link>
         <div className="flex-grow-1">
-          <div className="comment-bubble p-2 rounded bg-light">
+          <div className="comment-bubble p-2 rounded ">
             <div className="d-flex justify-content-between align-items-start">
               <Link
                 to={`/profile/${comment.author.id}`}

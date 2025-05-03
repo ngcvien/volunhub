@@ -113,9 +113,11 @@ const EventPostItem: React.FC<EventPostItemProps> = ({ post, eventCreatorId }) =
     setShowComments(!showComments)
   }
 
+  console.log('image url: ',post.imageUrl);
+  console.log(post.content);
   return (
     <Card className="event-post-item mb-3 shadow-sm border-0">
-      <Card.Header className="bg-white border-0 pt-2 pb-0 px-3">
+      <Card.Header className=" border-0 pt-2 pb-0 px-3">
         <div className="d-flex">
           <Link to={`/profile/${post.author.id}`} className="me-2">
             <RBImage
@@ -142,7 +144,7 @@ const EventPostItem: React.FC<EventPostItemProps> = ({ post, eventCreatorId }) =
             <div className="text-muted small">{formatTimeAgo(post.createdAt)}</div>
           </div>
           <div className="dropdown">
-            <Button variant="light" size="sm" className="rounded-circle p-1">
+            <Button variant="link" size="sm" className="rounded-circle p-1">
               <ThreeDots size={16} />
             </Button>
           </div>
@@ -153,23 +155,35 @@ const EventPostItem: React.FC<EventPostItemProps> = ({ post, eventCreatorId }) =
         <div className="post-content mb-2" style={{ whiteSpace: "pre-wrap", fontSize: "0.95rem" }}>
           {post.content}
         </div>
+        {post.imageUrl && (
+          <div className="mt-2 text-center event-post-image-container"> {/* Thêm text-center nếu muốn ảnh căn giữa */}
+            <RBImage
+              src={post.imageUrl}
+              alt="Ảnh bài viết"
+              fluid // Responsive
+              rounded // Bo góc nhẹ
+              style={{ maxHeight: '400px', cursor: 'pointer' }} // Giới hạn chiều cao, thêm cursor
+              onClick={() => window.open(post.imageUrl, '_blank')} // Mở ảnh tab mới khi click
+            />
+          </div>
+        )}
 
         <div className="post-actions d-flex border-top pt-2">
-          <Button variant="light" className="d-flex align-items-center me-2 p-1" onClick={handleLike} size="sm">
+          <Button variant="link" className="d-flex align-items-center me-2 p-1" onClick={handleLike} size="sm">
             {liked ? <HandThumbsUpFill className="text-primary" size={16} /> : <HandThumbsUp size={16} />}
             <span className="ms-1 small">{likeCount}</span>
           </Button>
 
-          <Button variant="light" className="d-flex align-items-center p-1" onClick={toggleComments} size="sm">
+          <Button variant="link" className="reaction-btn d-flex align-items-center p-1" onClick={toggleComments} size="sm">
             <ChatLeftText size={16} />
-            <span className="ms-1 small">{showComments ? comments.length : post.commentCount || 0}</span>
+            <span className="ms-1 small">{showComments ? comments.length : post.commentCount}</span>
           </Button>
         </div>
       </Card.Body>
 
       <div className={`comments-container ${showComments ? "show" : ""}`} ref={commentsRef}>
         {showComments && (
-          <Card.Footer className="bg-light border-0 pt-2 pb-2 px-3">
+          <Card.Footer className="border-0 pt-2 pb-2 px-3">
             {loadingComments ? (
               <div className="text-center py-2">
                 <Spinner animation="border" size="sm" />

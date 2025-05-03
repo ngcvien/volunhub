@@ -1,46 +1,60 @@
-
-// frontend/src/pages/HomePage.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { Alert, Spinner, Button, Card } from "react-bootstrap"
-import { getAllEventsApi } from "../api/event.api"
-import type { EventType } from "../types/event.types"
-import EventCard from "../components/Event/EventCard"
-import { Link } from "react-router-dom"
-import { useAuth } from "../contexts/AuthContext"
+import { Container, Row, Col, Spinner, Alert, Card, Button } from 'react-bootstrap';
+import { useInView } from 'react-intersection-observer';
+import LeftSidebar from '../components/Home/LeftSidebar';
+import RightSidebar from '../components/Home/RightSidebar';
+import EventCard from '../components/Event/EventCard';
+import EventFilterBar from '../components/Home/EventFilterBar';
+import { getAllEventsApi } from '../api/event.api';
+import { EventType } from '../types/event.types';
+import { useAuth } from '../contexts/AuthContext';
+import { Link } from "react-router-dom";
 import { PlusCircleFill, Calendar2CheckFill } from "react-bootstrap-icons"
 
-const HomePage = () => {
-  const [events, setEvents] = useState<EventType[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
-  const [refreshKey, setRefreshKey] = useState<number>(0) // State để trigger refresh
-  const { user } = useAuth()
+import './HomePage.css';
 
-  // Hàm refresh danh sách sự kiện
+const HomePage = () => {
+  const { user } = useAuth();
+  const [events, setEvents] = useState<EventType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const [refreshKey, setRefreshKey] = useState<number>(0)
+  const [filters, setFilters] = useState({
+    category: 'all',
+    status: 'active',
+    sortBy: 'latest'
+  });
+  // Infinite scroll setup
+  const { ref, inView } = useInView({
+    threshold: 0,
+  });
+
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showMobileInfo, setShowMobileInfo] = useState(false);
+
   const refreshEvents = () => {
     setRefreshKey((oldKey) => oldKey + 1)
   }
 
-  // useEffect để gọi API khi component được mount hoặc refreshKey thay đổi
-    useEffect(() => {
-      const fetchEvents = async () => {
-          setLoading(true);
-          setError(null);
-          try {
-              const response = await getAllEventsApi(Date.now()); // Gọi API để lấy danh sách sự kiện
-              setEvents(response.events);
-              console.log('HomePage: Updated events state with data:', response.events);
-          } catch (err: any) {
-              setError(err.message || "Không thể tải dữ liệu sự kiện.");
-          } finally {
-              setLoading(false);
-          }
-      } ;
-  
-      fetchEvents();
-  }, [refreshKey, user?.id]); // Thêm user vào dependencies nếu cần reload khi user thay đổi
-  
-  // --- Phần hiển thị ---
+  const fetchEvents = useCallback(async (pageNum: number) => {
+    try {
+      setLoading(true);
+      const response = await getAllEventsApi(pageNum, filters);
+      if (pageNum === 1) {
+        setEvents(response.events);
+      } else {
+        setEvents(prev => [...prev, ...response.events]);
+      }
+      setHasMore(response.events.length > 0);
+    } catch (err: any) {
+      setError(err.message || 'Không thể tải danh sách sự kiện.');
+    } finally {
+      setLoading(false);
+    }
+  }, [filters]);
+
   const renderContent = () => {
     if (loading) {
       return (
@@ -97,159 +111,75 @@ const HomePage = () => {
     )
   }
 
+  // Initial load
+  useEffect(() => {
+    setPage(1);
+    fetchEvents(1);
+  }, [fetchEvents]);
+
+  // Load more when scrolling
+  useEffect(() => {
+    if (inView && hasMore && !loading) {
+      setPage(prev => prev + 1);
+      fetchEvents(page + 1);
+    }
+  }, [inView, hasMore, loading, fetchEvents, page]);
+
+  const handleFilterChange = (newFilters: typeof filters) => {
+    setFilters(newFilters);
+    setPage(1);
+  };
+
   return (
-    <div className="homepage-container">
-      {/* Sidebar bên trái */}
-      <div className="sidebar-left">
-        <div className="position-sticky" style={{ top: "80px" }}>
-          <Card className="shadow-sm border-0 mb-4">
-            <Card.Body>
-              <Card.Title className="d-flex align-items-center mb-3">
-                <Calendar2CheckFill className="me-2 text-primary" />
-                <span>VolunHub</span>
-              </Card.Title>
-              <p className="text-muted small">
-                Khám phá và tham gia các sự kiện tình nguyện gần bạn. Cùng nhau tạo nên những thay đổi tích cực!
-              </p>
+    <div className="homepage">
+      <Container fluid>
+        <Row>
+          {/* Left Sidebar */}
+          <Col lg={3} className="d-none d-lg-block">
+            <LeftSidebar 
+              currentUser={user}
+              onFilterChange={handleFilterChange}
+              currentFilters={filters}
+              showMobile={showMobileMenu}
+              onMobileClose={() => setShowMobileMenu(false)}
+            />
+          </Col>
+
+          {/* Main Content */}
+          <Col lg={6} md={8} sm={12}>
+            <div className="main-content">
               {user && (
-                <Link to="/events/new" className="text-decoration-none">
-                  <Button variant="primary" className="w-100 mt-2">
-                    <PlusCircleFill className="me-2" /> Tạo sự kiện
-                  </Button>
-                </Link>
+                 <EventFilterBar
+                 filters={filters}
+                 onFilterChange={handleFilterChange}
+               />
               )}
-            </Card.Body>
-          </Card>
 
-          <Card className="shadow-sm border-0">
-            <Card.Body>
-              <Card.Title className="d-flex align-items-center mb-3">
-                <span>Xu hướng</span>
-              </Card.Title>
-              <div className="trending-tags">
-                <Button variant="outline-secondary" size="sm" className="me-2 mb-2">
-                  #MôiTrường
-                </Button>
-                <Button variant="outline-secondary" size="sm" className="me-2 mb-2">
-                  #GiáoDục
-                </Button>
-                <Button variant="outline-secondary" size="sm" className="me-2 mb-2">
-                  #CộngĐồng
-                </Button>
-                <Button variant="outline-secondary" size="sm" className="me-2 mb-2">
-                  #TrồngCây
-                </Button>
-                <Button variant="outline-secondary" size="sm" className="me-2 mb-2">
-                  #HiếnMáu
+              {/* Tiêu đề bảng tin */}
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <h4 className="m-0">Bảng tin sự kiện</h4>
+                <Button variant="outline-primary" size="sm" onClick={refreshEvents} disabled={loading}>
+                  <i className="bi bi-arrow-clockwise me-1"></i> Làm mới
                 </Button>
               </div>
-            </Card.Body>
-          </Card>
-        </div>
-      </div>
 
-      {/* Phần chính - Newsfeed */}
-      <div className="main-content">
-        {/* Phần tạo sự kiện (chỉ hiển thị khi đăng nhập) */}
-        {user && (
-          <Card className="shadow-sm border-0 mb-4 create-event-card">
-            <Card.Body className="d-flex align-items-center">
-              <img
-                src={user.avatarUrl || "/default-avatar.png"}
-                alt={user.username}
-                className="rounded-circle me-3"
-                width="40"
-                height="40"
-                style={{ objectFit: "cover" }}
-              />
-              <Link to="/events/new" className="flex-grow-1 text-decoration-none">
-                <div className="create-event-prompt p-2 rounded-pill bg-light text-muted ps-3">
-                  Bạn muốn tạo sự kiện tình nguyện mới?
-                </div>
-              </Link>
-            </Card.Body>
-          </Card>
-        )}
+              {/* Nội dung chính */}
+              {renderContent()}
+            </div>
+          </Col>
 
-        {/* Tiêu đề bảng tin */}
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h4 className="m-0">Bảng tin sự kiện</h4>
-          <Button variant="outline-primary" size="sm" onClick={refreshEvents} disabled={loading}>
-            <i className="bi bi-arrow-clockwise me-1"></i> Làm mới
-          </Button>
-        </div>
-
-        {/* Nội dung chính */}
-        {renderContent()}
-      </div>
-
-      {/* Sidebar bên phải */}
-      <div className="sidebar-right">
-        <div className="position-sticky" style={{ top: "80px" }}>
-          <Card className="shadow-sm border-0 mb-4">
-            <Card.Body>
-              <Card.Title className="mb-3">Sự kiện sắp diễn ra</Card.Title>
-              <div className="upcoming-events">
-                {events.slice(0, 3).map((event) => (
-                  <div key={`upcoming-${event.id}`} className="d-flex align-items-center mb-3 pb-2 border-bottom">
-                    <div className="event-date me-2 text-center">
-                      <div className="small fw-bold text-danger">
-                        {new Date(event.eventTime).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" })}
-                      </div>
-                    </div>
-                    <div className="event-info small">
-                      <div className="fw-semibold text-truncate" style={{ maxWidth: "180px" }}>
-                        {event.title}
-                      </div>
-                      <div className="text-muted">{event.location || "Chưa có địa điểm"}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card.Body>
-          </Card>
-
-          <Card className="shadow-sm border-0">
-            <Card.Body>
-              <Card.Title className="mb-3">Gợi ý kết nối</Card.Title>
-              <div className="suggested-connections">
-                <div className="d-flex align-items-center mb-2">
-                  <img
-                    src="/default-avatar.png"
-                    alt="Người dùng"
-                    className="rounded-circle me-2"
-                    width="32"
-                    height="32"
-                  />
-                  <div className="small">Trung tâm Tình nguyện Quốc gia</div>
-                </div>
-                <div className="d-flex align-items-center mb-2">
-                  <img
-                    src="/default-avatar.png"
-                    alt="Người dùng"
-                    className="rounded-circle me-2"
-                    width="32"
-                    height="32"
-                  />
-                  <div className="small">Quỹ Bảo trợ Trẻ em Việt Nam</div>
-                </div>
-                <div className="d-flex align-items-center">
-                  <img
-                    src="/default-avatar.png"
-                    alt="Người dùng"
-                    className="rounded-circle me-2"
-                    width="32"
-                    height="32"
-                  />
-                  <div className="small">Hội Chữ thập đỏ Việt Nam</div>
-                </div>
-              </div>
-            </Card.Body>
-          </Card>
-        </div>
-      </div>
+          {/* Right Sidebar */}
+          <Col lg={3} md={4} className="d-none d-md-block">
+            <RightSidebar 
+              currentUser={user}
+              showMobile={showMobileInfo}
+              onMobileClose={() => setShowMobileInfo(false)}
+            />
+          </Col>
+        </Row>
+      </Container>
     </div>
-  )
-}
+  );
+};
 
-export default HomePage
+export default HomePage;

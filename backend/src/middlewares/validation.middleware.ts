@@ -1,6 +1,7 @@
 // backend/src/middlewares/validation.middleware.ts
 import { check, validationResult, body } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
+import { UserRole } from '../models/User.model';
 
 // Hàm xử lý lỗi validation chung (có thể tạo file riêng nếu muốn)
 const handleValidationErrors = (req: Request, res: Response, next: NextFunction) => {
@@ -48,7 +49,8 @@ export const updateProfileValidator = [
 ];
 
 export const eventPostValidator = [
-    check('content', 'Nội dung bài viết không được để trống').notEmpty().trim().isLength({ min: 1 }).withMessage('Nội dung phải có ít nhất 1 ký tự'),
+    check('content', 'Nội dung bài viết không được để trống').trim().isLength({ min: 1 }),
+    body('imageUrl').optional({ checkFalsy: true }).isURL().withMessage('Image URL không hợp lệ'), 
     handleValidationErrors
 ];
 
@@ -59,7 +61,22 @@ export const commentValidator = [
     .optional({ nullable: true }) // Vẫn cho phép null hoặc không tồn tại
     .if((value) => value !== null && value !== undefined) // Chỉ chạy validation tiếp theo NẾU giá trị không phải null/undefined
     .isInt({ min: 1 }).withMessage('Parent Comment ID phải là một số nguyên dương.'),
-
+    body('imageUrl').optional({ checkFalsy: true }).isURL().withMessage('Image URL không hợp lệ'), 
     handleValidationErrors
 ];
-// Thêm các validator khác ở đây sau (ví dụ: eventValidator)
+
+export const updateUserStatusValidator = [
+    body('role')
+        .optional()
+        .isIn(Object.values(UserRole)) // Phải là một trong các giá trị của Enum UserRole
+        .withMessage(`Vai trò không hợp lệ. Chỉ chấp nhận: ${Object.values(UserRole).join(', ')}`),
+    body('isVerified')
+        .optional()
+        .isBoolean()
+        .withMessage('Trạng thái xác minh phải là true hoặc false.'),
+    body('isActive')
+        .optional()
+        .isBoolean()
+        .withMessage('Trạng thái hoạt động phải là true hoặc false.'),
+    handleValidationErrors
+];

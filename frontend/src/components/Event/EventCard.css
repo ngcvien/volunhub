@@ -1,160 +1,175 @@
 /* volunhub-project\frontend\src\components\Event\EventCard.css */
 /* Styling cho EventCard */
 .event-card {
-    border-radius: 12px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    border: none;
-    margin-bottom: 1.5rem;
-    padding: 2% !important;
-  }
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: none;
+  margin-bottom: 1.5rem;
+  padding: 2% !important;
+}
+
+.event-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Creator styling */
+.creator-avatar {
+  object-fit: cover;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.creator-avatar:hover {
+  border-color: var(--bs-primary);
+}
+
+.creator-name {
+  font-weight: 600;
+  color: var(--bs-body-color);
+  transition: color 0.2s ease;
+}
+
+.creator-name:hover {
+  color: var(--bs-primary);
+}
+
+/* Event title styling */
+.event-title {
+  font-weight: 600;
+  font-size: 1.5rem;
+  transition: color 0.2s ease;
+}
+
+.event-title-link {
+  text-decoration: none;
+  color: var(--bs-body-color);
+}
+
+.event-title-link:hover .event-title {
+  color: var(--bs-primary);
+}
+
+/* Event meta information */
+.event-meta {
+  font-size: 0.9rem;
+  color: var(--bs-secondary-color);
+  justify-content: space-between;
+}
+.time-and-location{
+  display: flex;
+  flex-direction: column;
+  gap: 0!important;
+  text-align: right ;
+  gap: 0.5rem;
+}
+
+
+.event-icon {
+  flex-shrink: 0;
+}
+
+.time-remaining {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--bs-danger);
+  background-color: rgba(var(--bs-danger-rgb), 0.1);
+  padding: 0.1rem 0.5rem;
+  border-radius: 1rem;
+}
+
+/* Event description */
+.event-description {
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+}
+
+/* Event image */
+.event-image-container {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.event-image {
+  transition: transform 0.3s ease;
+  cursor: pointer;
+  /* max-height: 400px; */
+  object-fit: cover;
+  width: 100%;
+}
+
+.event-image:hover {
+  transform: scale(1.02);
+}
+
+/* Action buttons */
+.participation-button {
+  border-radius: 20px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  transition: all 0.2s ease;
   
-  .event-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
-  }
-  
-  /* Creator styling */
-  .creator-avatar {
-    object-fit: cover;
-    border: 2px solid transparent;
-    transition: all 0.2s ease;
-  }
-  
-  .creator-avatar:hover {
-    border-color: var(--bs-primary);
-  }
-  
-  .creator-name {
-    font-weight: 600;
-    color: var(--bs-body-color);
-    transition: color 0.2s ease;
-  }
-  
-  .creator-name:hover {
-    color: var(--bs-primary);
-  }
-  
-  /* Event title styling */
-  .event-title {
-    font-weight: 600;
-    transition: color 0.2s ease;
-  }
-  
-  .event-title-link {
-    text-decoration: none;
-    color: var(--bs-body-color);
-  }
-  
-  .event-title-link:hover .event-title {
-    color: var(--bs-primary);
-  }
-  
-  /* Event meta information */
-  .event-meta {
-    font-size: 0.9rem;
-    color: var(--bs-secondary-color);
-  }
-  
-  .event-icon {
-    flex-shrink: 0;
-  }
-  
-  .time-remaining {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--bs-danger);
-    background-color: rgba(var(--bs-danger-rgb), 0.1);
-    padding: 0.1rem 0.5rem;
-    border-radius: 1rem;
-  }
-  
-  /* Event description */
-  .event-description {
-    font-size: 0.95rem;
-    white-space: pre-wrap;
-  }
-  
-  /* Event image */
-  .event-image-container {
+}
+
+.participation-button:hover {
+  transform: scale(1.05);
+}
+
+.action-button {
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.like-button span{
+  font-size: 1rem;
+  margin-left: 0!important;
+}
+
+.action-button:hover {
+  background-color: rgba(var(--bs-primary-rgb), 0.1);
+  color: var(--bs-primary);
+}
+
+.bi-patch-check-fill {
+  color: var(--bs-primary);
+  margin: 0 0.3rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .event-card {
     border-radius: 8px;
-    overflow: hidden;
-  }
-  
-  .event-image {
-    transition: transform 0.3s ease;
-    cursor: pointer;
-    /* max-height: 400px; */
-    object-fit: cover;
-    width: 100%;
-  }
-  
-  .event-image:hover {
-    transform: scale(1.02);
-  }
-  
-  /* Action buttons */
-  .participation-button {
-    border-radius: 20px;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    transition: all 0.2s ease;
-  }
-  
-  .participation-button:hover {
-    transform: scale(1.05);
-  }
-  
-  .action-button {
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    padding: 0 !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
+    padding: 0!important;
   }
 
-  .like-button span{
-    font-size: 1rem;
-    margin-left: 0!important;
+  .event-meta {
+    font-size: 0.85rem;
   }
-  
-  .action-button:hover {
-    background-color: rgba(var(--bs-primary-rgb), 0.1);
-    color: var(--bs-primary);
+
+  .event-description {
+    font-size: 0.9rem;
   }
-  
-  /* Responsive adjustments */
-  @media (max-width: 576px) {
-    .event-card {
-      border-radius: 8px;
+  #root{
       padding: 0!important;
-    }
-  
-    .event-meta {
-      font-size: 0.85rem;
-    }
-  
-    .event-description {
-      font-size: 0.9rem;
-    }
-    #root{
-        padding: 0!important;
-    }
   }
-  @media (max-width: 768px) {
-    .event-card {
-      padding: 1rem;
-    }
-  
-    .event-title {
-      font-size: 1.2rem;
-    }
-  
-    .event-description {
-      font-size: 0.95rem;
-    }
+}
+@media (max-width: 768px) {
+  .event-card {
+    padding: 1rem;
   }
-  
+
+  .event-title {
+    font-size: 1.2rem;
+  }
+
+  .event-description {
+    font-size: 0.95rem;
+  }
+}

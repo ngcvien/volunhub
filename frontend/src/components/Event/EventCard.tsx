@@ -8,7 +8,7 @@ import type { EventType } from "../../types/event.types"
 import { useAuth } from "../../contexts/AuthContext"
 import { joinEventApi, leaveEventApi, likeEventApi, unlikeEventApi } from "../../api/event.api"
 import { formatDistanceToNow, format } from "date-fns"
-import { vi } from "date-fns/locale"
+import { is, vi } from "date-fns/locale"
 import {
   GeoAlt,
   Calendar2Event,
@@ -19,6 +19,7 @@ import {
   BookmarkPlus,
   HandThumbsUp,
   HandThumbsUpFill,
+  PatchCheckFill
 } from "react-bootstrap-icons"
 import "./EventCard.css"
 import UserPopup from "../User/UserPopup"
@@ -54,6 +55,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
   const popupTimerRef = useRef<NodeJS.Timeout | null>(null); // Ref cho timer ẩn/hiện popup
 
   const [displayLikeCount, setDisplayLikeCount] = useState(event.likeCount || 0);
+
+  const isVerified = event.creator?.isVerified || false;
+
+  console.log("EventCard render", event.title, event.creator?.username, event.creator?.isVerified, event.creator?.bio);
 
   useEffect(() => {
     setDisplayLikeCount(event.likeCount || 0);
@@ -104,14 +109,14 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
   const handleLike = async () => {
     if (!user) {
       alert("Vui lòng đăng nhập để thích sự kiện.");
-      navigate("/login"); 
+      navigate("/auth");
       return;
     }
-  
+
     setIsLoadingLike(true);
     setLikeError(null);
     const currentLikedStatus = displayLiked;
-  
+
     try {
       if (currentLikedStatus) {
         await unlikeEventApi(event.id);
@@ -224,7 +229,13 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
                 className="creator-name text-decoration-none" // Cần style cho class này trong CSS
                 style={{ pointerEvents: 'none' }}
               >
-                {event.creator?.fullName||event.creator?.username || "Người dùng ẩn"} {/* Bỏ @ nếu muốn */}
+                {event.creator?.fullName || event.creator?.username || "Người dùng ẩn"}
+                {isVerified && (
+                  <OverlayTrigger placement="top" overlay={<Tooltip>Người dùng đã được xác minh</Tooltip>}>
+                    <PatchCheckFill />
+                  </OverlayTrigger>
+                )}
+
               </Link>
               <div className="text-muted small d-flex align-items-center">
                 <span>{formatTimeAgo(event.createdAt)}</span>
@@ -264,38 +275,41 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
               // Truyền các props cần thiết khác mà UserPopup cần
               username={event.creator?.username || 'Người dùng ẩn'}
               avatarUrl={event.creator?.avatarUrl}
-              fullName={event.creator?.fullName} 
-            // bio={event.creator?.bio} 
+              fullName={event.creator?.fullName}
+              isVerified={isVerified}
+              bio={event.creator?.bio}
             />
-            
+
           </div>
         )}
       </Overlay>
 
       {/* Card Body */}
       <Card.Body className="pt-2 pb-3"> {/* Giảm padding top */}
-        <Link to={`/events/${event.id}`} className="event-title-link text-decoration-none">
-          <h5 className="event-title mb-3">{event.title}</h5> {/* Thêm mb-3 */}
-        </Link>
+
 
         <div className="event-meta mb-3">
-          {/* ... Thông tin thời gian, địa điểm (giữ nguyên) ... */}
           <div className="d-flex align-items-center mb-1">
             <Calendar2Event className="event-icon text-primary me-2" />
             <span>{formatEventDate(event.eventTime)}</span>
             <span className="time-remaining ms-2">{getTimeRemaining(event.eventTime)}</span>
           </div>
-          <div className="d-flex align-items-center mb-1">
-            <Clock className="event-icon text-primary me-2" />
-            <span>{formatEventTime(event.eventTime)}</span>
-          </div>
-          {event.location && (
-            <div className="d-flex align-items-center">
-              <GeoAlt className="event-icon text-primary me-2" />
-              <span>{event.location}</span>
+          <div className="time-and-location">
+            <div className="d-flex justify-content-end align-items-center mb-1">
+              <Clock className="event-icon text-primary me-2" />
+              <span>{formatEventTime(event.eventTime)}</span>
             </div>
-          )}
+            {event.location && (
+              <div className="d-flex align-items-center">
+                <GeoAlt className="event-icon text-primary me-2" />
+                <span>{event.location}</span>
+              </div>
+            )}
+          </div>
         </div>
+        <Link to={`/events/${event.id}`} className="event-title-link text-decoration-none">
+          <h5 className="event-title mb-3">{event.title}</h5>
+        </Link>
 
         {event.description && (
           <div className="event-description mb-3">
@@ -350,7 +364,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
             <OverlayTrigger placement="top" overlay={<Tooltip>{displayLiked ? "Bỏ thích" : "Thích"}</Tooltip>}>
               <Button
                 type="button"
-                variant="light" // Giữ variant light
+                variant="light"
                 size="sm"
                 className="action-button d-flex align-items-center  me-2 mb-1 like-button"
                 onClick={handleLike} // Gắn hàm xử lý mới
@@ -359,13 +373,13 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
                 {isLoadingLike ? <Spinner size="sm" animation="border" variant="primary" /> :
                   (displayLiked ? <HandThumbsUpFill className="text-primary me-1" /> : <HandThumbsUp className="me-1" />) // Icon thay đổi theo displayLiked
                 }
-                {/* Hiển thị likeCount từ prop event (hoặc 0 nếu chưa có) */}
                 <span className="small ms-1">{displayLikeCount || 0}</span>
               </Button>
             </OverlayTrigger>
 
-            <OverlayTrigger placement="top" overlay={<Tooltip>Bình luận</Tooltip>}>
-              <Button variant="light" size="sm" className="action-button me-1 mb-2">
+
+            <OverlayTrigger placement="top" overlay={<Tooltip>Thảo luận</Tooltip>}>
+              <Button variant="light" size="sm" className="action-button me-1 mb-2" onClick={() => navigate(`/events/${event.id}#comments`)}>
                 <ChatLeftText />
               </Button>
             </OverlayTrigger>

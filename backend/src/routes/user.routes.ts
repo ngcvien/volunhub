@@ -33,6 +33,17 @@ router.put(
 
 router.get(
   '/:userId', 
-  userController.getUserProfile // Gọi hàm controller mới
+  userController.getUserProfile 
+);
+
+router.get(
+  '/username/:username', 
+  userController.getUserProfileByUsername 
+);
+
+router.get(
+  '/me/events/created',
+  authenticateToken,
+  userController.getMyCreatedEvents 
 );
 export default router;

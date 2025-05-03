@@ -1,0 +1,38 @@
+.dashboard-container {
+  /* background-color: #f8f9fa; */
+}
+
+.dashboard-stat-card {
+  transition: transform 0.2s ease-in-out;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.dashboard-stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.table th {
+  font-weight: 600;
+  border-top: none;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.table tr{
+  transition:  cubic-bezier(0.075, 0.82, 0.165, 1) 2s !important;
+}
+.table tr:hover{
+  background-color: #2364a5 !important;
+}
+
+.badge {
+  font-weight: 500;
+  padding: 0.5em 0.8em;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.7rem;
+}

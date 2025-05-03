@@ -7,13 +7,13 @@ class EventPostController {
         try {
             const eventId = parseInt(req.params.eventId, 10);
             const userId = req.user?.userId; // Lấy từ authenticateToken
-            const { content } = req.body;
+            const { content, imageUrl } = req.body;
 
             if (!userId) return res.status(401).json({ message: 'Yêu cầu xác thực.' });
             if (isNaN(eventId)) return res.status(400).json({ message: 'Event ID không hợp lệ.' });
             // Validation cho content sẽ được middleware xử lý trước đó
 
-            const postData = { eventId, userId, content };
+            const postData = { eventId, userId, content, imageUrl: imageUrl || null };
             const newPost = await eventPostService.createPost(postData);
 
             res.status(201).json({ message: 'Đăng bài viết thành công!', post: newPost });

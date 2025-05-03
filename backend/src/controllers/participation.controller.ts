@@ -53,6 +53,42 @@ class ParticipationController {
             next(error);
         }
     }
+
+    async confirmParticipant(req: Request, res: Response, next: NextFunction) {
+        try {
+            const eventId = parseInt(req.params.eventId, 10);
+            const participantUserId = parseInt(req.params.participantUserId, 10); // Lấy ID TNV từ params
+            const requestingUserId = req.user?.userId; // Lấy ID người yêu cầu (creator) từ token
+
+            if (!requestingUserId) return res.status(401).json({ message: 'Yêu cầu xác thực.' });
+            if (isNaN(eventId)) return res.status(400).json({ message: 'Event ID không hợp lệ.' });
+            if (isNaN(participantUserId)) return res.status(400).json({ message: 'Participant User ID không hợp lệ.' });
+
+            // Gọi service để xử lý
+            await participationService.confirmParticipantCompletion(eventId, participantUserId, requestingUserId);
+
+            res.status(200).json({ message: 'Xác nhận tình nguyện viên hoàn thành thành công!' });
+
+        } catch (error) {
+            next(error); // Chuyển lỗi cho middleware
+        }
+    }
+
+    async getParticipantsForManagement(req: Request, res: Response, next: NextFunction) {
+        try {
+            const eventId = parseInt(req.params.eventId, 10);
+            const requestingUserId = req.user?.userId; // Lấy từ authenticateToken
+
+            if (!requestingUserId) return res.status(401).json({ message: 'Yêu cầu xác thực.' });
+            if (isNaN(eventId)) return res.status(400).json({ message: 'Event ID không hợp lệ.' });
+
+            const participants = await participationService.getParticipantsForEventManagement(eventId, requestingUserId);
+            res.status(200).json({ message: 'Lấy danh sách người tham gia thành công!', participants });
+
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export default new ParticipationController();

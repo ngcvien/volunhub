@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import {getMeApi , registerUserApi, loginUserApi } from '../api/auth.api'; // Đổi tên hàm gọi API
-import { User, RegisterUserInput, LoginUserInput, AuthContextType as ContextType } from '../types/user.types';
+import { getMeApi, registerUserApi, loginUserApi } from '../api/auth.api'; // Đổi tên hàm gọi API
+import { User, RegisterUserInput, LoginUserInput, AuthContextType as ContextType, UserRole } from '../types/user.types';
 
 
 
@@ -20,9 +20,9 @@ const AuthContext = createContext<ContextType | undefined>(undefined);
 const getInitialTheme = (): 'light' | 'dark' => {
   const storedTheme = localStorage.getItem('appTheme') as 'light' | 'dark' | null;
   if (storedTheme) {
-      return storedTheme;
+    return storedTheme;
   }
-  
+
   return 'dark';
 };
 
@@ -44,73 +44,76 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // --- USEEFFECT KIỂM TRA TOKEN KHI TẢI ỨNG DỤNG ---
   useEffect(() => {
     const checkAuthStatus = async () => {
-        const storedToken = localStorage.getItem('authToken');
-        if (storedToken) {
-             // Đặt token state ngay lập tức nếu tìm thấy trong storage
-            setToken(storedToken);
-            try {
-                console.log('AuthContext: Found token, verifying...');
-                // Gọi API /users/me để xác thực token và lấy user data
-                const response = await getMeApi();
-                if (response.user) {
-                    setUser(response.user); // Cập nhật user state thành công
-                    console.log('AuthContext: User restored:', response.user);
-                } else {
-                     // Trường hợp lạ: API thành công nhưng không có user? -> Logout
-                    throw new Error('Dữ liệu người dùng không hợp lệ.');
-                }
-            } catch (error: any) {
-                // Lỗi xảy ra (token hết hạn, không hợp lệ, API /me lỗi) -> Logout
-                console.error('AuthContext: Failed to verify token or fetch user:', error);
-                localStorage.removeItem('authToken'); // Xóa token khỏi storage
-                setToken(null);                     // Xóa token khỏi state
-                setUser(null);                      // Xóa user khỏi state
-            }
+      const storedToken = localStorage.getItem('authToken');
+      if (storedToken) {
+        // Đặt token state ngay lập tức nếu tìm thấy trong storage
+        setToken(storedToken);
+        try {
+          console.log('AuthContext: Found token, verifying...');
+          // Gọi API /users/me để xác thực token và lấy user data
+          const response = await getMeApi();
+          if (response.user) {
+            setUser(response.user); // Cập nhật user state thành công
+            console.log('AuthContext: User restored:', response.user);
+          } else {
+            // Trường hợp lạ: API thành công nhưng không có user? -> Logout
+            throw new Error('Dữ liệu người dùng không hợp lệ.');
+          }
+        } catch (error: any) {
+          // Lỗi xảy ra (token hết hạn, không hợp lệ, API /me lỗi) -> Logout
+          console.error('AuthContext: Failed to verify token or fetch user:', error);
+          localStorage.removeItem('authToken'); // Xóa token khỏi storage
+          setToken(null);                     // Xóa token khỏi state
+          setUser(null);                      // Xóa user khỏi state
         }
-         // Dù có token hay không, hoặc có lỗi, cũng phải kết thúc loading
-        setIsLoading(false);
+      }
+      // Dù có token hay không, hoặc có lỗi, cũng phải kết thúc loading
+      setIsLoading(false);
     };
 
     checkAuthStatus();
-}, []);
+  }, []);
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
   const login = async (loginData: LoginUserInput) => {
     try {
-        console.log('Attempting login with:', loginData); // Log để debug
-        const response = await loginUserApi(loginData); // Gọi API đăng nhập
-        console.log('Login API Response:', response); // Log để debug
+      console.log('Attempting login with:', loginData); // Log để debug
+      const response = await loginUserApi(loginData); // Gọi API đăng nhập
+      console.log('Login API Response:', response); // Log để debug
 
-        if (response.token && response.user) {
-            localStorage.setItem('authToken', response.token); // Lưu token vào localStorage
-            setToken(response.token); // Cập nhật token state
+      if (response.token && response.user) {
+        localStorage.setItem('authToken', response.token); // Lưu token vào localStorage
+        setToken(response.token); // Cập nhật token state
 
-            // Cập nhật user state (đảm bảo đúng kiểu User)
-            const userData: User = {
-                id: response.user.id,
-                username: response.user.username,
-                email: response.user.email,
-                createdAt: response.user.createdAt,
-                updatedAt: response.user.updatedAt
-            };
-            setUser(userData);
-            console.log('User state updated:', userData); // Log để debug
-        } else {
-            // Trường hợp API thành công nhưng không trả về đủ dữ liệu
-            throw new Error('Phản hồi đăng nhập không hợp lệ từ server.');
-        }
+        // Cập nhật user state (đảm bảo đúng kiểu User)
+        const userData: User = {
+          id: response.user.id,
+          username: response.user.username,
+          email: response.user.email,
+          role: response.user.role,
+          isVerified: response.user.isVerified,
+          isActive: response.user.isActive,
+          createdAt: response.user.createdAt,
+          updatedAt: response.user.updatedAt
+        };
+        setUser(userData);
+        console.log('User state updated:', userData); // Log để debug
+      } else {
+        // Trường hợp API thành công nhưng không trả về đủ dữ liệu
+        throw new Error('Phản hồi đăng nhập không hợp lệ từ server.');
+      }
     } catch (error) {
-        console.error("Lỗi trong AuthContext login:", error);
-        logout(); // Đảm bảo đã logout (xóa token cũ nếu có) khi login thất bại
-        throw error; // Ném lỗi ra để LoginPage có thể bắt và hiển thị
+      console.error("Lỗi trong AuthContext login:", error);
+      logout(); // Đảm bảo đã logout (xóa token cũ nếu có) khi login thất bại
+      throw error; // Ném lỗi ra để LoginPage có thể bắt và hiển thị
     }
-};
-const updateUserContext = (newUserData: User) => {
-  // Chỉ cập nhật state user, không động đến token hay localStorage ở đây
-  setUser(newUserData);
-  console.log('AuthContext: User state updated locally:', newUserData);
-};
+  };
+  const updateUserContext = (newUserData: User) => {
+    // Chỉ cập nhật state user, không động đến token hay localStorage ở đây
+    setUser(newUserData);
+    console.log('AuthContext: User state updated locally:', newUserData);
+  };
   const logout = () => {
     localStorage.removeItem('authToken');
     setToken(null);
