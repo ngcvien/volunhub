@@ -12,9 +12,22 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+[data-bs-theme="dark"] {
+  --bs-body-bg: #000000 !important;
+  --bs-tertiary-bg-rgb: 10, 10, 10 !important;
+
+}
+
+[data-bs-theme="dark"] .sidebar-card {
+  background-color: #000000 !important;
+  border: none !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
 #root {
   padding: 0 !important;
   padding-top: 1rem !important;
+  color: rgb(30, 30, 30);
 }
 
 a {
