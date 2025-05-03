@@ -1,7 +1,7 @@
 import type React from "react"
-import { Popover, Image, Button, Badge } from "react-bootstrap"
+import { Popover, Image, Button, Badge, OverlayTrigger, Tooltip } from "react-bootstrap"
 import { Link } from "react-router-dom"
-import { Envelope, PersonPlus } from "react-bootstrap-icons"
+import { Envelope, PersonPlus, PatchCheckFill } from "react-bootstrap-icons"
 import "./UserPopup.css"
 
 interface UserPopupProps {
@@ -12,6 +12,7 @@ interface UserPopupProps {
   bio?: string | null
   location?: string | null
   volunCredit?: number
+  isVerified?: boolean
 }
 const UserPopup: React.FC<UserPopupProps> = ({
   userId,
@@ -21,6 +22,7 @@ const UserPopup: React.FC<UserPopupProps> = ({
   bio,
   location,
   volunCredit = 0,
+  isVerified
 }) => {
   return (
     <Popover id={`user-popover-${userId}`} className="user-popup" >
@@ -39,7 +41,14 @@ const UserPopup: React.FC<UserPopupProps> = ({
 
           {/* User info */}
           <div className="user-popup-info">
-            <h5 className="mb-1">{fullName || username}</h5>
+            <h5 className="mb-1">
+              {fullName || username}
+              {isVerified && (
+                <OverlayTrigger placement="top" overlay={<Tooltip>Người dùng đã được xác minh</Tooltip>}>
+                  <PatchCheckFill />
+                </OverlayTrigger>
+              )}
+            </h5>
             <p className="text-muted small mb-2">@{username}</p>
 
             {location && (

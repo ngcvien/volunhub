@@ -8,7 +8,7 @@ import type { EventType } from "../../types/event.types"
 import { useAuth } from "../../contexts/AuthContext"
 import { joinEventApi, leaveEventApi, likeEventApi, unlikeEventApi } from "../../api/event.api"
 import { formatDistanceToNow, format } from "date-fns"
-import { vi } from "date-fns/locale"
+import { is, vi } from "date-fns/locale"
 import {
   GeoAlt,
   Calendar2Event,
@@ -19,6 +19,7 @@ import {
   BookmarkPlus,
   HandThumbsUp,
   HandThumbsUpFill,
+  PatchCheckFill
 } from "react-bootstrap-icons"
 import "./EventCard.css"
 import UserPopup from "../User/UserPopup"
@@ -54,6 +55,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
   const popupTimerRef = useRef<NodeJS.Timeout | null>(null); // Ref cho timer ẩn/hiện popup
 
   const [displayLikeCount, setDisplayLikeCount] = useState(event.likeCount || 0);
+
+  const isVerified = event.creator?.isVerified || false;
+
+  console.log("EventCard render", event.title, event.creator?.username, event.creator?.isVerified, event.creator?.bio);
 
   useEffect(() => {
     setDisplayLikeCount(event.likeCount || 0);
@@ -224,7 +229,13 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
                 className="creator-name text-decoration-none" // Cần style cho class này trong CSS
                 style={{ pointerEvents: 'none' }}
               >
-                {event.creator?.fullName || event.creator?.username || "Người dùng ẩn"} {/* Bỏ @ nếu muốn */}
+                {event.creator?.fullName || event.creator?.username || "Người dùng ẩn"}
+                {isVerified && (
+                  <OverlayTrigger placement="top" overlay={<Tooltip>Người dùng đã được xác minh</Tooltip>}>
+                    <PatchCheckFill />
+                  </OverlayTrigger>
+                )}
+
               </Link>
               <div className="text-muted small d-flex align-items-center">
                 <span>{formatTimeAgo(event.createdAt)}</span>
@@ -265,7 +276,8 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
               username={event.creator?.username || 'Người dùng ẩn'}
               avatarUrl={event.creator?.avatarUrl}
               fullName={event.creator?.fullName}
-            // bio={event.creator?.bio} 
+              isVerified={isVerified}
+              bio={event.creator?.bio}
             />
 
           </div>
@@ -274,7 +286,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
 
       {/* Card Body */}
       <Card.Body className="pt-2 pb-3"> {/* Giảm padding top */}
-        
+
 
         <div className="event-meta mb-3">
           <div className="d-flex align-items-center mb-1">
@@ -296,7 +308,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
           </div>
         </div>
         <Link to={`/events/${event.id}`} className="event-title-link text-decoration-none">
-          <h5 className="event-title mb-3">{event.title}</h5> 
+          <h5 className="event-title mb-3">{event.title}</h5>
         </Link>
 
         {event.description && (
@@ -352,7 +364,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
             <OverlayTrigger placement="top" overlay={<Tooltip>{displayLiked ? "Bỏ thích" : "Thích"}</Tooltip>}>
               <Button
                 type="button"
-                variant="light" 
+                variant="light"
                 size="sm"
                 className="action-button d-flex align-items-center  me-2 mb-1 like-button"
                 onClick={handleLike} // Gắn hàm xử lý mới
@@ -364,7 +376,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
                 <span className="small ms-1">{displayLikeCount || 0}</span>
               </Button>
             </OverlayTrigger>
-            
+
 
             <OverlayTrigger placement="top" overlay={<Tooltip>Thảo luận</Tooltip>}>
               <Button variant="light" size="sm" className="action-button me-1 mb-2" onClick={() => navigate(`/events/${event.id}#comments`)}>

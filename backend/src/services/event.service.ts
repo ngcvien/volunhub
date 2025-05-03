@@ -24,14 +24,14 @@ interface GetAllEventsOptions {
 }
 
 type EventWithDetails = EventAttributes & {
-    creator: { id: number; username: string; avatarUrl?: string | null };
+    creator: { id: number; username: string; avatarUrl?: string | null; isVerified?: boolean; fullName?: string | null; bio?: string | null; location?: string | null; };
     isParticipating: boolean;
     isLiked: boolean;
     likeCount: number;
 };
 
 interface PaginatedEventsResult {
-    events: EventWithDetails[]; t
+    events: EventWithDetails[]; 
     totalPages: number;
     currentPage: number;
     totalEvents: number;
@@ -93,7 +93,7 @@ class EventService {
                 include: [{ // Vẫn include người tạo
                     model: User,
                     as: 'creator',
-                    attributes: ['id', 'username', 'avatarUrl', 'fullName']
+                    attributes: ['id', 'username', 'avatarUrl', 'fullName', 'isVerified', 'bio', 'location'] 
                 }],
                 order: [['createdAt', 'DESC']], // Sắp xếp
                 limit: limit, // Giới hạn số lượng

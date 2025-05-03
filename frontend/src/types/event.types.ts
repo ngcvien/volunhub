@@ -9,6 +9,7 @@ interface EventCreator {
     fullName?: string | null
     bio?: string | null
     location?: string | null
+    isVerified?: boolean
   }
 
   export interface EventPostType {
@@ -39,6 +40,7 @@ interface EventCreator {
     isLiked?: boolean 
     likeCount?: number
     imageUrl?: string | null
+    // isVerified?: boolean 
     participants?: BasicUser[]; // Dùng BasicUser
     posts?: EventPostType[]; 
   }

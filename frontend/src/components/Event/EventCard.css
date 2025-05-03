@@ -137,6 +137,11 @@
   color: var(--bs-primary);
 }
 
+.bi-patch-check-fill {
+  color: var(--bs-primary);
+  margin: 0 0.3rem;
+}
+
 /* Responsive adjustments */
 @media (max-width: 576px) {
   .event-card {
