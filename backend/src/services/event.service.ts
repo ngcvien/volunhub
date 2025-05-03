@@ -158,7 +158,7 @@ class EventService {
                     { // Lấy thông tin người tạo
                         model: User,
                         as: 'creator',
-                        attributes: ['id', 'username', 'fullName', 'avatarUrl'] // Lấy các trường cần thiết
+                        attributes: ['id', 'username', 'fullName', 'avatarUrl', 'bio'] 
                     },
                     { // Lấy danh sách người tham gia
                         model: User,
