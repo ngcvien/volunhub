@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Sun, Moon } from 'react-bootstrap-icons';
 import './ThemeToggle.css';
-const ThemeToggle = () => {
+const   ThemeToggle = () => {
     const { theme, toggleTheme } = useAuth();
 
     return (
