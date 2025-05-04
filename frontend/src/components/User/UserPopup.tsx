@@ -1,7 +1,7 @@
 import type React from "react"
 import { Popover, Image, Button, Badge, OverlayTrigger, Tooltip } from "react-bootstrap"
 import { Link } from "react-router-dom"
-import { Envelope, PersonPlus, PatchCheckFill } from "react-bootstrap-icons"
+import { Envelope, PersonPlus, PatchCheckFill, CashCoin, Coin } from "react-bootstrap-icons"
 import "./UserPopup.css"
 
 interface UserPopupProps {
@@ -11,8 +11,8 @@ interface UserPopupProps {
   fullName?: string | null
   bio?: string | null
   location?: string | null
-  volunCredit?: number
   isVerified?: boolean
+  volunpoints?: number
 }
 const UserPopup: React.FC<UserPopupProps> = ({
   userId,
@@ -21,8 +21,8 @@ const UserPopup: React.FC<UserPopupProps> = ({
   fullName,
   bio,
   location,
-  volunCredit = 0,
-  isVerified
+  isVerified,
+  volunpoints = 0,
 }) => {
   return (
     <Popover id={`user-popover-${userId}`} className="user-popup" >
@@ -61,7 +61,7 @@ const UserPopup: React.FC<UserPopupProps> = ({
 
             <div className="d-flex align-items-center mb-3">
               <Badge bg="primary" className="volun-credit-badge">
-                <i className="bi bi-star-fill me-1"></i> {volunCredit} VolunCredit
+                <i className="bi bi-star-fill me-1"></i> {volunpoints} <Coin size={16} className="ms-1" />
               </Badge>
             </div>
 

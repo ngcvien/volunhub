@@ -93,7 +93,7 @@ class EventService {
                 include: [{ // Vẫn include người tạo
                     model: User,
                     as: 'creator',
-                    attributes: ['id', 'username', 'avatarUrl', 'fullName', 'isVerified', 'bio', 'location'] 
+                    attributes: ['id', 'username', 'avatarUrl', 'fullName', 'isVerified', 'bio','volunpoints', 'location'] 
                 }],
                 order: [['createdAt', 'DESC']], // Sắp xếp
                 limit: limit, // Giới hạn số lượng
@@ -158,7 +158,7 @@ class EventService {
                     { // Lấy thông tin người tạo
                         model: User,
                         as: 'creator',
-                        attributes: ['id', 'username', 'fullName', 'avatarUrl', 'bio'] 
+                        attributes: ['id', 'username', 'fullName', 'avatarUrl', 'bio', 'volunpoints', 'location', 'isVerified'] // Chọn các trường cần thiết
                     },
                     { // Lấy danh sách người tham gia
                         model: User,

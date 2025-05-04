@@ -10,6 +10,8 @@ interface EventCreator {
     bio?: string | null
     location?: string | null
     isVerified?: boolean
+    volunpoints?: number
+    createdAt: string 
   }
 
   export interface EventPostType {

@@ -63,7 +63,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
 
   const isVerified = event.creator?.isVerified || false;
 
-  console.log("EventCard render", event.title, event.creator?.username, event.creator?.isVerified, event.creator?.bio);
+  console.log("EventCard render", event.title, event.creator?.username, event.creator?.isVerified, event.creator?.volunpoints);
 
   useEffect(() => {
     setDisplayLikeCount(event.likeCount || 0);
@@ -283,6 +283,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
               fullName={event.creator?.fullName}
               isVerified={isVerified}
               bio={event.creator?.bio}
+              volunpoints={event.creator?.volunpoints}
             />
 
           </div>
