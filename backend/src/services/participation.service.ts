@@ -1,8 +1,10 @@
 // backend/src/services/participation.service.ts
 import Participation, {ParticipationAttributes} from '../models/Participation.model';
-import Event from '../models/Event.model'; // Import Event để kiểm tra sự kiện tồn tại
-import User from '../models/User.model'; // Import User (có thể cần sau này)
-import { sequelize } from './database.service'; // Import sequelize nếu cần transaction
+import Event from '../models/Event.model'; 
+import User from '../models/User.model'; 
+import pointService from './point.service';
+import {CompletionStatus} from '../models/Participation.model'; 
+import { sequelize } from './database.service'; 
 
 enum CompletionStatus {
     PENDING = 'pending',
@@ -13,8 +15,8 @@ interface ParticipantDetailBE {
     userId: number;
     eventId: number;
     completionStatus: CompletionStatus;
-    createdAt: Date; // Hoặc string
-    user: { // Thông tin user kèm theo
+    createdAt: Date; 
+    user: {
         id: number;
         username: string;
         avatarUrl: string | null;
@@ -159,6 +161,14 @@ class ParticipationService {
             // Sau này sẽ gọi PointService ở đây
             console.log(`POINTS_AWARDED: User ${participantUserId} completed Event ${eventId}. Confirmed by verified creator ${requestingUserId}.`);
             // await PointService.awardPointsForParticipation(participantUserId, eventId, transaction);
+            const POINTS_PER_EVENT = 10;
+            await pointService.awardPoints(
+                participantUserId,
+                POINTS_PER_EVENT,
+                `Hoàn thành sự kiện: ${event.title}`, // Lý do
+                eventId,
+                transaction 
+            );
 
             await transaction.commit(); // Commit transaction nếu mọi thứ thành công
 

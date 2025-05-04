@@ -82,7 +82,9 @@ class UserController {
       // Tìm user trong DB bằng ID lấy từ token
       const user = await User.findByPk(userId, {
         // Lấy cả các trường profile mới, loại bỏ password_hash
-        attributes: ['id', 'username', 'email', 'fullName', 'bio', 'location', 'avatarUrl', 'createdAt', 'updatedAt', 'role', 'isVerified', 'isActive'],
+        attributes: ['id', 'username', 'email', 'fullName', 'bio',
+           'location', 'avatarUrl', 'createdAt', 'updatedAt', 'role',
+            'isVerified', 'isActive', 'volunpoints'],
       });
       if (!user) {
         return res.status(404).json({ message: 'Người dùng không tồn tại.' });

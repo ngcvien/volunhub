@@ -28,15 +28,7 @@ const CreatorDashboardPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 10;
 
-  // Calculate Statistics
-  const statistics = useMemo(() => {
-    return {
-      total: myEvents.length,
-      active: myEvents.filter(e => e.status === 'active').length,
-      completed: myEvents.filter(e => e.status === 'completed').length,
-      totalParticipants: myEvents.reduce((acc, event) => acc + (event.participantCount || 0), 0)
-    };
-  }, [myEvents]);
+ 
 
   // Fetch Events
   useEffect(() => {
@@ -56,11 +48,59 @@ const CreatorDashboardPage = () => {
     }
   };
 
+  const getTimeRemaining = (isoString: string): string => {
+    try {
+      const eventDate = new Date(isoString);
+      const now = new Date();
+      if (eventDate < now) return "Đã diễn ra";
+      const diffTime = eventDate.getTime() - now.getTime(); // Chỉ cần hiệu số dương
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays > 30) return `Còn ~${Math.floor(diffDays / 30)} tháng`;
+      if (diffDays > 0) return `Còn ${diffDays} ngày`;
+      const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+      if (diffHours > 0) return `Còn ${diffHours} giờ`;
+      const diffMinutes = Math.floor(diffTime / (1000 * 60));
+      if (diffMinutes > 0) return `Còn ${diffMinutes} phút`;
+      return "Sắp diễn ra";
+    } catch (e) { return ""; }
+  };
+
+  const getEventStatusBadge = (isoString: string) => {
+    try {
+      const eventDate = new Date(isoString);
+      const now = new Date();
+      if (eventDate < now) return <Badge bg="secondary">Đã diễn ra</Badge>;
+      const diffTime = eventDate.getTime() - now.getTime();
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays <= 1) return <Badge bg="danger">Hôm nay/Ngày mai</Badge>; // Sửa logic
+      if (diffDays <= 7) return <Badge bg="warning" text="dark">Tuần này</Badge>;
+      return <Badge bg="info">Sắp tới</Badge>;
+    } catch (e) { return <Badge bg="light" text="dark">Không xác định</Badge>; } // Sửa màu badge
+  };
+
+  const getEventStatusText = (isoString: string) => {
+    try {
+      const eventDate = new Date(isoString);
+      const now = new Date();
+      if (eventDate < now) return 'completed';
+      return 'active';
+    } catch (e) { return 'undefine' } // Sửa màu badge
+  };
+
+  const statistics = useMemo(() => {
+    return {
+      total: myEvents.length,
+      active: myEvents.filter(e => getEventStatusText(e.eventTime) === 'active').length,
+      completed: myEvents.filter(e => getEventStatusText(e.eventTime)  === 'completed').length,
+      totalParticipants: myEvents.reduce((acc, event) => acc + (event.participantCount || 0), 0)
+    };
+  }, [myEvents]);
+
   // Filter and Search Events
   const filteredEvents = useMemo(() => {
     return myEvents.filter(event => {
       const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || event.status === statusFilter;
+      const matchesStatus = statusFilter === 'all' || getEventStatusText(event.eventTime) === statusFilter;
       return matchesSearch && matchesStatus;
     });
   }, [myEvents, searchTerm, statusFilter]);
@@ -197,8 +237,8 @@ const CreatorDashboardPage = () => {
             className="mb-3 mb-md-0"
           >
             <option value="all">Tất cả trạng thái</option>
-            <option value="upcoming">Sắp diễn ra</option>
-            <option value="completed">Đã hoàn thành</option>
+            <option value="active">Sắp diễn ra</option>
+            <option value="completed">Đã diễn ra</option>
             <option value="cancelled">Đã hủy</option>
           </Form.Select>
         </Col>
@@ -246,10 +286,12 @@ const CreatorDashboardPage = () => {
                     </Link>
                   </td>
                   <td className="text-center">
-                    <Badge bg={getStatusBadgeVariant(event.status)}>
+                    {/* <Badge bg={getStatusBadgeVariant(event.status)}>
                       {event.status === 'upcoming' ? 'Sắp diễn ra' :
                         event.status === 'completed' ? 'Đã hoàn thành' : 'Đã hủy'}
-                    </Badge>
+                    </Badge> */}
+                    {getEventStatusBadge(event.eventTime)}
+
                   </td>
                   <td>{formatEventDateTime(event.eventTime)}</td>
                   <td>{event.location}</td>

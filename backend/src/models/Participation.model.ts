@@ -13,6 +13,12 @@ export interface ParticipationAttributes {
   updatedAt?: Date;
 }
 
+export enum CompletionStatus {
+  PENDING = 'pending',
+  CONFIRMED = 'confirmed',
+  ABSENT = 'absent'
+}
+
 
 
 // Không cần CreationAttributes vì các trường đều là bắt buộc khi tạo
@@ -44,7 +50,7 @@ Participation.init(
       // Không cần references ở đây vì sẽ định nghĩa qua association belongsToMany
     },
     completionStatus: {
-      type: DataTypes.ENUM('pending', 'confirmed', 'absent'), // Enum phải khớp migration
+      type: DataTypes.ENUM('pending', 'confirmed', 'absent'), 
       allowNull: false,
       defaultValue: 'pending',
       field: 'completion_status'

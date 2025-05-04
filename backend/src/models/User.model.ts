@@ -6,6 +6,7 @@ import Participation from './Participation.model';
 import EventLike from './EventLike.model';
 import EventPostComment from './EventPostComment.model';
 import { ENUM } from 'sequelize';
+import VolunpointLog from './VolunpointLog.model';
 
 export enum UserRole {
   USER = 'user',
@@ -25,6 +26,7 @@ export interface UserAttributes {
   bio: string | null;        
   location: string | null;  
   avatarUrl: string | null; 
+  volunpoints?: number; 
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -45,6 +47,9 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public bio!: string | null;       
   public location!: string | null;    
   public avatarUrl!: string | null; 
+  public volunpoint!: number; 
+  public readonly pointLogs?: VolunpointLog[];
+
 
   // Timestamps tự động
   public readonly createdAt!: Date;
@@ -119,7 +124,13 @@ User.init(
       allowNull: false,
       defaultValue: true,
       field: 'is_active'
-    }
+    },
+    volunpoints: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+      defaultValue: 0
+  }
+
   },
   {
     tableName: 'users',       

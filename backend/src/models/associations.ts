@@ -5,6 +5,7 @@ import Participation from './Participation.model';
 import EventLike from './EventLike.model';
 import EventPost from './EventPost.model';
 import EventPostComment from './EventPostComment.model'; 
+import VolunpointLog from './VolunpointLog.model';
 
 const setupAssociations = () => {
     console.log('Setting up database associations...'); // Thêm log để kiểm tra
@@ -85,6 +86,14 @@ const setupAssociations = () => {
         });
 
         Participation.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+        if (VolunpointLog) { 
+            VolunpointLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+            User.hasMany(VolunpointLog, { foreignKey: 'userId', as: 'pointLogs' });
+
+            VolunpointLog.belongsTo(Event, { foreignKey: 'eventId', as: 'event' });
+            Event.hasMany(VolunpointLog, { foreignKey: 'eventId', as: 'pointLogs' });
+        }
 
 
         // --- (Tùy chọn) Định nghĩa quan hệ rõ ràng cho bảng nối Participation ---

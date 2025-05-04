@@ -139,7 +139,9 @@ class UserService {
           'bio',
           'location',
           'avatarUrl',
-          'createdAt' // Lấy cả ngày tham gia
+          'volunpoints', 
+          'isVerified',
+          'createdAt' 
         ]
       });
 
