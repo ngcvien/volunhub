@@ -4,12 +4,12 @@ import React, { useState, useEffect } from "react"
 import {
     Container, Row, Col, Card, Image,
     Button, Spinner, Alert, Badge,
-    Nav, Tab, Modal
+    Nav, Tab, Modal, OverlayTrigger, Tooltip
 } from "react-bootstrap"
 import { useParams, Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 import { getUserProfileApi } from "../api/auth.api";
-import { PersonPlus, Envelope, GeoAlt, Calendar3, PersonBadge } from "react-bootstrap-icons"
+import { PersonPlus, Envelope, GeoAlt, Calendar3, PersonBadge, PatchCheckFill } from "react-bootstrap-icons"
 import type { User } from "../types/user.types"
 
 // Đường dẫn đến ảnh avatar mặc định trong thư mục public
@@ -26,6 +26,7 @@ const UserProfilePage = () => {
     const [isFollowing, setIsFollowing] = useState(false)
     const navigate = useNavigate()
     const [showImageModal, setShowImageModal] = useState(false)
+    const isVerified = user?.isVerified || false
 
     // Dữ liệu giả cho thống kê (sau này sẽ lấy từ API)
     const stats = {
@@ -196,7 +197,13 @@ const UserProfilePage = () => {
                     <Col lg={8} className="mb-4">
                         {/* Thông tin cơ bản */}
                         <div className="profile-info mb-4">
-                            <h2 className="mb-1">{user.fullName || user.username}</h2>
+                            <h2 className="mb-1">{user.fullName || user.username}
+                                {isVerified && (
+                                    <OverlayTrigger placement="top" overlay={<Tooltip>Người dùng đã được xác minh</Tooltip>}>
+                                        <PatchCheckFill size={'1.2rem'} />
+                                    </OverlayTrigger>
+                                )}
+                            </h2>
                             <p className="text-muted mb-2">@{user.username}</p>
 
                             <div className="user-meta d-flex flex-wrap gap-3 text-muted mb-3">
