@@ -39,7 +39,7 @@ class PointService {
                     {
                         userId,
                         eventId,
-                        pointsAwarded,
+                        pointsAwarded: pointsToAward,
                         reason
                     },
                     { transaction } // Thực hiện trong transaction
