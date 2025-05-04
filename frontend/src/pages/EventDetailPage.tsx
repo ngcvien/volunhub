@@ -343,18 +343,18 @@ const EventDetailPage = () => {
               <div className="d-flex align-items-center mb-0">
                 {user && (
                   <Button
-                    variant={event.isParticipating ? "outline-danger" : "success"}
+                    variant={event.isParticipating ? "success" : "primary"}
                     onClick={event.isParticipating ? handleLeave : handleJoin}
                     disabled={isProcessingJoin}
                     className="me-2 px-2 px-md-3"
                     size="sm"
                   >
                     {isProcessingJoin ? <Spinner size="sm" animation="border" className="me-1" /> : null}
-                    {event.isParticipating ? "Rời khỏi" : "Tham gia"}
+                    {event.isParticipating ? "Đã tham gia" : "Tham gia"}
                   </Button>
                 )}
                 {!user && (
-                  <Button variant="primary" as={Link} to="/login" className="me-2 px-2 px-md-3" size="sm">
+                  <Button variant="primary" as={Link} to="/auth" className="me-2 px-2 px-md-3" size="sm">
                     Đăng nhập
                   </Button>
                 )}

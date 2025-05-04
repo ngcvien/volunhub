@@ -5,6 +5,7 @@ import LeftSidebar from '../components/Home/LeftSidebar';
 import RightSidebar from '../components/Home/RightSidebar';
 import EventCard from '../components/Event/EventCard';
 import EventFilterBar from '../components/Home/EventFilterBar';
+import EventCardOverlay from '../components/Event/EventCardOverlay';
 import { getAllEventsApi } from '../api/event.api';
 import { EventType } from '../types/event.types';
 import { useAuth } from '../contexts/AuthContext';
@@ -105,6 +106,11 @@ const HomePage = () => {
         {events.map((event) => (
           <div key={event.id} className="event-card-wrapper mb-4 animate__animated animate__fadeIn">
             <EventCard event={event} onActionComplete={refreshEvents} />
+            {/* <EventCardOverlay
+              event={event}
+              // onParticipationChange={handleParticipationChange}
+            
+            /> */}
           </div>
         ))}
       </div>
@@ -136,7 +142,7 @@ const HomePage = () => {
         <Row>
           {/* Left Sidebar */}
           <Col lg={3} className="d-none d-lg-block">
-            <LeftSidebar 
+            <LeftSidebar
               currentUser={user}
               onFilterChange={handleFilterChange}
               currentFilters={filters}
@@ -149,10 +155,10 @@ const HomePage = () => {
           <Col lg={6} md={8} sm={12}>
             <div className="main-content">
               {user && (
-                 <EventFilterBar
-                 filters={filters}
-                 onFilterChange={handleFilterChange}
-               />
+                <EventFilterBar
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                />
               )}
 
               {/* Tiêu đề bảng tin */}
@@ -170,7 +176,7 @@ const HomePage = () => {
 
           {/* Right Sidebar */}
           <Col lg={3} md={4} className="d-none d-md-block">
-            <RightSidebar 
+            <RightSidebar
               currentUser={user}
               showMobile={showMobileInfo}
               onMobileClose={() => setShowMobileInfo(false)}

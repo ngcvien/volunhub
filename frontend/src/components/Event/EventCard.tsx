@@ -2,7 +2,11 @@
 
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
-import { Card, Button, Spinner, Alert, Image, Badge, OverlayTrigger, Tooltip, Overlay } from "react-bootstrap"
+import {
+  Card, Button, Spinner, Alert,
+  Image, Badge, OverlayTrigger,
+  Tooltip, Overlay, Modal
+} from "react-bootstrap"
 import { Link } from "react-router-dom"
 import type { EventType } from "../../types/event.types"
 import { useAuth } from "../../contexts/AuthContext"
@@ -51,8 +55,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
 
   // State và Ref cho User Popup
   const [showUserPopup, setShowUserPopup] = useState(false);
-  const triggerRef = useRef<HTMLSpanElement>(null); // Ref cho vùng trigger (avatar + tên)
-  const popupTimerRef = useRef<NodeJS.Timeout | null>(null); // Ref cho timer ẩn/hiện popup
+  const triggerRef = useRef<HTMLSpanElement>(null);
+  const popupTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   const [displayLikeCount, setDisplayLikeCount] = useState(event.likeCount || 0);
 
@@ -326,10 +331,37 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
             alt={event.title}
             fluid
             className="event-image"
-            onClick={() => window.open(event.imageUrl, "_blank")}
+            onClick={() => setShowImageModal(true)}
           />
         </div>
       )}
+
+      <Modal
+        show={showImageModal}
+        onHide={() => setShowImageModal(false)}
+        centered
+        size="lg"
+        contentClassName="bg-transparent border-0"
+      >
+        <Modal.Header closeButton className="border-0">
+          <Modal.Title className="text-center w-100" style={{ color: '#fff' }} >
+            <Link 
+            to={`/events/${event.id}`}
+             className="event-title-link text-decoration-none"
+             style={{color: '#fff'}}
+             >
+              <h5 className="event-title mb-3">{event.title}</h5>
+            </Link>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="d-flex justify-content-center align-items-center p-0">
+          <img
+            src={event.imageUrl}
+            alt={event.title}
+            style={{ maxWidth: "90vw", maxHeight: "80vh", borderRadius: 8 }}
+          />
+        </Modal.Body>
+      </Modal>
 
       {/* Card Footer */}
       <Card.Footer className="bg-transparent pt-0 pb-3">
@@ -342,18 +374,19 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
           {/* Nút tham gia/rời khỏi */}
           {user && (
             <Button
-              variant={displayParticipating ? "outline-danger" : "success"}
+              variant={displayParticipating ? "success" : "primary"}
               size="sm"
               onClick={displayParticipating ? handleLeave : handleJoin}
               disabled={isLoadingAction}
               className="participation-button me-2 mb-2"
+              
             >
               {isLoadingAction ? (
                 <Spinner animation="border" size="sm" />
               ) : (
                 <>
                   <PersonCheck className="me-1" />
-                  {displayParticipating ? "Rời khỏi" : "Tham gia"}
+                  {displayParticipating ? "Đã tham gia" : "Tham gia"}
                 </>
               )}
             </Button>

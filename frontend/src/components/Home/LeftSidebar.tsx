@@ -44,16 +44,17 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
       <Card className="sidebar-card">
         <Card.Body>
           <h6 className="sidebar-title">Danh mục</h6>
-          <Nav className="flex-column">
+          <Nav className="flex-column ">
             {categories.map(category => (
               <Nav.Link
                 key={category.id}
-                className={`sidebar-link ${currentFilters.category === category.id ? 'active' : ''}`}
+                className={`sidebar-link ${currentFilters.category === category.id ? 'active' : ''}` }
+                
                 onClick={() => handleCategoryClick(category.id)}
               >
                 <category.icon className="sidebar-icon" />
-                <span className="sidebar-text">{category.name}</span>
-                <Badge bg="light" text="dark" className="ms-auto">
+                <span className="sidebar-text ">{category.name}</span>
+                <Badge bg="light" text="dark" className="ms-auto" >
                   {category.count}
                 </Badge>
               </Nav.Link>

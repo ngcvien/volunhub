@@ -1,7 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { Container, Row, Col, Card, Image, Button, Spinner, Alert, Badge, Nav, Tab } from "react-bootstrap"
+import {
+  Container, Row, Col, Card,
+  Image, Button, Spinner, Alert,
+  Badge, Nav, Tab, Modal
+} from "react-bootstrap"
 import { useAuth } from "../contexts/AuthContext"
 import EditProfileForm from "../components/Profile/EditProfileForm"
 import { PencilSquare, GeoAlt, Calendar3, PersonBadge } from "react-bootstrap-icons"
@@ -14,6 +18,7 @@ const ProfilePage = () => {
   const { user, isLoading: authIsLoading } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [activeTab, setActiveTab] = useState("about")
+  const [showImageModal, setShowImageModal] = useState(false)
 
   // Dữ liệu giả cho thống kê (sau này sẽ lấy từ API)
   const stats = {
@@ -76,9 +81,26 @@ const ProfilePage = () => {
                 roundedCircle
                 width={120}
                 height={120}
-                style={{ objectFit: "cover" }}
+                style={{ objectFit: "cover", cursor: "pointer" }}
+                onClick={() => setShowImageModal(true)}
               />
             </div>
+            <Modal
+              show={showImageModal}
+              onHide={() => setShowImageModal(false)}
+              centered
+              size="lg"
+              contentClassName="bg-transparent border-0"
+            >
+              <Modal.Header closeButton className="border-0" />
+              <Modal.Body className="d-flex justify-content-center align-items-center p-0">
+                <img
+                  src={user.avatarUrl || defaultAvatar}
+                  alt={user.username}
+                  style={{ maxWidth: "90vw", maxHeight: "80vh", borderRadius: 8 }}
+                />
+              </Modal.Body>
+            </Modal>
 
             {!isEditing && (
               <Button

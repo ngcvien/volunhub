@@ -1,0 +1,232 @@
+.event-card-overlay {
+  position: relative;
+  border: none;
+  border-radius: 20px;
+  overflow: hidden;
+  background: transparent;
+  transition: transform 0.3s ease;
+}
+
+.event-card-overlay:hover {
+  transform: translateY(-5px);
+}
+
+.event-image-container {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+}
+
+.event-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.event-card-overlay:hover .event-image {
+  transform: scale(1.05);
+}
+
+.event-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.7) 50%,
+    rgba(0, 0, 0, 0.4) 75%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 2rem;
+  color: white;
+}
+
+.event-content {
+  position: relative;
+  z-index: 2;
+}
+
+.event-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.status-badge {
+  padding: 0.5em 1em;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.time-ago {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.event-title-link {
+  text-decoration: none;
+}
+
+.event-title {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  transition: color 0.2s ease;
+}
+
+.event-title:hover {
+  color: var(--bs-primary);
+}
+
+.event-details {
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.detail-item .icon {
+  color: var(--bs-primary);
+}
+
+.creator-info {
+  margin-bottom: 1.5rem;
+}
+
+.creator-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: white;
+}
+
+.creator-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--bs-primary);
+}
+
+.creator-name {
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.creator-link:hover .creator-name {
+  color: var(--bs-primary);
+}
+
+.event-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.join-button {
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.join-button:hover {
+  transform: translateY(-2px);
+}
+
+.like-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.like-button:hover {
+  transform: translateY(-2px);
+}
+
+.like-button.liked {
+  color: var(--bs-danger);
+}
+
+.like-button .icon {
+  font-size: 1.2rem;
+}
+
+.like-count {
+  font-weight: 500;
+}
+
+/* Hover Effects */
+.event-card-overlay::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.event-card-overlay:hover::after {
+  opacity: 1;
+}
+
+/* Animation for like button */
+@keyframes likeAnimation {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.like-button.liked .icon {
+  animation: likeAnimation 0.3s ease;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .event-overlay {
+    padding: 1.5rem;
+  }
+
+  .event-title {
+    font-size: 1.2rem;
+  }
+
+  .event-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .join-button,
+  .like-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

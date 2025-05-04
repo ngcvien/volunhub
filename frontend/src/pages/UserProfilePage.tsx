@@ -1,7 +1,11 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Container, Row, Col, Card, Image, Button, Spinner, Alert, Badge, Nav, Tab } from "react-bootstrap"
+import {
+    Container, Row, Col, Card, Image,
+    Button, Spinner, Alert, Badge,
+    Nav, Tab, Modal
+} from "react-bootstrap"
 import { useParams, Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../contexts/AuthContext"
 import { getUserProfileApi } from "../api/auth.api";
@@ -21,6 +25,7 @@ const UserProfilePage = () => {
     const [activeTab, setActiveTab] = useState("about")
     const [isFollowing, setIsFollowing] = useState(false)
     const navigate = useNavigate()
+    const [showImageModal, setShowImageModal] = useState(false)
 
     // Dữ liệu giả cho thống kê (sau này sẽ lấy từ API)
     const stats = {
@@ -52,7 +57,7 @@ const UserProfilePage = () => {
             // Nếu xem profile của chính mình, có thể dùng API /me để lấy cả email (tùy chọn)
             // Hoặc đơn giản là vẫn gọi API /users/:userId
             if (currentUser && currentUser.id === profileUserId) {
-                setUser(currentUser); 
+                setUser(currentUser);
                 setLoading(false);
                 return;
             }
@@ -129,6 +134,7 @@ const UserProfilePage = () => {
                         fluid
                         className="w-100 h-100 object-fit-cover"
                         style={{ objectPosition: "center 30%" }}
+
                     />
                 </div>
 
@@ -143,9 +149,26 @@ const UserProfilePage = () => {
                                 roundedCircle
                                 width={120}
                                 height={120}
-                                style={{ objectFit: "cover" }}
+                                style={{ objectFit: "cover", cursor: "pointer" }}
+                                onClick={() => setShowImageModal(true)}
                             />
                         </div>
+                        <Modal
+                            show={showImageModal}
+                            onHide={() => setShowImageModal(false)}
+                            centered
+                            size="lg"
+                            contentClassName="bg-transparent border-0"
+                        >
+                            <Modal.Header closeButton className="border-0" />
+                            <Modal.Body className="d-flex justify-content-center align-items-center p-0">
+                                <img
+                                    src={user.avatarUrl || defaultAvatar}
+                                    alt={user.username}
+                                    style={{ maxWidth: "90vw", maxHeight: "80vh", borderRadius: 8 }}
+                                />
+                            </Modal.Body>
+                        </Modal>
 
                         {currentUser && currentUser.id !== user.id && (
                             <div className="d-flex gap-2 mb-2">
