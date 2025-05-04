@@ -44,7 +44,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ currentUser }) => {
                   className="user-avatar"
                 />
                 <div className="user-info">
-                  <h6>{currentUser.username}</h6>
+                  <h6>@{currentUser.username}</h6>
                   <span className="text-muted">Tình nguyện viên</span>
                 </div>
               </div>

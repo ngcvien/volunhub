@@ -163,7 +163,7 @@ const HomePage = () => {
 
               {/* Tiêu đề bảng tin */}
               <div className="d-flex justify-content-between align-items-center mb-4">
-                <h4 className="m-0">Bảng tin sự kiện</h4>
+                <span className="m-0 fs-3">Bảng tin sự kiện</span>
                 <Button variant="outline-primary" size="sm" onClick={refreshEvents} disabled={loading}>
                   <i className="bi bi-arrow-clockwise me-1"></i> Làm mới
                 </Button>

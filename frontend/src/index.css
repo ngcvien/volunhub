@@ -30,6 +30,10 @@
   color: rgb(30, 30, 30);
 }
 
+[data-bs-theme="dark"] span {
+  color: #fff !important;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
