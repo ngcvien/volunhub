@@ -269,8 +269,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
             onMouseLeave={handleMouseLeaveTriggerOrPopup} // Đặt timer ẩn khi rời nó
             style={{
               ...props.style,
-              // Có thể thêm style cho popup ở đây hoặc trong UserPopup.css
-              zIndex: 1080 // Đảm bảo nổi lên trên
+              zIndex: 1080 
             }}
           >
             {/* --- Component UserPopup --- */}
@@ -398,7 +397,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
             <OverlayTrigger placement="top" overlay={<Tooltip>{displayLiked ? "Bỏ thích" : "Thích"}</Tooltip>}>
               <Button
                 type="button"
-                variant="light"
+                variant="link"
                 size="sm"
                 className="action-button d-flex align-items-center  me-2 mb-1 like-button"
                 onClick={handleLike} // Gắn hàm xử lý mới
@@ -413,19 +412,19 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
 
 
             <OverlayTrigger placement="top" overlay={<Tooltip>Thảo luận</Tooltip>}>
-              <Button variant="light" size="sm" className="action-button me-1 mb-2" onClick={() => navigate(`/events/${event.id}#comments`)}>
+              <Button variant="link" size="sm" className="action-button me-1 mb-2" onClick={() => navigate(`/events/${event.id}#comments`)}>
                 <ChatLeftText />
               </Button>
             </OverlayTrigger>
 
             <OverlayTrigger placement="top" overlay={<Tooltip>Chia sẻ</Tooltip>}>
-              <Button variant="light" size="sm" className="action-button me-1 mb-2">
+              <Button variant="link" size="sm" className="action-button me-1 mb-2">
                 <Share />
               </Button>
             </OverlayTrigger>
 
             <OverlayTrigger placement="top" overlay={<Tooltip>Lưu</Tooltip>}>
-              <Button variant="light" size="sm" className="action-button mb-2">
+              <Button variant="link" size="sm" className="action-button mb-2">
                 <BookmarkPlus />
               </Button>
             </OverlayTrigger>

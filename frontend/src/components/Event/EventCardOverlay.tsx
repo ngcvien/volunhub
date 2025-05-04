@@ -157,7 +157,7 @@ const EventCardOverlay: React.FC<EventCardOverlayProps> = ({
               <Button
                 variant={displayParticipating ? "success" : "primary"}
                 onClick={handleJoin}
-                disabled={isLoadingAction || event.status !== 'active'}
+                disabled={isLoadingAction }
                 className="join-button"
               >
                 {isLoadingAction ? (
