@@ -41,8 +41,8 @@ interface EventCreator {
     isParticipating?: boolean
     isLiked?: boolean 
     likeCount?: number
-    // imageUrl?: string | null
-    images?: EventImageInfo[]; 
+    imageUrl?: string | null
+    images?: EventImageInfo[] ; 
     // isVerified?: boolean 
     participants?: BasicUser[]; // Dùng BasicUser
     posts?: EventPostType[]; 
