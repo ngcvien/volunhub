@@ -1,0 +1,306 @@
+/* src/styles/CreateEventPage.custom.css */
+
+/* CSS Variables for Theming */
+:root {
+  --cep-primary-color: #6d28d9; /* Deep purple - Bootstrap's $purple-600 is #6f42c1 */
+  --cep-primary-color-darker: #5b21b6;
+  --cep-secondary-color: #ec4899; /* Bright pink */
+  --cep-success-color: #10b981; /* Emerald green */
+  --cep-danger-color: #ef4444; /* Red */
+  --cep-warning-color: #f59e0b; /* Amber */
+  --cep-info-color: #3b82f6; /* Blue */
+
+  --cep-text-color: #343a40; /* Dark gray for text */
+  --cep-text-muted-color: #6c757d; /* Bootstrap's $text-muted */
+  --cep-light-text-color: #f8f9fa; /* For dark backgrounds */
+
+  --cep-body-bg: #f4f7f6; /* Light grayish background */
+  --cep-card-bg: #ffffff;
+  --cep-input-bg: #ffffff;
+  --cep-input-border-color: #ced4da; /* Bootstrap's $gray-400 */
+  --cep-input-focus-border-color: var(--cep-primary-color);
+  --cep-input-focus-box-shadow: 0 0 0 0.25rem rgba(109, 40, 217, 0.25);
+
+  --cep-border-radius: 0.375rem; /* 6px, Bootstrap's $border-radius */
+  --cep-border-radius-lg: 0.5rem; /* 8px */
+  --cep-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1); /* Softer shadow */
+  --cep-box-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+
+  --cep-font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Apply a modern font to the page if Inter is available */
+body {
+  font-family: var(--cep-font-family);
+}
+
+.cep-page-container {
+  background-color: var(--cep-body-bg);
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  min-height: 100vh;
+}
+
+.cep-form-card {
+  background-color: var(--cep-card-bg);
+  border: none; /* Remove default card border if using shadow */
+  border-radius: var(--cep-border-radius-lg);
+  box-shadow: var(--cep-box-shadow);
+  overflow: hidden; /* Ensures child elements respect border-radius */
+}
+
+.cep-page-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.cep-page-header h2 {
+  font-weight: 700;
+  color: var(--cep-text-color);
+  font-size: 2.25rem; /* Larger title */
+}
+
+.cep-page-header p {
+  color: var(--cep-text-muted-color);
+  font-size: 1.1rem;
+}
+
+/* Step Indicator Enhancements */
+.cep-step-indicator {
+  margin-bottom: 2.5rem !important; /* Increased margin */
+}
+
+.cep-step-indicator .progress {
+  height: 4px !important; /* Thicker progress bar */
+  background-color: #e9ecef; /* Lighter background for progress */
+}
+
+.cep-step-indicator .progress-bar {
+  background-color: var(--cep-primary-color) !important;
+}
+
+.cep-step-item .step-circle {
+  width: 40px !important; /* Larger circles */
+  height: 40px !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border-width: 2px !important;
+}
+
+.cep-step-item .step-circle.bg-primary {
+  background-color: var(--cep-primary-color) !important;
+  border-color: var(--cep-primary-color) !important;
+}
+.cep-step-item .step-circle.bg-light {
+  background-color: #fff !important;
+  border-color: var(--cep-input-border-color) !important;
+  color: var(--cep-text-muted-color);
+}
+
+.cep-step-item .step-label {
+  font-size: 0.875rem; /* Slightly smaller label */
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+.cep-step-item .step-label.text-primary {
+  color: var(--cep-primary-color) !important;
+  font-weight: 600;
+}
+
+/* Form Control Enhancements */
+.cep-form-section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--cep-primary-color);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #dee2e6; /* Light border */
+}
+
+.cep-form-card .form-control,
+.cep-form-card .form-select {
+  border-radius: var(--cep-border-radius);
+  border-color: var(--cep-input-border-color);
+  padding: 0.875rem 1rem; /* Increased padding */
+  font-size: 1rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.cep-form-card .form-control:focus,
+.cep-form-card .form-select:focus {
+  border-color: var(--cep-input-focus-border-color);
+  box-shadow: var(--cep-input-focus-box-shadow);
+  background-color: #fff; /* Ensure background is white on focus */
+}
+
+/* Override for FloatingLabel specific styling if needed */
+.cep-form-card .form-floating > .form-control,
+.cep-form-card .form-floating > .form-select {
+  /* padding-top and padding-bottom are handled by FloatingLabel */
+}
+
+.cep-form-card .form-floating > label {
+  color: var(--cep-text-muted-color);
+}
+
+.cep-form-card .form-control.is-invalid,
+.cep-form-card .form-select.is-invalid {
+  border-color: var(--cep-danger-color);
+}
+.cep-form-card .form-control.is-invalid:focus,
+.cep-form-card .form-select.is-invalid:focus {
+  box-shadow: 0 0 0 0.25rem rgba(239, 68, 68, 0.25); /* Red shadow for error */
+}
+
+.cep-form-card .form-text {
+  font-size: 0.875rem;
+}
+
+/* Media Step Enhancements */
+.cep-media-upload-button {
+  background-color: var(--cep-primary-color);
+  border-color: var(--cep-primary-color);
+  color: var(--cep-light-text-color);
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+}
+.cep-media-upload-button:hover {
+  background-color: var(--cep-primary-color-darker);
+  border-color: var(--cep-primary-color-darker);
+}
+.cep-media-upload-button:disabled {
+  background-color: #adb5bd; /* Bootstrap's $gray-500 */
+  border-color: #adb5bd;
+}
+
+.cep-image-preview-card {
+  border-radius: var(--cep-border-radius);
+  overflow: hidden; /* For image inside */
+  box-shadow: var(--cep-box-shadow-sm);
+  transition: transform 0.2s ease-in-out;
+}
+.cep-image-preview-card:hover {
+    transform: translateY(-3px);
+}
+
+.cep-image-preview-card .card-img-top, /* If using Card.Img */
+.cep-image-preview-card .img-thumbnail { /* If using RBImage thumbnail */
+  object-fit: cover;
+  height: 150px; /* Consistent height for previews */
+  width: 100%;
+  border-bottom: 1px solid #eee; /* Separator if content below */
+}
+
+.cep-image-preview-card .btn-danger {
+  background-color: var(--cep-danger-color) !important;
+  border: none !important;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+.cep-image-preview-card .btn-danger:hover {
+  opacity: 1;
+}
+
+.cep-image-preview-card .progress-bar {
+  height: 0.5rem !important;
+}
+.cep-image-preview-card .badge {
+  font-size: 0.7rem;
+  padding: 0.3em 0.5em;
+}
+
+/* Review Step Enhancements */
+.cep-review-section .card-body > div { /* Each review item */
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.cep-review-section .card-body > div:last-child {
+  border-bottom: none;
+}
+.cep-review-section strong {
+  color: var(--cep-text-color);
+}
+.cep-review-section .text-muted {
+  color: var(--cep-text-muted-color) !important;
+}
+
+/* Navigation Buttons */
+.cep-nav-buttons .btn {
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  border-radius: var(--cep-border-radius);
+}
+.cep-nav-buttons .btn-primary {
+  background-color: var(--cep-primary-color);
+  border-color: var(--cep-primary-color);
+}
+.cep-nav-buttons .btn-primary:hover {
+  background-color: var(--cep-primary-color-darker);
+  border-color: var(--cep-primary-color-darker);
+}
+.cep-nav-buttons .btn-success {
+  background-color: var(--cep-success-color);
+  border-color: var(--cep-success-color);
+}
+.cep-nav-buttons .btn-success:hover {
+  background-color: #059669; /* Darker success */
+}
+.cep-nav-buttons .btn-outline-secondary {
+  color: var(--cep-text-muted-color);
+  border-color: var(--cep-input-border-color);
+}
+.cep-nav-buttons .btn-outline-secondary:hover {
+  background-color: #e9ecef; /* Light gray hover */
+  color: var(--cep-text-color);
+}
+
+/* Alerts */
+.cep-form-card .alert {
+  border-radius: var(--cep-border-radius);
+}
+.cep-form-card .alert-danger {
+  background-color: #fef2f2; /* Lighter red */
+  color: #991b1b; /* Darker red text */
+  border-color: #fecaca;
+}
+.cep-form-card .alert-success {
+  background-color: #f0fdf4; /* Lighter green */
+  color: #14532d; /* Darker green text */
+  border-color: #bbf7d0;
+}
+.cep-form-card .alert-info {
+  background-color: #eff6ff; /* Lighter blue */
+  color: #1e40af; /* Darker blue text */
+  border-color: #bfdbfe;
+}
+.cep-form-card .alert-warning {
+    background-color: #fffbeb; /* Lighter yellow */
+    color: #b45309; /* Darker yellow text */
+    border-color: #fde68a;
+}
+
+/* Utility for icons in buttons */
+.cep-btn-icon {
+  margin-right: 0.5rem;
+  vertical-align: text-bottom; /* Align icon better with text */
+}
+
+/* Responsive adjustments if needed */
+@media (max-width: 768px) {
+  .cep-page-header h2 {
+    font-size: 1.8rem;
+  }
+  .cep-page-header p {
+    font-size: 1rem;
+  }
+  .cep-step-item .step-label {
+    font-size: 0.75rem; /* Smaller labels on mobile */
+  }
+  .cep-step-item .step-circle {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  .cep-form-card .card-body {
+    padding: 1.5rem !important; /* Reduce padding on mobile */
+  }
+}
