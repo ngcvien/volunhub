@@ -1,4 +1,6 @@
 // "use client"
+// frontend/src/pages/CreateEventPage.tsx
+
 
 import type React from "react"
 
@@ -14,6 +16,9 @@ import {
   ProgressBar,
   InputGroup,
   FloatingLabel,
+  Row,
+  Col,
+  Badge,
 } from "react-bootstrap"
 import { createEventApi } from "../api/event.api"
 import { uploadFileApi } from "../api/upload.api"
@@ -41,7 +46,7 @@ enum FormStep {
 
 const CreateEventPage = () => {
   const navigate = useNavigate()
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Form fields
@@ -66,6 +71,19 @@ const CreateEventPage = () => {
 
   // Validation
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+
+
+
+  // State cho danh sách các file đã chọn và URL của chúng sau khi upload
+  const [selectedImageFiles, setSelectedImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]); // URL tạm thời để preview
+  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]); // URLs từ Cloudinary
+
+  // State cho quá trình upload từng ảnh
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
+  const [uploadProgressMap, setUploadProgressMap] = useState<Record<string, number>>({}); // { [fileName]: progress }
+  const [uploadErrors, setUploadErrors] = useState<Record<string, string>>({}); // { [fileName]: errorMsg }
+
 
   // Fetch provinces for location dropdown
   useEffect(() => {
@@ -177,8 +195,76 @@ const CreateEventPage = () => {
     }
   }
 
+  const handleFilesChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const newFilesArray = Array.from(files);
+      // Giới hạn số lượng ảnh nếu muốn, ví dụ 5 ảnh
+      if (selectedImageFiles.length + newFilesArray.length > 5) {
+        alert("Bạn chỉ có thể tải lên tối đa 5 ảnh.");
+        event.target.value = ''; // Reset input
+        return;
+      }
+
+      setSelectedImageFiles(prevFiles => [...prevFiles, ...newFilesArray]);
+
+      // Tạo preview và bắt đầu upload từng file
+      const newPreviews: string[] = [];
+      newFilesArray.forEach(file => newPreviews.push(URL.createObjectURL(file)));
+      setImagePreviews(prevPreviews => [...prevPreviews, ...newPreviews]);
+
+      setIsUploadingImages(true); // Báo hiệu đang có quá trình upload
+      setUploadErrors({}); // Reset lỗi cũ
+
+      // Upload từng file
+      const uploadedUrls: string[] = [...uploadedImageUrls]; // Giữ lại các URL đã upload thành công
+      let anyUploadFailed = false;
+
+      for (let i = 0; i < newFilesArray.length; i++) {
+        const file = newFilesArray[i];
+        const previewUrlToRevoke = newPreviews[i]; // URL preview của file hiện tại
+        try {
+          setUploadProgressMap(prev => ({ ...prev, [file.name]: 0 })); // Khởi tạo progress
+          // Simulate progress for individual file (nếu API không có)
+          // For real progress, uploadFileApi needs to report it
+          const uploadResult = await uploadFileApi(file); // Hàm này cần được sửa để nhận onUploadProgress callback nếu muốn real progress
+          uploadedUrls.push(uploadResult.url);
+          setUploadProgressMap(prev => ({ ...prev, [file.name]: 100 }));
+          console.log(`Uploaded ${file.name}:`, uploadResult.url);
+        } catch (err: any) {
+          console.error(`Error uploading ${file.name}:`, err);
+          setUploadErrors(prev => ({ ...prev, [file.name]: err.message || 'Lỗi tải lên' }));
+          anyUploadFailed = true;
+          // Không thêm URL bị lỗi vào mảng uploadedImageUrls
+        } finally {
+          URL.revokeObjectURL(previewUrlToRevoke); // Thu hồi URL preview sau khi upload xong (kể cả lỗi)
+        }
+      }
+      setUploadedImageUrls(uploadedUrls); // Cập nhật danh sách URL đã upload thành công
+      setIsUploadingImages(false); // Hoàn tất quá trình upload (kể cả có lỗi)
+    }
+    if (event.target) event.target.value = ""; // Reset input file để có thể chọn lại
+  };
+
+  // Hàm xóa ảnh khỏi danh sách preview và uploaded URLs
+  const handleRemoveImage = (indexToRemove: number) => {
+    setImagePreviews(prev => prev.filter((_, index) => index !== indexToRemove));
+    setUploadedImageUrls(prev => prev.filter((_, index) => index !== indexToRemove));
+    setSelectedImageFiles(prev => prev.filter((_, index) => index !== indexToRemove));
+    // Xóa lỗi và progress của file đó (nếu cần quản lý chi tiết hơn)
+    // const fileNameToRemove = selectedImageFiles[indexToRemove]?.name;
+    // if (fileNameToRemove) {
+    // setUploadProgressMap(prev => { const newState = {...prev}; delete newState[fileNameToRemove]; return newState; });
+    // setUploadErrors(prev => { const newState = {...prev}; delete newState[fileNameToRemove]; return newState; });
+    // }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (isUploadingImages) { // Kiểm tra isUploadingImages
+      setSubmitError("Vui lòng chờ tất cả ảnh tải lên hoàn tất.");
+      return;
+    }
     setSubmitError(null)
     setSuccess(null)
 
@@ -207,7 +293,8 @@ const CreateEventPage = () => {
         description: description || null,
         location: location || null,
         eventTime: new Date(eventTime),
-        imageUrl: uploadedImageUrl,
+        // imageUrl: uploadedImageUrl,
+        imageUrls: uploadedImageUrls,
       })
 
       setSuccess(`Sự kiện "${title}" đã được tạo thành công!`)
@@ -221,6 +308,11 @@ const CreateEventPage = () => {
       setUploadedImageUrl(null)
       setUploadError(null)
       setCurrentStep(FormStep.BasicInfo)
+      setSelectedImageFiles([]);
+      setImagePreviews([]);
+      setUploadedImageUrls([]);
+      setUploadErrors({});
+      setUploadProgressMap({});
 
       // Redirect after success
       setTimeout(() => {
@@ -270,9 +362,8 @@ const CreateEventPage = () => {
               style={{ zIndex: 2 }}
             >
               <div
-                className={`step-circle d-flex align-items-center justify-content-center rounded-circle ${
-                  currentStep >= step ? "bg-primary text-white" : "bg-light border"
-                }`}
+                className={`step-circle d-flex align-items-center justify-content-center rounded-circle ${currentStep >= step ? "bg-primary text-white" : "bg-light border"
+                  }`}
                 style={{ width: "32px", height: "32px" }}
               >
                 {currentStep > step ? <CheckCircle size={16} /> : step + 1}
@@ -310,18 +401,18 @@ const CreateEventPage = () => {
 
         <Form.Group className="mb-4" controlId="eventTime">
           <FloatingLabel label="Thời gian diễn ra *">
-            
-              <Form.Control
-                type="datetime-local"
-                value={eventTime}
-                onChange={(e) => setEventTime(e.target.value)}
-                onBlur={() => handleBlur("eventTime")}
-                isInvalid={touched.eventTime && !!validationErrors.eventTime}
-                required
-                disabled={isSubmitting}
-                // className="border-0 border-bottom rounded-0 shadow-none"
-              />
-            
+
+            <Form.Control
+              type="datetime-local"
+              value={eventTime}
+              onChange={(e) => setEventTime(e.target.value)}
+              onBlur={() => handleBlur("eventTime")}
+              isInvalid={touched.eventTime && !!validationErrors.eventTime}
+              required
+              disabled={isSubmitting}
+            // className="border-0 border-bottom rounded-0 shadow-none"
+            />
+
             {touched.eventTime && validationErrors.eventTime && (
               <div className="text-danger small mt-1">{validationErrors.eventTime}</div>
             )}
@@ -339,50 +430,50 @@ const CreateEventPage = () => {
 
         <Form.Group className="mb-4" controlId="eventLocation">
           <FloatingLabel label="Địa điểm">
-            
-              {locationLoading ? (
-                <Form.Control
-                  placeholder="Đang tải danh sách địa điểm..."
-                  disabled
-                  required
-                  className="border-0 border-bottom rounded-0 shadow-none"
-                />
-              ) : (
-                <Form.Select
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  disabled={isSubmitting}
-                  className="border-0 border-bottom rounded-0 shadow-none"
-                >
-                  <option value="">-- Chọn địa điểm --</option>
-                  {provinces
-                    .sort((a, b) => a.name.localeCompare(b.name))
-                    .map((province) => (
-                      <option key={province.code} value={province.name}>
-                        {province.name}
-                      </option>
-                    ))}
-                </Form.Select>
-              )}
-            
+
+            {locationLoading ? (
+              <Form.Control
+                placeholder="Đang tải danh sách địa điểm..."
+                disabled
+                required
+                className="border-0 border-bottom rounded-0 shadow-none"
+              />
+            ) : (
+              <Form.Select
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                disabled={isSubmitting}
+                className="border-0 border-bottom rounded-0 shadow-none"
+              >
+                <option value="">-- Chọn địa điểm --</option>
+                {provinces
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((province) => (
+                    <option key={province.code} value={province.name}>
+                      {province.name}
+                    </option>
+                  ))}
+              </Form.Select>
+            )}
+
           </FloatingLabel>
         </Form.Group>
 
         <Form.Group className="mb-4" controlId="eventDescription">
           <FloatingLabel label="Mô tả chi tiết">
-              
-              <Form.Control
-                as="textarea"
-                rows={5}
-                placeholder="Nhập mô tả chi tiết về sự kiện" 
-                value={description}
-                required
-                onChange={(e) => setDescription(e.target.value)}
-                disabled={isSubmitting}
-                className="border-0 border-bottom rounded-0 shadow-none"
-                style={{ minHeight: "120px" }}
-              />
-           
+
+            <Form.Control
+              as="textarea"
+              rows={5}
+              placeholder="Nhập mô tả chi tiết về sự kiện"
+              value={description}
+              required
+              onChange={(e) => setDescription(e.target.value)}
+              disabled={isSubmitting}
+              className="border-0 border-bottom rounded-0 shadow-none"
+              style={{ minHeight: "120px" }}
+            />
+
           </FloatingLabel>
           <Form.Text className="text-muted">
             Mô tả chi tiết giúp người tham gia hiểu rõ hơn về sự kiện của bạn
@@ -395,85 +486,81 @@ const CreateEventPage = () => {
   const renderMediaStep = () => {
     return (
       <>
-        <h5 className="mb-4">Hình ảnh sự kiện</h5>
+        <h5 className="mb-4">Hình ảnh sự kiện (Tối đa 5 ảnh)</h5>
+        {/* Nút bấm để mở cửa sổ chọn file */}
+        <Button
+          variant="outline-primary"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploadingImages || isSubmitting || selectedImageFiles.length >= 5}
+          className="mb-3"
+        >
+          <i className="bi bi-images me-2"></i> Chọn ảnh
+        </Button>
+        {/* Input file ẩn */}
+        <Form.Control
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple // <<<--- Cho phép chọn nhiều file
+          onChange={handleFilesChange}
+          style={{ display: "none" }}
+          disabled={isUploadingImages || isSubmitting}
+        />
 
-        <div className="text-center mb-4">
-          <div
-            className={`image-upload-area position-relative ${uploadedImageUrl ? "has-image" : ""}`}
-            style={{
-              border: "2px dashed #dee2e6",
-              borderRadius: "8px",
-              padding: "20px",
-              cursor: "pointer",
-              backgroundColor: "#f8f9fa",
-              minHeight: "200px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            {uploadedImageUrl ? (
-              <div className="position-relative w-100">
-                <RBImage
-                  src={uploadedImageUrl}
-                  alt="Event preview"
-                  fluid
-                  className="rounded"
-                  style={{ maxHeight: "300px", objectFit: "contain" }}
-                />
-                <div
-                  className="position-absolute top-0 end-0 m-2 bg-dark bg-opacity-50 rounded-circle p-1"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setUploadedImageUrl(null)
-                    setSelectedFile(null)
-                  }}
-                  style={{ cursor: "pointer" }}
-                >
-                  <span className="text-white">×</span>
-                </div>
-              </div>
-            ) : (
-              <>
-                <Image size={48} className="text-primary mb-3" />
-                <p className="mb-1">Nhấp để tải lên hình ảnh sự kiện</p>
-                <p className="text-muted small">Hỗ trợ JPG, PNG (tối đa 10MB)</p>
-              </>
-            )}
+        {/* Hiển thị trạng thái Upload chung */}
+        {isUploadingImages && Object.values(uploadProgressMap).some(p => p < 100) && (
+          <div className="my-3"><Spinner size="sm" /> Đang tải ảnh lên... (Kiểm tra từng ảnh bên dưới)</div>
+        )}
 
-            <Form.Control
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              disabled={isUploading || isSubmitting}
-              style={{ display: "none" }}
-            />
+        {/* Khu vực Preview ảnh đã chọn/upload */}
+        {imagePreviews.length > 0 && (
+          <div className="mt-3">
+            <h6>Ảnh đã chọn:</h6>
+            <Row xs={2} md={3} lg={4} className="g-3">
+              {imagePreviews.map((previewUrl, index) => {
+                const file = selectedImageFiles[index]; // Lấy file tương ứng
+                const progress = file ? uploadProgressMap[file.name] : undefined;
+                const errorMsg = file ? uploadErrors[file.name] : undefined;
+                const isUploaded = uploadedImageUrls.includes(previewUrl) || (file && progress === 100 && !errorMsg);
+
+
+                return (
+                  <Col key={index}>
+                    <Card className="position-relative">
+                      <RBImage src={previewUrl} alt={`Preview ${index + 1}`} thumbnail fluid />
+                      {/* Nút xóa ảnh preview */}
+                      <Button
+                        variant="danger" size="sm"
+                        className="position-absolute top-0 end-0 m-1 p-0 px-1 lh-1"
+                        onClick={() => handleRemoveImage(index)}
+                        disabled={isSubmitting}
+                        title="Xóa ảnh này"
+                        style={{ zIndex: 1 }}
+                      > &times; </Button>
+                      {/* Progress hoặc Error cho từng ảnh */}
+                      {file && progress !== undefined && progress < 100 && !errorMsg && (
+                        <ProgressBar now={progress} label={`${progress}%`} striped variant="info" size="sm" className="mt-1" />
+                      )}
+                      {file && errorMsg && (
+                        <Alert variant="danger" className="mt-1 py-1 px-2 small mb-0">{errorMsg}</Alert>
+                      )}
+                      {isUploaded && !errorMsg && (
+                        <Badge bg="success" className="position-absolute bottom-0 start-0 m-1">Đã tải lên</Badge>
+                      )}
+                    </Card>
+                  </Col>
+                );
+              })}
+            </Row>
           </div>
-
-          {isUploading && (
-            <div className="mt-3">
-              <ProgressBar
-                now={uploadProgress}
-                label={`${uploadProgress}%`}
-                variant="primary"
-                animated={uploadProgress < 100}
-              />
-              <p className="text-muted small mt-2">{uploadProgress < 100 ? "Đang tải lên..." : "Tải lên hoàn tất!"}</p>
-            </div>
-          )}
-
-          {uploadError && (
-            <Alert variant="danger" className="mt-3 py-2">
-              {uploadError}
-            </Alert>
-          )}
-        </div>
+        )}
+        {/* Hiển thị lỗi upload chung nếu có */}
+        {Object.values(uploadErrors).filter(e => e).length > 0 && !isUploadingImages && (
+          <Alert variant="warning" className="mt-3 py-2">Một số ảnh không tải lên được, vui lòng thử lại hoặc xóa chúng.</Alert>
+        )}
       </>
-    )
-  }
+    );
+  };
 
   const renderReviewStep = () => {
     return (

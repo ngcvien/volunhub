@@ -1,9 +1,10 @@
 // frontend/src/api/event.api.ts
 import api from './index';
-import { GetAllEventsResponse, EventType, GetEventByIdResponse,EventPostType   } from '../types/event.types'; // Import kiểu dữ liệu response
+import { GetAllEventsResponse, EventType, GetEventByIdResponse,EventPostType, EventImageInfo   } from '../types/event.types'; // Import kiểu dữ liệu response
 
-type CreateEventInputApi = Omit<EventType, 'id' | 'creatorId' | 'creator' | 'createdAt' | 'updatedAt'>;
-
+type CreateEventInputApi = Omit<EventType, 'id' | 'creatorId' | 'creator' | 'createdAt' | 'updatedAt' | 'images' | 'isParticipating' | 'isLiked' | 'likeCount' | 'participantCount' | 'posts' | 'status'> & {
+    imageUrls?: string[]; 
+};
 // Kiểu dữ liệu response khi tạo event thành công (giả sử trả về event mới)
 interface CreateEventResponse {
     message: string;
@@ -21,6 +22,8 @@ export const createEventApi = async (eventData: CreateEventInputApi): Promise<Cr
         throw new Error(error.response?.data?.message || 'Không thể tạo sự kiện.');
     }
 };
+
+
 
 export const getAllEventsApi = async (triggerParam?: string | number): Promise<GetAllEventsResponse> => {
     try {

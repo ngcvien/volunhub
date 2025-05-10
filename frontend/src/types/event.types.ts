@@ -24,7 +24,7 @@ interface EventCreator {
     updatedAt: string; 
     author: BasicUser; 
     commentCount?: number;
-    comments?: EventPostCommentType[]; // Mảng các bình luận cho bài viết
+    comments?: EventPostCommentType[]; 
 }
   
   // Kiểu dữ liệu chính cho một sự kiện trả về từ API list events
@@ -41,7 +41,8 @@ interface EventCreator {
     isParticipating?: boolean
     isLiked?: boolean 
     likeCount?: number
-    imageUrl?: string | null
+    // imageUrl?: string | null
+    images?: EventImageInfo[]; 
     // isVerified?: boolean 
     participants?: BasicUser[]; // Dùng BasicUser
     posts?: EventPostType[]; 
@@ -56,5 +57,10 @@ interface EventCreator {
   export interface GetEventByIdResponse {
     message: string;
     event: EventType; 
+}
+
+export interface EventImageInfo {
+    id?: number; 
+    imageUrl: string; 
 }
   
