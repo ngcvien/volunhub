@@ -6,7 +6,7 @@ import eventService from '../services/event.service';
 class EventController {
 
     async create(req: Request, res: Response, next: NextFunction) {
-        const { title, description, location, eventTime, imageUrl } = req.body;
+        const { title, description, location, eventTime, imageUrls } = req.body;
         const creatorId = req.user?.userId;
         if (!creatorId) {
             return res.status(401).json({ message: 'Lỗi: Không tìm thấy thông tin người dùng đã xác thực.' });
@@ -19,7 +19,7 @@ class EventController {
                 description,
                 location,
                 eventTime: new Date(eventTime),
-                imageUrl: imageUrl || null,
+                imageUrls: imageUrls || [],
 
             });
             res.status(201).json({ message: 'Tạo sự kiện thành công!', event: newEvent });

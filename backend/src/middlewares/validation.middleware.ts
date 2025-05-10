@@ -31,11 +31,17 @@ export const eventValidator = [
     check('title', 'Tiêu đề không được để trống').notEmpty().trim(),
     check('description', 'Mô tả nên là một chuỗi').optional().isString(), // optional() cho phép null/undefined
     check('location', 'Địa điểm nên là một chuỗi').optional().isString(),
-    check('eventTime', 'Thời gian sự kiện không hợp lệ').notEmpty().isISO8601().toDate(), 
-    check('imageUrl', 'Image URL không hợp lệ').optional({ checkFalsy: true }).isURL(), // optional({ checkFalsy: true }) cho phép null, undefined, ""
-
+    check('eventTime', 'Thời gian sự kiện không hợp lệ').notEmpty().isISO8601().toDate(),
+    // check('imageUrl', 'Image URL không hợp lệ').optional({ checkFalsy: true }).isURL(), // optional({ checkFalsy: true }) cho phép null, undefined, ""
+    body('imageUrls').optional().isArray().withMessage('Danh sách URL ảnh không hợp lệ.')
+        .custom((value: any[]) => { // value ở đây là mảng
+            if (value && value.length > 0) {
+                return value.every(url => typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://')));
+            }
+            return true; // Cho phép mảng rỗng hoặc không có
+        }).withMessage('Mỗi URL ảnh phải là chuỗi hợp lệ và bắt đầu bằng http(s).'),
     handleValidationErrors
-]; 
+];
 
 export const updateProfileValidator = [
     // Các trường đều là optional vì user có thể chỉ muốn cập nhật 1 vài thông tin
@@ -50,7 +56,7 @@ export const updateProfileValidator = [
 
 export const eventPostValidator = [
     check('content', 'Nội dung bài viết không được để trống').trim().isLength({ min: 1 }),
-    body('imageUrl').optional({ checkFalsy: true }).isURL().withMessage('Image URL không hợp lệ'), 
+    body('imageUrl').optional({ checkFalsy: true }).isURL().withMessage('Image URL không hợp lệ'),
     handleValidationErrors
 ];
 
@@ -58,10 +64,10 @@ export const commentValidator = [
     check('content', 'Nội dung bình luận không được để trống').trim().isLength({ min: 1 }),
     // parentId là optional, kiểm tra xem nó có phải là số không nếu được cung cấp
     body('parentId')
-    .optional({ nullable: true }) // Vẫn cho phép null hoặc không tồn tại
-    .if((value) => value !== null && value !== undefined) // Chỉ chạy validation tiếp theo NẾU giá trị không phải null/undefined
-    .isInt({ min: 1 }).withMessage('Parent Comment ID phải là một số nguyên dương.'),
-    body('imageUrl').optional({ checkFalsy: true }).isURL().withMessage('Image URL không hợp lệ'), 
+        .optional({ nullable: true }) // Vẫn cho phép null hoặc không tồn tại
+        .if((value) => value !== null && value !== undefined) // Chỉ chạy validation tiếp theo NẾU giá trị không phải null/undefined
+        .isInt({ min: 1 }).withMessage('Parent Comment ID phải là một số nguyên dương.'),
+    body('imageUrl').optional({ checkFalsy: true }).isURL().withMessage('Image URL không hợp lệ'),
     handleValidationErrors
 ];
 
