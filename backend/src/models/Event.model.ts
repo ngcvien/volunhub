@@ -3,8 +3,7 @@ import { DataTypes, Model, Optional } from 'sequelize';
 import { sequelize } from '../config/database.config';
 import User from './User.model'; // Import User model để tạo quan hệ
 import Participation from './Participation.model';
-import EventPost from './EventPost.model'; 
-import EventImage from './EventImage.model';
+import EventPost from './EventPost.model'; // Import EventPost model để tạo quan hệ
 // Interface mô tả thuộc tính Event
 export interface EventAttributes {
   id: number;
@@ -23,7 +22,6 @@ export interface EventAttributes {
   isParticipating?: boolean;
   isLiked?: boolean;
   likeCount?: number;
-  images?: EventImage[];
 }
 
 export enum EventStatus {
@@ -52,7 +50,6 @@ class Event extends Model<EventAttributes, EventCreationAttributes> implements E
   // Timestamps
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
-  public readonly images? : EventImage;
 
   // Khai báo quan hệ (tùy chọn, nhưng hữu ích cho các truy vấn sau này)
   // public readonly user?: User; // Định nghĩa sau khi setup association

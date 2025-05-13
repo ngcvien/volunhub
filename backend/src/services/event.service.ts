@@ -5,15 +5,7 @@ import User from '../models/User.model';
 import Participation from '../models/Participation.model';
 import EventLike from '../models/EventLike.model';
 import EventPost from '../models/EventPost.model';
-import { sequelize } from '../config/database.config';
-import EventImage from '../models/EventImage.model';
 
-
-interface CreateEventInputServer extends Omit<EventAttributes, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'imageUrl' | 'images' | 'creator' | 'participants' | 'posts' | 'isLiked' | 'isParticipating' | 'likeCount'> {
-    creatorId: number;
-    eventTime: Date; // Đảm bảo controller gửi Date object
-    imageUrls?: string[]; // Mảng các URL ảnh
-}
 interface EventWithCount extends EventAttributes {
     participantCount: number;
 }
@@ -39,7 +31,7 @@ type EventWithDetails = EventAttributes & {
 };
 
 interface PaginatedEventsResult {
-    events: EventWithDetails[];
+    events: EventWithDetails[]; 
     totalPages: number;
     currentPage: number;
     totalEvents: number;
@@ -55,35 +47,18 @@ type EventWithParticipationAndCreator = EventAttributes & {
 };
 class EventService {
 
-    async createEvent(eventData: CreateEventInputServer): Promise<Event> {
-        const transaction = await sequelize.transaction();
+    async createEvent(eventData: CreateEventInput): Promise<Event> {
         try {
-            const { imageUrls, ...coreEventData } = eventData; // Tách mảng imageUrls ra
-
-            // Tạo sự kiện chính
-            const newEvent = await Event.create(coreEventData, { transaction });
-
-            // Nếu có imageUrls, tạo các bản ghi trong event_images
-            if (imageUrls && imageUrls.length > 0) {
-                const imageRecords = imageUrls.map(url => ({
-                    eventId: newEvent.id,
-                    imageUrl: url
-                }));
-                await EventImage.bulkCreate(imageRecords, { transaction });
+            // creatorId đã có sẵn trong eventData (sẽ được lấy từ req.user ở controller)
+            const newEvent = await Event.create(eventData);
+            return newEvent;
+        } catch (error) {
+            console.error("Lỗi khi tạo sự kiện:", error);
+            // Xử lý lỗi validation từ Sequelize nếu có
+            if (error instanceof Error && error.name === 'SequelizeValidationError') {
+                throw new Error(`Lỗi validation: ${error.message}`);
             }
-
-            await transaction.commit();
-
-            // Lấy lại event với các ảnh đã include để trả về (tùy chọn)
-            return Event.findByPk(newEvent.id, {
-                include: [{ model: EventImage, as: 'images' }]
-            }) as Promise<Event>; // Cast vì findByPk có thể trả null
-
-        } catch (error: any) {
-            await transaction.rollback();
-            console.error("Lỗi khi tạo sự kiện với nhiều ảnh:", error);
-            if (error.name === 'SequelizeValidationError') { /* ... */ }
-            throw new Error('Không thể tạo sự kiện (đa ảnh) vào lúc này.');
+            throw new Error('Không thể tạo sự kiện vào lúc này.');
         }
     }
     async getAllEvents(options: GetAllEventsOptions): Promise<PaginatedEventsResult> {
@@ -114,12 +89,16 @@ class EventService {
         try {
             // 1. Dùng findAndCountAll để lấy cả dữ liệu và tổng số bản ghi (cho phân trang)
             const { count, rows } = await Event.findAndCountAll({
-                where: whereClause,
-                include: [
-                    { model: User, as: 'creator', attributes: ['id', 'username', 'avatarUrl'] },
-                    { model: EventImage, as: 'images', attributes: ['id', 'imageUrl'] }
-                ],
-                order: [['createdAt', 'DESC']], limit, offset, distinct: true
+                where: whereClause, // Áp dụng điều kiện lọc/tìm kiếm
+                include: [{ // Vẫn include người tạo
+                    model: User,
+                    as: 'creator',
+                    attributes: ['id', 'username', 'avatarUrl', 'fullName', 'isVerified', 'bio','volunpoints', 'location'] 
+                }],
+                order: [['createdAt', 'DESC']], // Sắp xếp
+                limit: limit, // Giới hạn số lượng
+                offset: offset, // Bỏ qua bao nhiêu bản ghi
+                distinct: true // Quan trọng khi có include và limit/offset
             });
 
             const events = rows; // rows chứa danh sách sự kiện của trang hiện tại
@@ -151,8 +130,8 @@ class EventService {
             }
 
             // 3. Map kết quả cuối cùng
-            const results: EventWithDetails[] = events.map(eventInstance => {
-                const plainEvent = eventInstance.get({ plain: true }) as EventWithDetails;
+            const results: EventWithDetails[] = events.map(event => {
+                const plainEvent = event.get({ plain: true }) as EventWithDetails;
                 plainEvent.likeCount = likeCountMap.get(plainEvent.id) || 0;
                 plainEvent.isLiked = likedEventIds.has(plainEvent.id);
                 plainEvent.isParticipating = participatingEventIds.has(plainEvent.id);
@@ -198,9 +177,7 @@ class EventService {
                             as: 'author',
                             attributes: ['id', 'username', 'avatarUrl']
                         }]
-                    },
-                    { model: EventImage, as: 'images', attributes: ['id', 'imageUrl'] }
-
+                    }
                     // Có thể include thêm EventLike (as 'likers') nếu muốn lấy danh sách người like
                 ]
                 // Không dùng raw: true ở đây để giữ cấu trúc object với association
@@ -215,7 +192,7 @@ class EventService {
 
             plainEvent.isLiked = false;
             plainEvent.isParticipating = false;
-            plainEvent.likeCount = await EventLike.count({ where: { eventId: eventId } });
+            plainEvent.likeCount = await EventLike.count({ where: { eventId: eventId } }); // Đếm tổng số like
 
             if (userId) {
                 const [userLike, userParticipation] = await Promise.all([
@@ -227,8 +204,6 @@ class EventService {
             }
 
             plainEvent.participants = plainEvent.participants || [];
-            plainEvent.images = plainEvent.images || [];
-
 
             return plainEvent;
 
