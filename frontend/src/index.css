@@ -479,6 +479,7 @@ html[data-bs-theme="light"] .navbar .navbar-toggler-icon {
   text-decoration: none !important;
 }
 
+/* =================CUSTOM CLASS================= */
 .ta-left {
   text-align: left !important;
 }
@@ -488,6 +489,11 @@ html[data-bs-theme="light"] .navbar .navbar-toggler-icon {
 .ta-right {
   text-align: right !important;
 }
+
+.no-border {
+  border: none !important;
+}
+
 
 [data-bs-theme="dark"] .form-floating > .form-control ~ label,
 [data-bs-theme="dark"] .form-floating > .form-select ~ label,

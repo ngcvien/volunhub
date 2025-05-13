@@ -68,7 +68,7 @@ const UserPopup: React.FC<UserPopupProps> = ({
             {/* Action buttons */}
             <div className="d-flex gap-2">
               <Link to={`/profile/${userId}`} className="flex-grow-1">
-                <Button variant="primary" size="sm" className="w-100">
+                <Button variant="primary" size="sm" className="w-100 no-border home-button">
                   Xem hồ sơ
                 </Button>
               </Link>

@@ -18,6 +18,10 @@ import AdminUserManagementPage from "../pages/admin/AdminUserManagementPage"
 import CreatorDashboardPage from "../pages/dashboard/CreatorDashboardPage"
 import AuthPage from "../pages/AuthPage"
 import AboutPage from "../pages/AboutPage"
+import AdminEventApprovalPage from "../pages/admin/AdminEventApprovalPage"
+import NotFoundPage from "../pages/NotFoundPage"
+import { Modal, Button } from "react-bootstrap"
+import { useState, useEffect } from "react"
 
 // Component để bảo vệ route, yêu cầu đăng nhập
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -34,6 +38,49 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
 
   return children;
 };
+const LockProtect = ({ children }: { children: JSX.Element }) => {
+  const { token, isLoading, user, logout } = useAuth();
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    if (user?.isActive === false) {
+      setShowModal(true);
+    }
+  }, [user]);
+
+  if (isLoading) {
+    return <div>Kiểm tra quyền truy cập...</div>;
+  }
+
+  if (user?.isActive === false) {
+    return (
+      <>
+        <Modal show={showModal} onHide={() => {
+          setShowModal(false);
+          window.location.href = '/auth';
+        }} centered>
+          <Modal.Header closeButton>
+            <Modal.Title style={{color: 'red'}}>Tài khoản bị khóa</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>Tài khoản của bạn đã bị khóa. Vui lòng liên hệ với quản trị viên để được hỗ trợ.</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="primary" onClick={() => {
+              logout();
+              window.location.href = '/auth';
+            }}>
+              Đăng xuất
+            </Button>
+          </Modal.Footer>
+        </Modal>
+        {/* <Navigate to="/auth" replace state={{ reason: "locked" }} /> */}
+      </>
+    );
+  }
+
+  return children;
+};
 
 const AppRoutes = () => {
   return (
@@ -42,10 +89,16 @@ const AppRoutes = () => {
       <AppNavbar /> {/* Navbar vẫn ở đây */}
       <Container fluid className="mt-4 px-0">
         <Routes>
+          {/* Public routes */}
+          <Route path="/" element={
+            <LockProtect>
+              <HomePage />
+            </LockProtect>
+          } />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/" element={<HomePage />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/about" element={<AboutPage />} />
 
           <Route
             path="/events/new"
@@ -56,14 +109,6 @@ const AppRoutes = () => {
             }
           />
           <Route
-            path="*"
-            element={
-              <div className="text-center mt-5">
-                <h2>404 Not Found</h2>
-              </div>
-            }
-          />
-          <Route
             path="/profile/me"
             element={
               <ProtectedRoute>
@@ -71,26 +116,52 @@ const AppRoutes = () => {
               </ProtectedRoute>
             }
           />
-          <Route path="/events/:eventId" element={<EventDetailPage />} />
-          <Route path="/profile/:userId" element={<UserProfilePage />} />
-
+          <Route
+            path="/events/:eventId"
+            element={
+              <ProtectedRoute>
+                <EventDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/:userId"
+            element={
+              <ProtectedRoute>
+                <UserProfilePage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/dashboard/my-events"
             element={
-              <ProtectedRoute> {/* Chỉ cần đăng nhập thường */}
+              <ProtectedRoute>
                 <CreatorDashboardPage />
               </ProtectedRoute>
             }
           />
-
-          <Route path="/admin/users" element={
-            <AdminRoute>
-              <AdminUserManagementPage />
-            </AdminRoute>
-          } />
-
-          <Route path="/about" element={<AboutPage />} />
-
+          <Route
+            path="/admin/users"
+            element={
+              <AdminRoute>
+                <AdminUserManagementPage />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/events/approval"
+            element={
+              <AdminRoute>
+                <AdminEventApprovalPage />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <NotFoundPage />
+            }
+          />
         </Routes>
 
 

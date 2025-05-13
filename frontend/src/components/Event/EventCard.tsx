@@ -486,7 +486,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
               size="sm"
               onClick={displayParticipating ? handleLeave : handleJoin}
               disabled={isLoadingAction}
-              className="participation-button me-2 mb-2"
+              className="participation-button me-2 mb-2 no-border home-button"
 
             >
               {isLoadingAction ? (

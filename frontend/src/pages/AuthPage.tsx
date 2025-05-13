@@ -163,7 +163,7 @@ const AuthPage = () => {
                     <Button
                       variant="primary"
                       type="submit"
-                      className="w-100 mb-3"
+                      className="w-100 mb-3 no-border home-button"
                       disabled={loading}
                     >
                       {loading ? (
@@ -179,7 +179,7 @@ const AuthPage = () => {
 
                     <Button
                       variant="outline-primary"
-                      className="w-100 mb-4 google-btn"
+                      className="w-100 mb-4 google-btn events-button"
                       onClick={handleGoogleLogin}
                       disabled={loading}
                     >

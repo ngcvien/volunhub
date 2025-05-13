@@ -6,7 +6,23 @@ import { useEffect, useRef, useState } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { Link } from "react-router-dom"
-import { FaHandsHelping, FaUsers, FaHeart, FaQuestionCircle, FaPhone, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa"
+import {
+    FaUsers,
+    FaHeart,
+    FaQuestionCircle,
+    FaPhone,
+    FaEnvelope,
+    FaMapMarkerAlt,
+    FaRocket,
+    FaSatellite,
+    FaGlobeAsia,
+    FaSpaceShuttle,
+    FaFacebookF, 
+    FaTwitter,
+    FaInstagram, 
+    FaLinkedinIn,
+    FaGithub 
+} from "react-icons/fa"
 import "./AboutPage.css"
 
 // Đăng ký plugin ScrollTrigger
@@ -25,11 +41,98 @@ const AboutPage = () => {
     const contactRef = useRef<HTMLDivElement>(null)
     const ctaRef = useRef<HTMLDivElement>(null)
     const footerRef = useRef<HTMLDivElement>(null)
+    const starsCanvasRef = useRef<HTMLCanvasElement>(null)
 
     // State để theo dõi mission card đang được active
     const [activeMission, setActiveMission] = useState(0)
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+
+    // Xử lý parallax effect
+    const handleMouseMove = (e: MouseEvent) => {
+        setMousePosition({
+            x: e.clientX / window.innerWidth - 0.5,
+            y: e.clientY / window.innerHeight - 0.5,
+        })
+    }
 
     useEffect(() => {
+        // Tạo hiệu ứng ngôi sao
+        const createStarryBackground = () => {
+            const canvas = starsCanvasRef.current
+            if (!canvas) return
+
+            const ctx = canvas.getContext("2d")
+            if (!ctx) return
+
+            // Thiết lập kích thước canvas
+            const setCanvasSize = () => {
+                canvas.width = window.innerWidth
+                canvas.height = window.innerHeight * 3 // Cao hơn để bao phủ toàn bộ trang
+            }
+
+            setCanvasSize()
+            window.addEventListener("resize", setCanvasSize)
+
+            // Tạo các ngôi sao
+            const stars: { x: number; y: number; size: number; opacity: number; speed: number }[] = []
+            for (let i = 0; i < 200; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    opacity: Math.random(),
+                    speed: 0.05 + Math.random() * 0.1,
+                })
+            }
+
+            // Vẽ và animation các ngôi sao
+            const drawStars = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+                // Vẽ gradient nền
+                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height)
+                gradient.addColorStop(0, "rgba(10, 10, 40, 1)")
+                gradient.addColorStop(0.5, "rgba(20, 20, 60, 1)")
+                gradient.addColorStop(1, "rgba(5, 5, 20, 1)")
+
+                ctx.fillStyle = gradient
+                ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+                // Vẽ các ngôi sao
+                stars.forEach((star) => {
+                    ctx.beginPath()
+                    ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2)
+                    ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`
+                    ctx.fill()
+
+                    // Cập nhật opacity để tạo hiệu ứng nhấp nháy
+                    star.opacity += Math.random() * 0.01 - 0.005
+                    if (star.opacity < 0.1) star.opacity = 0.1
+                    if (star.opacity > 1) star.opacity = 1
+
+                    // Di chuyển ngôi sao
+                    star.y -= star.speed
+                    if (star.y < 0) {
+                        star.y = canvas.height
+                        star.x = Math.random() * canvas.width
+                    }
+                })
+
+                requestAnimationFrame(drawStars)
+            }
+
+            drawStars()
+
+            return () => {
+                window.removeEventListener("resize", setCanvasSize)
+            }
+        }
+
+        createStarryBackground()
+
+        // Thêm event listener cho hiệu ứng parallax
+        window.addEventListener("mousemove", handleMouseMove)
+
         // Animation cho header
         gsap.fromTo(
             headerRef.current,
@@ -37,7 +140,7 @@ const AboutPage = () => {
             {
                 opacity: 1,
                 y: 0,
-                duration: 1,
+                duration: 1.5,
                 ease: "power3.out",
             },
         )
@@ -90,11 +193,12 @@ const AboutPage = () => {
         // Animation cho values section
         gsap.fromTo(
             valuesRef.current?.querySelectorAll(".value-card"),
-            { opacity: 0, scale: 0.8 },
+            { opacity: 0, scale: 0.8, rotation: -5 },
             {
                 opacity: 1,
                 scale: 1,
-                duration: 0.6,
+                rotation: 0,
+                duration: 0.8,
                 stagger: 0.15,
                 scrollTrigger: {
                     trigger: valuesRef.current,
@@ -138,10 +242,11 @@ const AboutPage = () => {
         // Animation cho team section
         gsap.fromTo(
             teamRef.current?.querySelectorAll(".team-member"),
-            { opacity: 0, y: 50 },
+            { opacity: 0, y: 50, rotation: -3 },
             {
                 opacity: 1,
                 y: 0,
+                rotation: 0,
                 duration: 0.8,
                 stagger: 0.2,
                 scrollTrigger: {
@@ -255,11 +360,12 @@ const AboutPage = () => {
         return () => {
             ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
             clearInterval(interval)
+            window.removeEventListener("mousemove", handleMouseMove)
         }
     }, [])
 
     // Toggle FAQ
-    const toggleFaq = (index) => {
+    const toggleFaq = (index: number) => {
         const faqItems = document.querySelectorAll(".faq-item")
         faqItems[index].classList.toggle("active")
     }
@@ -268,12 +374,12 @@ const AboutPage = () => {
     const missionData = [
         {
             id: 0,
-            icon: <FaHandsHelping />,
+            icon: <FaRocket />,
             title: "Kết nối",
             shortDesc: "Kết nối tình nguyện viên với các tổ chức",
             description:
                 "Chúng tôi kết nối những người có mong muốn giúp đỡ cộng đồng với các tổ chức và sự kiện thiện nguyện phù hợp. Thông qua nền tảng của chúng tôi, tình nguyện viên có thể dễ dàng tìm kiếm và tham gia các hoạt động phù hợp với sở thích, kỹ năng và thời gian của họ.",
-            image: "assets/img/blog/blog-3.jpg?height=400&width=600",
+            image: "/assets/img/blog/blog-3.jpg",
             color: "#4154f1",
         },
         {
@@ -283,7 +389,7 @@ const AboutPage = () => {
             shortDesc: "Tạo nên cộng đồng tình nguyện vững mạnh",
             description:
                 "Chúng tôi xây dựng một cộng đồng những người có cùng tâm huyết, cùng nhau tạo nên những thay đổi tích cực. VolunHub không chỉ là nơi kết nối mà còn là không gian để chia sẻ, học hỏi và phát triển cùng nhau, tạo nên một mạng lưới hỗ trợ bền vững.",
-            image: "assets/img/blog/blog-2.jpg?height=400&width=600",
+            image: "/assets/img/blog/blog-2.jpg",
             color: "#ff6b6b",
         },
         {
@@ -293,29 +399,50 @@ const AboutPage = () => {
             shortDesc: "Mỗi hành động nhỏ tạo nên sự khác biệt lớn",
             description:
                 "Chúng tôi tin rằng mỗi hành động nhỏ đều có thể tạo nên sự khác biệt lớn, và cùng nhau chúng ta có thể lan tỏa yêu thương đến mọi nơi. Thông qua các hoạt động tình nguyện, chúng tôi không chỉ giúp đỡ những người cần mà còn truyền cảm hứng cho nhiều người khác cùng tham gia.",
-            image: "assets/img/blog/blog-4.jpg?height=400&width=600",
+            image: "/assets/img/blog/blog-4.jpg",
             color: "#20c997",
         },
     ]
 
     return (
-        <div className="about-page">
+        <div className="about-page space-theme">
+            {/* Canvas cho nền ngôi sao */}
+            <canvas ref={starsCanvasRef} className="stars-canvas"></canvas>
+
+            {/* Các hành tinh trang trí */}
+            <div
+                className="planet planet-1"
+                style={{ transform: `translate(${mousePosition.x * 20}px, ${mousePosition.y * 20}px)` }}
+            ></div>
+            <div
+                className="planet planet-2"
+                style={{ transform: `translate(${mousePosition.x * -30}px, ${mousePosition.y * -30}px)` }}
+            ></div>
+            <div
+                className="planet planet-3"
+                style={{ transform: `translate(${mousePosition.x * 40}px, ${mousePosition.y * 40}px)` }}
+            ></div>
+
+            {/* Phi thuyền bay lơ lửng */}
+            <div className="spaceship">
+                <FaSpaceShuttle />
+            </div>
+
             {/* Hero Section */}
-            <div className="hero-section" ref={headerRef}
-            >
-                <div className="glass-container">
+            <div className="hero-section space-hero" ref={headerRef}>
+                <div className="space-container">
                     <h1 className="hero-title">Về VolunHub</h1>
                     <p className="hero-subtitle">Kết nối cộng đồng, lan tỏa yêu thương</p>
                     <div className="hero-decoration">
-                        <div className="circle circle-1"></div>
-                        <div className="circle circle-2"></div>
-                        <div className="circle circle-3"></div>
+                        <div className="orbit orbit-1"></div>
+                        <div className="orbit orbit-2"></div>
+                        <div className="orbit orbit-3"></div>
                     </div>
                 </div>
             </div>
 
-            {/* Mission Section - Thiết kế mới */}
-            <section className="mission-section" ref={missionRef}>
+            {/* Mission Section - Thiết kế không gian */}
+            <section className="mission-section space-section" ref={missionRef}>
                 <div className="container">
                     <div className="mission-intro">
                         <h2 className="section-title">Sứ mệnh của chúng tôi</h2>
@@ -329,7 +456,7 @@ const AboutPage = () => {
                         {missionData.map((mission, index) => (
                             <div
                                 key={mission.id}
-                                className={`mission-card ${activeMission === index ? "active" : ""}`}
+                                className={`mission-card space-card ${activeMission === index ? "active" : ""}`}
                                 onClick={() => setActiveMission(index)}
                                 style={{ "--mission-color": mission.color } as React.CSSProperties}
                             >
@@ -341,7 +468,7 @@ const AboutPage = () => {
                         ))}
                     </div>
 
-                    <div className="mission-detail">
+                    <div className="mission-detail space-detail">
                         <div className="mission-detail-content">
                             <h3 style={{ color: missionData[activeMission].color }}>{missionData[activeMission].title}</h3>
                             <p>{missionData[activeMission].description}</p>
@@ -359,15 +486,15 @@ const AboutPage = () => {
                     </div>
 
                     <div className="mission-stats">
-                        <div className="mission-stat-item">
+                        <div className="mission-stat-item space-stat">
                             <div className="mission-stat-number">5,000+</div>
                             <div className="mission-stat-label">Tình nguyện viên</div>
                         </div>
-                        <div className="mission-stat-item">
+                        <div className="mission-stat-item space-stat">
                             <div className="mission-stat-number">350+</div>
                             <div className="mission-stat-label">Sự kiện đã tổ chức</div>
                         </div>
-                        <div className="mission-stat-item">
+                        <div className="mission-stat-item space-stat">
                             <div className="mission-stat-number">120+</div>
                             <div className="mission-stat-label">Tổ chức đối tác</div>
                         </div>
@@ -376,28 +503,40 @@ const AboutPage = () => {
             </section>
 
             {/* Values Section */}
-            <section className="values-section" ref={valuesRef}>
+            <section className="values-section space-section" ref={valuesRef}>
                 <div className="container">
                     <h2 className="section-title">Giá trị cốt lõi</h2>
                     <div className="values-grid">
-                        <div className="value-card">
+                        <div className="value-card space-card">
+                            <div className="value-icon">
+                                <FaSatellite />
+                            </div>
                             <h3>Tính minh bạch</h3>
                             <p>Chúng tôi cam kết minh bạch trong mọi hoạt động, từ quản lý sự kiện đến thông tin người dùng.</p>
                         </div>
-                        <div className="value-card">
+                        <div className="value-card space-card">
+                            <div className="value-icon">
+                                <FaUsers />
+                            </div>
                             <h3>Tính cộng đồng</h3>
                             <p>
                                 Chúng tôi tin vào sức mạnh của cộng đồng và khả năng tạo ra tác động tích cực khi chúng ta đoàn kết.
                             </p>
                         </div>
-                        <div className="value-card">
+                        <div className="value-card space-card">
+                            <div className="value-icon">
+                                <FaGlobeAsia />
+                            </div>
                             <h3>Tính bền vững</h3>
                             <p>
                                 Chúng tôi hướng đến các giải pháp bền vững, tạo ra tác động lâu dài thay vì chỉ giải quyết vấn đề tạm
                                 thời.
                             </p>
                         </div>
-                        <div className="value-card">
+                        <div className="value-card space-card">
+                            <div className="value-icon">
+                                <FaRocket />
+                            </div>
                             <h3>Tính đổi mới</h3>
                             <p>Chúng tôi luôn tìm kiếm những cách tiếp cận mới để giải quyết các thách thức xã hội.</p>
                         </div>
@@ -406,29 +545,29 @@ const AboutPage = () => {
             </section>
 
             {/* Stats Section */}
-            <section className="stats-section" ref={statsRef}>
+            <section className="stats-section space-section" ref={statsRef}>
                 <div className="container">
                     <h2 className="section-title">Thành tựu của chúng tôi</h2>
                     <div className="stats-container">
-                        <div className="stat-item">
+                        <div className="stat-item space-stat">
                             <div className="stat-number" data-count="5000">
                                 5,000+
                             </div>
                             <div className="stat-label">Tình nguyện viên</div>
                         </div>
-                        <div className="stat-item">
+                        <div className="stat-item space-stat">
                             <div className="stat-number" data-count="350">
                                 350+
                             </div>
                             <div className="stat-label">Sự kiện đã tổ chức</div>
                         </div>
-                        <div className="stat-item">
+                        <div className="stat-item space-stat">
                             <div className="stat-number" data-count="120">
                                 120+
                             </div>
                             <div className="stat-label">Tổ chức đối tác</div>
                         </div>
-                        <div className="stat-item">
+                        <div className="stat-item space-stat">
                             <div className="stat-number" data-count="50">
                                 50+
                             </div>
@@ -439,48 +578,48 @@ const AboutPage = () => {
             </section>
 
             {/* History Section */}
-            <section className="history-section" ref={historyRef}>
+            <section className="history-section space-section" ref={historyRef}>
                 <div className="container">
                     <h2 className="section-title">Lịch sử phát triển</h2>
-                    <div className="timeline">
+                    <div className="timeline space-timeline">
                         <div className="history-item">
                             <div className="history-date">2018</div>
-                            <div className="history-content">
+                            <div className="history-content space-card">
                                 <h3>Khởi đầu</h3>
                                 <p>VolunHub được thành lập với mục tiêu kết nối tình nguyện viên với các tổ chức phi lợi nhuận.</p>
                             </div>
                         </div>
                         <div className="history-item">
                             <div className="history-date">2019</div>
-                            <div className="history-content">
+                            <div className="history-content space-card">
                                 <h3>Mở rộng</h3>
                                 <p>Mở rộng hoạt động đến 10 tỉnh thành và kết nối với hơn 50 tổ chức đối tác.</p>
                             </div>
                         </div>
                         <div className="history-item">
                             <div className="history-date">2020</div>
-                            <div className="history-content">
+                            <div className="history-content space-card">
                                 <h3>Đối mặt thách thức</h3>
                                 <p>Chuyển đổi sang mô hình hoạt động trực tuyến trong bối cảnh đại dịch COVID-19.</p>
                             </div>
                         </div>
                         <div className="history-item">
                             <div className="history-date">2021</div>
-                            <div className="history-content">
+                            <div className="history-content space-card">
                                 <h3>Phát triển nền tảng</h3>
                                 <p>Ra mắt nền tảng kỹ thuật số mới với nhiều tính năng hiện đại và trải nghiệm người dùng tốt hơn.</p>
                             </div>
                         </div>
                         <div className="history-item">
                             <div className="history-date">2022</div>
-                            <div className="history-content">
+                            <div className="history-content space-card">
                                 <h3>Đạt mốc 1000 sự kiện</h3>
                                 <p>Tổ chức thành công hơn 1000 sự kiện thiện nguyện trên toàn quốc.</p>
                             </div>
                         </div>
                         <div className="history-item">
                             <div className="history-date">2023</div>
-                            <div className="history-content">
+                            <div className="history-content space-card">
                                 <h3>Hiện tại</h3>
                                 <p>
                                     Tiếp tục mở rộng và phát triển, với mục tiêu trở thành nền tảng kết nối tình nguyện viên lớn nhất Việt
@@ -493,22 +632,22 @@ const AboutPage = () => {
             </section>
 
             {/* Team Section */}
-            <section className="team-section" ref={teamRef}>
+            <section className="team-section space-section" ref={teamRef}>
                 <div className="container">
                     <h2 className="section-title">Đội ngũ của chúng tôi</h2>
                     <div className="team-grid">
-                        <div className="team-member">
+                        <div className="team-member space-card">
                             <div className="member-image">
-                                <img src="/assets/img/team/team-1.jpg?height=300&width=300" alt="Nguyễn Văn A" />
+                                <img src="/assets/img/team/team-1.jpg" alt="Hồ Ngọc Viên" />
                                 <div className="member-social">
-                                    <a href="#">
-                                        <i className="fab fa-facebook"></i>
+                                    <a href="#" className="facebook" aria-label="Facebook">
+                                        <FaFacebookF />
                                     </a>
-                                    <a href="#">
-                                        <i className="fab fa-twitter"></i>
+                                    <a href="#" className="twitter" aria-label="Github">
+                                        <FaGithub />
                                     </a>
-                                    <a href="#">
-                                        <i className="fab fa-linkedin"></i>
+                                    <a href="#" className="instagram" aria-label="Instagram">
+                                        <FaInstagram />   
                                     </a>
                                 </div>
                             </div>
@@ -517,84 +656,83 @@ const AboutPage = () => {
                                 <p>Nhà sáng lập & CEO</p>
                             </div>
                         </div>
-                        <div className="team-member">
+                        <div className="team-member space-card">
                             <div className="member-image">
-                                <img src="/assets/img/team/team-4.jpg?height=300&width=300" alt="Trần Thị B" />
+                                <img src="/assets/img/team/team-4.jpg" alt="Trần Đặng Nhật Tân" />
                                 <div className="member-social">
-                                    <a href="#">
-                                        <i className="fab fa-facebook"></i>
+                                    <a href="#" className="facebook" aria-label="Facebook">
+                                        <FaFacebookF />
                                     </a>
-                                    <a href="#">
-                                        <i className="fab fa-twitter"></i>
+                                    <a href="#" className="twitter" aria-label="Github">
+                                        <FaGithub />
                                     </a>
-                                    <a href="#">
-                                        <i className="fab fa-linkedin"></i>
+                                    <a href="#" className="instagram" aria-label="Instagram">
+                                        <FaInstagram />   
                                     </a>
                                 </div>
                             </div>
                             <div className="member-info">
-                                <h3>Trần Thị B</h3>
+                                <h3>Trần Đặng Nhật Tân</h3>
                                 <p>Giám đốc Điều hành</p>
                             </div>
                         </div>
-                        <div className="team-member">
+                        <div className="team-member space-card">
                             <div className="member-image">
-                                <img src="/assets/img/team/team-3.jpg?height=300&width=300" alt="Lê Văn C" />
+                                <img src="/assets/img/team/team-3.jpg" alt="Hoàng Mạnh Duy" />
                                 <div className="member-social">
-                                    <a href="#">
-                                        <i className="fab fa-facebook"></i>
+                                    <a href="#" className="facebook" aria-label="Facebook">
+                                        <FaFacebookF />
                                     </a>
-                                    <a href="#">
-                                        <i className="fab fa-twitter"></i>
+                                    <a href="#" className="twitter" aria-label="Github">
+                                        <FaGithub />
                                     </a>
-                                    <a href="#">
-                                        <i className="fab fa-linkedin"></i>
+                                    <a href="#" className="instagram" aria-label="Instagram">
+                                        <FaInstagram />   
                                     </a>
                                 </div>
                             </div>
                             <div className="member-info">
-                                <h3>Lê Văn C</h3>
+                                <h3>Hoàng Mạnh Duy</h3>
                                 <p>Giám đốc Công nghệ</p>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </section>
 
             {/* Partners Section */}
-            <section className="partners-section" ref={partnersRef}>
+            <section className="partners-section space-section" ref={partnersRef}>
                 <div className="container">
                     <h2 className="section-title">Đối tác của chúng tôi</h2>
                     <div className="partners-grid">
                         <div className="partner-logo">
-                            <img src="/assets/img/clients/client-1.png?height=150&width=150" alt="Đối tác 1" />
+                            <img src="/assets/img/clients/client-1.png" alt="Đối tác 1" />
                         </div>
                         <div className="partner-logo">
-                            <img src="/assets/img/clients/client-2.png?height=150&width=150" alt="Đối tác 2" />
+                            <img src="/assets/img/clients/client-2.png" alt="Đối tác 2" />
                         </div>
                         <div className="partner-logo">
                             <img src="/assets/img/clients/client-3.png" alt="Đối tác 3" />
                         </div>
                         <div className="partner-logo">
-                            <img src="/assets/img/clients/client-4.png?height=150&width=150" alt="Đối tác 4" />
+                            <img src="/assets/img/clients/client-4.png" alt="Đối tác 4" />
                         </div>
                         <div className="partner-logo">
-                            <img src="/assets/img/clients/client-5.png?height=150&width=150" alt="Đối tác 5" />
+                            <img src="/assets/img/clients/client-5.png" alt="Đối tác 5" />
                         </div>
                         <div className="partner-logo">
-                            <img src="/assets/img/clients/client-6.png?height=150&width=150" alt="Đối tác 6" />
+                            <img src="/assets/img/clients/client-6.png" alt="Đối tác 6" />
                         </div>
                     </div>
                 </div>
             </section>
 
             {/* Testimonials Section */}
-            <section className="testimonials-section" ref={testimonialsRef}>
+            <section className="testimonials-section space-section" ref={testimonialsRef}>
                 <div className="container">
                     <h2 className="section-title">Người dùng nói gì về chúng tôi</h2>
                     <div className="testimonials-grid">
-                        <div className="testimonial-card">
+                        <div className="testimonial-card space-card">
                             <div className="testimonial-content">
                                 <p>
                                     "VolunHub đã giúp tôi tìm được những sự kiện thiện nguyện phù hợp với sở thích và thời gian của mình.
@@ -602,14 +740,14 @@ const AboutPage = () => {
                                 </p>
                             </div>
                             <div className="testimonial-author">
-                                <img src="assets\img\testimonials\testimonials-1.jpg?height=80&width=80" alt="Nguyễn Văn X" />
+                                <img src="/assets/img/testimonials/testimonials-1.jpg" alt="Nguyễn Văn X" />
                                 <div className="author-info">
                                     <h4>Sơn Tùng MPT</h4>
                                     <p>Tình nguyện viên</p>
                                 </div>
                             </div>
                         </div>
-                        <div className="testimonial-card">
+                        <div className="testimonial-card space-card">
                             <div className="testimonial-content">
                                 <p>
                                     "Là một tổ chức phi lợi nhuận, chúng tôi đã tìm thấy rất nhiều tình nguyện viên tài năng và nhiệt
@@ -617,14 +755,14 @@ const AboutPage = () => {
                                 </p>
                             </div>
                             <div className="testimonial-author">
-                                <img src="assets\img\testimonials\testimonials-2.jpg?height=80&width=80" alt="Trần Thị Y" />
+                                <img src="/assets/img/testimonials/testimonials-2.jpg" alt="Trần Thị Y" />
                                 <div className="author-info">
                                     <h4>Vũ Đinh Trọng Thắng</h4>
                                     <p>Quản lý tổ chức phi lợi nhuận</p>
                                 </div>
                             </div>
                         </div>
-                        <div className="testimonial-card">
+                        <div className="testimonial-card space-card">
                             <div className="testimonial-content">
                                 <p>
                                     "VolunHub không chỉ là một nền tảng kết nối, mà còn là một cộng đồng. Tôi đã học hỏi được rất nhiều từ
@@ -632,7 +770,7 @@ const AboutPage = () => {
                                 </p>
                             </div>
                             <div className="testimonial-author">
-                                <img src="assets\img\testimonials\testimonials-3.jpg?height=80&width=80" alt="Lê Văn Z" />
+                                <img src="/assets/img/testimonials/testimonials-3.jpg" alt="Lê Văn Z" />
                                 <div className="author-info">
                                     <h4>Tùng Dương</h4>
                                     <p>Tình nguyện viên thường xuyên</p>
@@ -644,11 +782,11 @@ const AboutPage = () => {
             </section>
 
             {/* FAQ Section */}
-            <section className="faq-section" ref={faqRef}>
+            <section className="faq-section space-section" ref={faqRef}>
                 <div className="container">
                     <h2 className="section-title">Câu hỏi thường gặp</h2>
                     <div className="faq-container">
-                        <div className="faq-item" onClick={() => toggleFaq(0)}>
+                        <div className="faq-item space-card" onClick={() => toggleFaq(0)}>
                             <div className="faq-question">
                                 <FaQuestionCircle className="faq-icon" />
                                 <h3>Làm thế nào để tôi có thể tham gia một sự kiện?</h3>
@@ -662,7 +800,7 @@ const AboutPage = () => {
                                 </p>
                             </div>
                         </div>
-                        <div className="faq-item" onClick={() => toggleFaq(1)}>
+                        <div className="faq-item space-card" onClick={() => toggleFaq(1)}>
                             <div className="faq-question">
                                 <FaQuestionCircle className="faq-icon" />
                                 <h3>Làm thế nào để tôi có thể tạo một sự kiện?</h3>
@@ -676,7 +814,7 @@ const AboutPage = () => {
                                 </p>
                             </div>
                         </div>
-                        <div className="faq-item" onClick={() => toggleFaq(2)}>
+                        <div className="faq-item space-card" onClick={() => toggleFaq(2)}>
                             <div className="faq-question">
                                 <FaQuestionCircle className="faq-icon" />
                                 <h3>VolunHub có tính phí không?</h3>
@@ -690,7 +828,7 @@ const AboutPage = () => {
                                 </p>
                             </div>
                         </div>
-                        <div className="faq-item" onClick={() => toggleFaq(3)}>
+                        <div className="faq-item space-card" onClick={() => toggleFaq(3)}>
                             <div className="faq-question">
                                 <FaQuestionCircle className="faq-icon" />
                                 <h3>Làm thế nào để tôi có thể liên hệ với VolunHub?</h3>
@@ -703,7 +841,7 @@ const AboutPage = () => {
                                 </p>
                             </div>
                         </div>
-                        <div className="faq-item" onClick={() => toggleFaq(4)}>
+                        <div className="faq-item space-card" onClick={() => toggleFaq(4)}>
                             <div className="faq-question">
                                 <FaQuestionCircle className="faq-icon" />
                                 <h3>Tôi có thể hủy đăng ký tham gia sự kiện không?</h3>
@@ -721,60 +859,51 @@ const AboutPage = () => {
             </section>
 
             {/* Contact Section */}
-            <section className="contact-section" ref={contactRef}>
+            <section className="contact-section space-section" ref={contactRef}>
                 <div className="container">
                     <h2 className="section-title">Liên hệ với chúng tôi</h2>
                     <div className="contact-container">
                         <div className="contact-info">
-                            <div className="contact-item">
+                            <div className="contact-item space-card">
                                 <div className="contact-icon">
                                     <FaMapMarkerAlt />
                                 </div>
                                 <div>
                                     <h3>Địa chỉ</h3>
-                                    <p>123 Đường ABC, Quận XYZ, TP. Hồ Chí Minh</p>
+                                    <p>70 đường Trần Đại Nghĩa, TP Đà Nẵng</p>
                                 </div>
                             </div>
-                            <div className="contact-item">
+                            <div className="contact-item space-card">
                                 <div className="contact-icon">
                                     <FaEnvelope />
                                 </div>
                                 <div>
                                     <h3>Email</h3>
-                                    <p>info@volunhub.com</p>
+                                    <p>contact@volunhub.vku.com</p>
                                 </div>
                             </div>
-                            <div className="contact-item">
+                            <div className="contact-item space-card">
                                 <div className="contact-icon">
                                     <FaPhone />
                                 </div>
                                 <div>
                                     <h3>Điện thoại</h3>
-                                    <p>+84 123 456 789</p>
+                                    <p>+84 905 100 200</p>
                                 </div>
                             </div>
-                            <div className="contact-map">
-                                {/* <iframe
-                                    src="https://www.google.com/maps/place/94+Nguy%E1%BB%85n+Th%E1%BB%A9c+T%E1%BB%B1,+Ho%C3%A0+H%E1%BA%A3i,+Ng%C5%A9+H%C3%A0nh+S%C6%A1n,+%C4%90%C3%A0+N%E1%BA%B5ng+550000,+Vi%E1%BB%87t+Nam/@15.9804023,108.2467191,1025m/data=!3m2!1e3!4b1!4m6!3m5!1s0x314210856356bc53:0x7ec1e1b80754f803!8m2!3d15.9804023!4d108.249294!16s%2Fg%2F11fw9_pgkb?authuser=0&entry=ttu&g_ep=EgoyMDI1MDUxMS4wIKXMDSoASAFQAw%3D%3D"
+                            <div className="contact-map space-card">
+                                <iframe
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4464.919404923983!2d108.24671907575544!3d15.98040228468632!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x314210856356bc53%3A0x7ec1e1b80754f803!2zOTQgTmd1eeG7hW4gVGjhu6ljIFThu7EsIEhvw6AgSOG6o2ksIE5nxakgSMOgbmggU8ahbiwgxJDDoCBO4bq1bmcgNTUwMDAwLCBWaeG7h3QgTmFt!5e1!3m2!1svi!2s!4v1747111710792!5m2!1svi!2s"
                                     width="100%"
                                     height="300"
-                                    style={{ border: 0 }}
-                                    allowFullScreen=""
+                                    allowFullScreen
                                     loading="lazy"
                                     referrerPolicy="no-referrer-when-downgrade"
-                                ></iframe> */}
-                                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4464.919404923983!2d108.24671907575544!3d15.98040228468632!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x314210856356bc53%3A0x7ec1e1b80754f803!2zOTQgTmd1eeG7hW4gVGjhu6ljIFThu7EsIEhvw6AgSOG6o2ksIE5nxakgSMOgbmggU8ahbiwgxJDDoCBO4bq1bmcgNTUwMDAwLCBWaeG7h3QgTmFt!5e1!3m2!1svi!2s!4v1747111710792!5m2!1svi!2s"
-                                    width="100%" height="300"
-                                    allowfullscreen="" loading="lazy"
-                                    referrerpolicy="no-referrer-when-downgrade"
                                     title="Google Maps"
-                                >
-
-
-                                </iframe>
+                                ></iframe>
                             </div>
                         </div>
-                        <div className="contact-form">
+                        <div className="contact-form space-card">
                             <form>
                                 <div className="form-group">
                                     <input type="text" placeholder="Họ và tên" required />
@@ -786,9 +915,9 @@ const AboutPage = () => {
                                     <input type="text" placeholder="Tiêu đề" required />
                                 </div>
                                 <div className="form-group">
-                                    <textarea placeholder="Nội dung" rows="5" required></textarea>
+                                    <textarea placeholder="Nội dung" rows={5} required></textarea>
                                 </div>
-                                <button type="submit" className="btn-submit">
+                                <button type="submit" className="btn-submit no-border home-button">
                                     Gửi tin nhắn
                                 </button>
                             </form>
@@ -798,15 +927,15 @@ const AboutPage = () => {
             </section>
 
             {/* CTA Section */}
-            <section className="cta-section" ref={ctaRef}>
-                <div className="glass-container">
+            <section className="cta-section space-cta" ref={ctaRef}>
+                <div className="space-container">
                     <h2>Sẵn sàng tham gia cùng chúng tôi?</h2>
                     <p>Hãy trở thành một phần của cộng đồng VolunHub và cùng nhau tạo nên những thay đổi tích cực.</p>
                     <div className="cta-buttons">
-                        <Link to="/auth" className="btn btn-primary">
+                        <Link to="/auth" className="btn btn-primary no-border ">
                             Đăng ký ngay
                         </Link>
-                        <Link to="/" className="btn btn-secondary">
+                        <Link to="/" className="btn btn-secondary no-border home-button">
                             Khám phá sự kiện
                         </Link>
                     </div>
@@ -814,7 +943,7 @@ const AboutPage = () => {
             </section>
 
             {/* Footer */}
-            <footer className="footer" ref={footerRef}>
+            <footer className="footer space-footer" ref={footerRef}>
                 <div className="container">
                     <div className="footer-content">
                         <div className="footer-column">
@@ -885,15 +1014,15 @@ const AboutPage = () => {
                             <ul className="footer-contact">
                                 <li>
                                     <i className="fas fa-map-marker-alt"></i>
-                                    <span>123 Đường ABC, Quận XYZ, TP. Hồ Chí Minh</span>
+                                    <span>70 đường Trần Đại Nghĩa, TP Đà Nẵng</span>
                                 </li>
                                 <li>
                                     <i className="fas fa-phone"></i>
-                                    <span>+84 123 456 789</span>
+                                    <span>+84 905 100 200</span>
                                 </li>
                                 <li>
                                     <i className="fas fa-envelope"></i>
-                                    <span>info@volunhub.com</span>
+                                    <span>contact@volunhub.vku.com</span>
                                 </li>
                             </ul>
                         </div>

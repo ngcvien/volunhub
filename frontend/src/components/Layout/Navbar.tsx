@@ -95,7 +95,7 @@ const Navbar = () => {
                   to="/events/new"
                   className="me-3"
                 >
-                  <Button variant="primary" className="create-event-btn">
+                  <Button variant="primary" className="create-event-btn no-border home-button">
                     <PlusCircle className="me-1" />
                     Tạo sự kiện
                 </Button>
