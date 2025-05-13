@@ -114,7 +114,7 @@ const AuthPage = () => {
                       <div className="form-floating mb-3">
                         <Form.Control
                           type="text"
-                          placeholder="Tên người dùng"
+                          placeholder=""
                           value={formData.username}
                           onChange={(e) => setFormData({
                             ...formData,
@@ -131,7 +131,7 @@ const AuthPage = () => {
                     <div className="form-floating mb-3">
                       <Form.Control
                         type="email"
-                        placeholder="Email"
+                        placeholder=""
                         value={formData.email}
                         onChange={(e) => setFormData({
                           ...formData,
@@ -147,7 +147,7 @@ const AuthPage = () => {
                     <div className="form-floating mb-4">
                       <Form.Control
                         type="password"
-                        placeholder="Mật khẩu"
+                        placeholder=""
                         value={formData.password}
                         onChange={(e) => setFormData({
                           ...formData,

@@ -6,6 +6,7 @@ import EventLike from './EventLike.model';
 import EventPost from './EventPost.model';
 import EventPostComment from './EventPostComment.model'; 
 import VolunpointLog from './VolunpointLog.model';
+import EventImage from './EventImage.model';
 
 const setupAssociations = () => {
     console.log('Setting up database associations...'); // Thêm log để kiểm tra
@@ -94,6 +95,16 @@ const setupAssociations = () => {
             VolunpointLog.belongsTo(Event, { foreignKey: 'eventId', as: 'event' });
             Event.hasMany(VolunpointLog, { foreignKey: 'eventId', as: 'pointLogs' });
         }
+
+        Event.hasMany(EventImage, {
+            foreignKey: 'eventId', 
+            as: 'images'          
+        });
+        // Một EventImage thuộc về một Event
+        EventImage.belongsTo(Event, {
+            foreignKey: 'eventId',
+            as: 'event'
+        });
 
 
         // --- (Tùy chọn) Định nghĩa quan hệ rõ ràng cho bảng nối Participation ---
