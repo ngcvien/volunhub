@@ -3,6 +3,7 @@ import { Router } from 'express';
 import userController from '../controllers/user.controller'; // Dùng UserController
 import authenticateToken from '../middlewares/auth.middleware'; // Middleware xác thực user
 import isAdmin from '../middlewares/admin.middleware'; // Middleware kiểm tra quyền Admin
+import eventController from '../controllers/event.controller';
 import { updateUserStatusValidator } from '../middlewares/validation.middleware'; // Middleware validate
 
 const router = Router();
@@ -21,6 +22,15 @@ router.put(
     updateUserStatusValidator, // Validate dữ liệu gửi lên
     userController.updateUserStatus
 );
+
+// GET /api/admin/events/pending-approval - Lấy danh sách sự kiện chờ duyệt
+router.get('/events/pending-approval', eventController.getPendingApprovalEvents);
+
+// PUT /api/admin/events/:eventId/approve - Duyệt sự kiện
+router.put('/events/:eventId/approve', eventController.approveEvent);
+
+// PUT /api/admin/events/:eventId/reject - Từ chối sự kiện
+router.put('/events/:eventId/reject', eventController.rejectEvent);
 
 // TODO: Thêm các route Admin khác sau này (quản lý event, post...)
 

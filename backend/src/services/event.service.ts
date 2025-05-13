@@ -7,6 +7,8 @@ import EventLike from '../models/EventLike.model';
 import EventPost from '../models/EventPost.model';
 import { sequelize } from '../config/database.config';
 import EventImage from '../models/EventImage.model';
+import { UserRole } from '../models/User.model';
+import { EventStatus } from '../models/Event.model';
 
 
 interface CreateEventInputServer extends Omit<EventAttributes, 'id' | 'createdAt' | 'updatedAt' | 'status' | 'imageUrl' | 'images' | 'creator' | 'participants' | 'posts' | 'isLiked' | 'isParticipating' | 'likeCount'> {
@@ -17,11 +19,7 @@ interface CreateEventInputServer extends Omit<EventAttributes, 'id' | 'createdAt
 interface EventWithCount extends EventAttributes {
     participantCount: number;
 }
-export enum EventStatus {
-    PENDING = 'pending',
-    CONFIRMED = 'confirmed',
-    ABSENT = 'absent'
-}
+
 interface GetAllEventsOptions {
     userId?: number;         // ID người dùng đang đăng nhập (để check like/join)
     query?: string;          // Từ khóa tìm kiếm
@@ -55,13 +53,27 @@ type EventWithParticipationAndCreator = EventAttributes & {
 };
 class EventService {
 
-    async createEvent(eventData: CreateEventInputServer): Promise<Event> {
+    async createEvent(eventData: CreateEventInputServer, creator: User): Promise<Event> {
         const transaction = await sequelize.transaction();
         try {
             const { imageUrls, ...coreEventData } = eventData; // Tách mảng imageUrls ra
 
+            let initialStatus = EventStatus.PENDING_APPROVAL;
+            // Nếu người tạo là Admin hoặc Tổ chức đã xác minh, sự kiện được duyệt tự động
+            if (creator.role === UserRole.ADMIN || (creator.role === UserRole.VERIFIED_ORG && creator.isVerified)) {
+                initialStatus = EventStatus.UPCOMING;
+            }
+
+            const newEvent = await Event.create(
+                {
+                    ...coreEventData,
+                    status: initialStatus // Gán trạng thái ban đầu
+                },
+                { transaction }
+            );
+
             // Tạo sự kiện chính
-            const newEvent = await Event.create(coreEventData, { transaction });
+            // const newEvent = await Event.create(coreEventData, { transaction });
 
             // Nếu có imageUrls, tạo các bản ghi trong event_images
             if (imageUrls && imageUrls.length > 0) {
@@ -91,7 +103,11 @@ class EventService {
         const offset = (page - 1) * limit; // Tính offset
 
         // Xây dựng mệnh đề WHERE dựa trên query và các filter khác
-        const whereClause: any = {}; // Bắt đầu với object rỗng
+        const whereClause: any = {
+            status: {
+                [Op.in]: [EventStatus.UPCOMING, EventStatus.ONGOING, EventStatus.COMPLETED]
+            }
+        }; // Bắt đầu với object rỗng
         if (query) {
             // Tìm kiếm query trong title hoặc description
             // Dùng Op.like không phân biệt hoa thường (mặc định trong MySQL thường là vậy)
@@ -290,7 +306,36 @@ class EventService {
         }
     }
 
+     async adminGetPendingApprovalEvents(options: { page?: number, limit?: number }): Promise<PaginatedEventsResult> {
+        const { page = 1, limit = 10 } = options;
+        const offset = (page - 1) * limit;
+        try {
+            const { count, rows } = await Event.findAndCountAll({
+                where: { status: EventStatus.PENDING_APPROVAL },
+                include: [{ model: User, as: 'creator', attributes: ['id', 'username', 'avatarUrl'] }],
+                order: [['createdAt', 'ASC']], // Ưu tiên duyệt sự kiện cũ trước
+                limit,
+                offset,
+                distinct: true
+            });
+             // Xử lý thêm likeCount, isLiked, isParticipating nếu cần cho trang Admin
+            const eventIds = rows.map(e => e.id);
+            // ... (logic tương tự getAllEvents để lấy count/status) ...
+            // Tạm thời trả về events thô
+            return { events: rows.map(e => e.get({plain:true})), totalPages: Math.ceil(count/limit), currentPage: page, totalEvents: count };
+        } catch (error) { /* ... */ throw error; }
+    }
 
+    async adminUpdateEventStatus(eventId: number, newStatus: EventStatus): Promise<Event | null> {
+        const event = await Event.findByPk(eventId);
+        if (!event) {
+            throw Object.assign(new Error('Sự kiện không tồn tại.'), { statusCode: 404 });
+        }
+        // Có thể thêm logic kiểm tra: không cho phép chuyển từ completed/cancelled sang trạng thái khác, vv.
+        event.status = newStatus;
+        await event.save();
+        return event;
+    }
 
     // Thêm các hàm khác sau: getAllEvents, getEventById...
 }

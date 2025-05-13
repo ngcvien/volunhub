@@ -27,10 +27,12 @@ export interface EventAttributes {
 }
 
 export enum EventStatus {
+  PENDING_APPROVAL = 'pending_approval',
   UPCOMING = 'upcoming',
   ONGOING = 'ongoing',
   COMPLETED = 'completed',
-  CANCELLED = 'cancelled'
+  CANCELLED = 'cancelled',
+  REJECTED = 'rejected'
 }
 
 interface EventCreationAttributes extends Optional<EventAttributes, 'id' | 'description' | 'location' | 'imageUrl' | 'createdAt' | 'updatedAt'> {}
@@ -99,7 +101,7 @@ Event.init(
     status: {
       type: DataTypes.ENUM(...Object.values(EventStatus)),
       allowNull: false,
-      defaultValue: EventStatus.UPCOMING
+      defaultValue: EventStatus.PENDING_APPROVAL
     }
     // createdAt và updatedAt Sequelize tự quản lý nếu timestamps: true
     // và underscored: true sẽ tự ánh xạ sang created_at, updated_at
