@@ -5,11 +5,10 @@ import { useState, useEffect, useRef } from "react"
 import {
   Card, Button, Spinner, Alert,
   Image, Badge, OverlayTrigger,
-  Tooltip, Overlay, Modal,
-  Col, Row
+  Tooltip, Overlay, Modal
 } from "react-bootstrap"
 import { Link } from "react-router-dom"
-import type { EventType, EventImageInfo } from "../../types/event.types"
+import type { EventType } from "../../types/event.types"
 import { useAuth } from "../../contexts/AuthContext"
 import { joinEventApi, leaveEventApi, likeEventApi, unlikeEventApi } from "../../api/event.api"
 import { formatDistanceToNow, format } from "date-fns"
@@ -29,7 +28,6 @@ import {
 import "./EventCard.css"
 import UserPopup from "../User/UserPopup"
 import { useNavigate } from "react-router-dom";
-import Post from "./Post"
 
 
 // Ảnh mặc định
@@ -203,99 +201,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
       return <Badge bg="info">Sắp tới</Badge>;
     } catch (e) { return <Badge bg="light" text="dark">Không xác định</Badge>; } // Sửa màu badge
   };
-
-  const renderImageGrid = (images: EventImageInfo[] | undefined) => {
-    if (!images || images.length === 0) {
-      return (
-
-        <div className="event-image-container mb-3">
-          <Image
-            src={event.imageUrl ||
-              (event.images && event.images.length > 0 ? event.images[0].imageUrl : placeholderImageUrl)
-            }
-            alt={event.title}
-            fluid
-            className="event-image"
-            onClick={() => setShowImageModal(true)}
-          />
-        </div>
-      );
-    }
-
-    const imageCount = images.length;
-    const displayImages = images.slice(0, 4); // Hiển thị tối đa 4 ảnh
-
-    if (imageCount === 1) {
-      return (
-        <Image
-          src={images[0].imageUrl}
-          alt={event.title}
-          className="card-img-top"
-          style={{ height: '200px', objectFit: 'cover' }}
-        />
-      );
-    }
-
-    // Sử dụng Row và Col của React Bootstrap để tạo grid
-    // Đặt chiều cao cố định cho vùng chứa ảnh để đồng nhất
-    return (
-      <div className="event-card-image-grid-container" style={{ height: '200px', overflow: 'hidden' }}>
-        <Row className="g-1 h-100"> {/* g-1 là gutter nhỏ */}
-          {imageCount === 2 && (
-            <>
-              <Col xs={6} className="h-100"><Image src={images[0].imageUrl} alt={`${event.title} 1`} fluid className="h-100" style={{ objectFit: 'cover' }} /></Col>
-              <Col xs={6} className="h-100"><Image src={images[1].imageUrl} alt={`${event.title} 2`} fluid className="h-100" style={{ objectFit: 'cover' }} /></Col>
-            </>
-          )}
-          {imageCount === 3 && (
-            <>
-              {/* Ảnh lớn bên trái, 2 ảnh nhỏ bên phải */}
-              <Col xs={8} className="h-100 pe-1"> {/* Giảm padding end một chút */}
-                <Image src={images[0].imageUrl} alt={`${event.title} 1`} fluid className="h-100" style={{ objectFit: 'cover' }} />
-              </Col>
-              <Col xs={4} className="h-100 ps-0"> {/* Giảm padding start một chút */}
-                <Row className="g-1 h-100 flex-column">
-                  <Col className="h-50 pb-1"> {/* Nửa trên, thêm padding bottom */}
-                    <Image src={images[1].imageUrl} alt={`${event.title} 2`} fluid className="h-100" style={{ objectFit: 'cover' }} />
-                  </Col>
-                  <Col className="h-50 pt-0"> {/* Nửa dưới, bỏ padding top */}
-                    <Image src={images[2].imageUrl} alt={`${event.title} 3`} fluid className="h-100" style={{ objectFit: 'cover' }} />
-                  </Col>
-                </Row>
-              </Col>
-            </>
-          )}
-          {imageCount >= 4 && (
-            <>
-              {/* Grid 2x2 cho 4 ảnh */}
-              {displayImages.map((img, index) => (
-                <Col key={img.id || index} xs={6} className={`h-50 ${index < 2 ? 'pb-1' : 'pt-0'}`}>
-                  <div className="position-relative h-100">
-                    <Image src={img.imageUrl} alt={`${event.title} ${index + 1}`} fluid className="h-100" style={{ objectFit: 'cover' }} />
-                    {/* Nếu là ảnh thứ 4 và có nhiều hơn 4 ảnh, hiển thị overlay +N */}
-                    {index === 3 && imageCount > 4 && (
-                      <div
-                        className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
-                        style={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', fontSize: '1.5rem', fontWeight: 'bold' }}
-                      >
-                        +{imageCount - 3}
-                      </div>
-                    )}
-                  </div>
-                </Col>
-              ))}
-            </>
-          )}
-        </Row>
-      </div>
-    );
-  };
+  // --- Kết thúc Các hàm Format thời gian ---
 
 
   return (
-
     <Card className="event-card shadow-sm mb-4"> {/* Thêm mb-4 nếu muốn khoảng cách giữa các card */}
-
       {/* Card Header */}
       <Card.Header className="bg-transparent border-0 pt-3 pb-0">
         <div className="d-flex align-items-center text-start">
@@ -359,7 +269,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
             onMouseLeave={handleMouseLeaveTriggerOrPopup} // Đặt timer ẩn khi rời nó
             style={{
               ...props.style,
-              zIndex: 1080
+              zIndex: 1080 
             }}
           >
             {/* --- Component UserPopup --- */}
@@ -414,30 +324,17 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
       </Card.Body>
 
       {/* Card Image (Nếu có) */}
-
-      {/* <div className="event-image-container mb-3">
-        <Image
-          src={event.imageUrl ||
-            (event.images && event.images.length > 0 ? event.images[0].imageUrl : placeholderImageUrl)
-          }
-          alt={event.title}
-          fluid
-          className="event-image"
-          onClick={() => setShowImageModal(true)}
-        />
-      </div> */}
-      {/* {renderImageGrid.call(this, event.images)} */}
-      <Post
-        images={
-          event.images && event.images.length > 0
-            ? event.images.map(img => img.imageUrl)
-            : event.imageUrl
-              ? [event.imageUrl]
-              : []
-        }
-      />
-
-
+      {event.imageUrl && (
+        <div className="event-image-container mb-3">
+          <Image
+            src={event.imageUrl || "/placeholder.svg"}
+            alt={event.title}
+            fluid
+            className="event-image"
+            onClick={() => setShowImageModal(true)}
+          />
+        </div>
+      )}
 
       <Modal
         show={showImageModal}
@@ -448,19 +345,18 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
       >
         <Modal.Header closeButton className="border-0">
           <Modal.Title className="text-center w-100" style={{ color: '#fff' }} >
-            <Link
-              to={`/events/${event.id}`}
-              className="event-title-link text-decoration-none"
-              style={{ color: '#fff' }}
-            >
+            <Link 
+            to={`/events/${event.id}`}
+             className="event-title-link text-decoration-none"
+             style={{color: '#fff'}}
+             >
               <h5 className="event-title mb-3">{event.title}</h5>
             </Link>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="d-flex justify-content-center align-items-center p-0">
           <img
-            src={event.imageUrl || (event.images && event.images.length > 0 ? event.images[0].imageUrl : "/placeholder.svg")
-            }
+            src={event.imageUrl}
             alt={event.title}
             style={{ maxWidth: "90vw", maxHeight: "80vh", borderRadius: 8 }}
           />
@@ -483,7 +379,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
               onClick={displayParticipating ? handleLeave : handleJoin}
               disabled={isLoadingAction}
               className="participation-button me-2 mb-2"
-
+              
             >
               {isLoadingAction ? (
                 <Spinner animation="border" size="sm" />

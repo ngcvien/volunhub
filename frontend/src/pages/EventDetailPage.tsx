@@ -4,7 +4,7 @@
 import type React from "react"
 import { useState, useEffect, useRef, ChangeEvent } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
-import { Form, Container, Row, Col, Card, Image as RBImage, Button, Spinner, Alert, Badge, Carousel } from "react-bootstrap"
+import { Form, Container, Row, Col, Card, Image as RBImage, Button, Spinner, Alert, Badge } from "react-bootstrap"
 import { useAuth } from "../contexts/AuthContext"
 import { uploadFileApi } from "../api/upload.api"
 import {
@@ -293,75 +293,6 @@ const EventDetailPage = () => {
           className="event-cover"
           style={{
             height: "200px", // Giảm chiều cao trên mobile
-            backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${event.images && event.images.length > 0 ? event.images[0].imageUrl : event.imageUrl || placeholderImageUrl})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            position: "relative",
-          }}
-        >
-          <Container className="h-100 d-flex flex-column justify-content-end text-white py-2 py-md-4">
-            <div className="mb-1 mb-md-2 d-flex align-items-center flex-wrap">
-              <Badge bg={new Date(event.eventTime) > new Date() ? "success" : "secondary"} className="me-2 py-1 px-2">
-                {new Date(event.eventTime) > new Date() ? "Sắp diễn ra" : "Đã diễn ra"}
-              </Badge>
-              <div className="d-flex align-items-center">
-                <Calendar2Event className="me-1" size={14} />
-                <span className="small">{formatEventDateTimeFull(event.eventTime)}</span>
-              </div>
-            </div>
-            <h1 className="event-title fw-bold mb-2" style={{ fontSize: "1.5rem" }}>
-              {event.title}
-            </h1>
-            <div className="d-flex align-items-center">
-              <Link
-                to={`/profile/${event.creator.id}`}
-                className="d-flex align-items-center text-white text-decoration-none"
-              >
-                <RBImage
-                  src={event.creator.avatarUrl || defaultAvatar}
-                  roundedCircle
-                  width={28}
-                  height={28}
-                  className="me-2 border border-2 border-white"
-                  style={{ objectFit: "cover" }}
-                />
-                <span className="small">
-                  Tổ chức bởi <strong>{event.creator.fullName || event.creator.username}</strong>
-                </span>
-              </Link>
-            </div>
-          </Container>
-        </div>
-      </div>
-
-      {/* {event.images && event.images.length > 0 ? (
-        <Carousel interval={3000} className="mb-4 shadow-lg event-carousel">
-          {event.images.map((image, index) => (
-            <Carousel.Item key={image.id || index}> 
-              <RBImage
-                className="d-block w-100"
-                src={image.imageUrl}
-                alt={`${event.title} - ảnh ${index + 1}`}
-                style={{ maxHeight: '500px', objectFit: 'cover' }}
-                onError={(e) => { 
-                  const target = e.target as HTMLImageElement;
-                  target.src = placeholderImageUrl;
-                  target.onerror = null;
-                }}
-              />
-              
-            </Carousel.Item>
-          ))}
-        </Carousel>
-
-        
-      ) : (
-        // Hiển thị ảnh placeholder lớn nếu không có ảnh nào trong sự kiện
-        <div className="event-hero position-relative mb-3 mb-md-4">
-        <div
-          className="event-cover"
-          style={{
-            height: "200px", // Giảm chiều cao trên mobile
             backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${event.imageUrl || placeholderImageUrl})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
@@ -402,7 +333,6 @@ const EventDetailPage = () => {
           </Container>
         </div>
       </div>
-      )} */}
 
       <Container className="px-2 px-md-3">
         <Row className="g-2 g-md-4">

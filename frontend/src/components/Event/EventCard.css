@@ -142,19 +142,6 @@
   margin: 0 0.3rem;
 }
 
-/* Trong EventCard.css hoặc file CSS toàn cục */
-.event-card-image-grid-container .row,
-.event-card-image-grid-container .col,
-.event-card-image-grid-container .h-100 { /* Đảm bảo các phần tử con chiếm hết chiều cao */
-    height: 100%;
-}
-.event-card-image-grid-container .col img { /* Cho ảnh trong Col lấp đầy */
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 8px;
-}
-
 /* Responsive adjustments */
 @media (max-width: 576px) {
   .event-card {

@@ -318,7 +318,7 @@ const CreateEventPage = () => {
         <Form.Group className="mb-4" controlId="eventTitle">
           <FloatingLabel label="Tiêu đề sự kiện *">
             <Form.Control
-            type="text" placeholder="" value={title}
+            type="text" placeholder="Nhập tiêu đề sự kiện" value={title}
             onChange={(e) => setTitle(e.target.value)} onBlur={() => handleBlur("title")}
             isInvalid={touched.title && !!validationErrors.title} disabled={isSubmitting}
             />
