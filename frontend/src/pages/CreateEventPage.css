@@ -58,9 +58,9 @@ html[data-bs-theme="light"] .gradient-sphere-2 {
 html[data-bs-theme="light"] .gradient-sphere-3 {
   width: 250px;
   height: 250px;
-  background: radial-gradient(circle, #d4fc79, #96e6a1);
+  background: radial-gradient(circle, #79fafc, #9796e6);
   top: 40%;
-  left: 45%;
+  left: 65%;
   animation-duration: 18s;
   animation-delay: -10s;
 }
@@ -105,6 +105,7 @@ html[data-bs-theme="dark"] .gradient-sphere-3 {
   width: 100%;
   max-width: 900px;
   margin: auto;
+  max-width: 1000px !important;
 }
 
 .form-card {
@@ -114,6 +115,7 @@ html[data-bs-theme="dark"] .gradient-sphere-3 {
   padding: 30px 40px;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
   transition: background-color 0.3s ease, border-color 0.3s ease;
+  
 }
 
 html[data-bs-theme="light"] .form-card {
@@ -160,8 +162,8 @@ html[data-bs-theme="dark"] .form-card {
 }
 
 .step-icon {
-  width: var(--cep-step-icon-size);
-  height: var(--cep-step-icon-size);
+  width: 2rem;
+  height: 2rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -656,7 +658,7 @@ html[data-bs-theme="dark"] .form-card .alert-info {
 
 @media (max-width: 480px) {
   .step-item {
-    flex-basis: 100%;
+    /* flex-basis: 20%; */
   }
 
   .page-form-title {

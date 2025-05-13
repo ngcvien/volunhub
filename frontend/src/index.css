@@ -381,7 +381,7 @@ html[data-bs-theme="light"] .navbar .navbar-toggler-icon {
 
 .form-floating > .form-control:focus ~ label,
 .form-floating > .form-control:not(:placeholder-shown) ~ label {
-  color: var(--bs-primary);
+  /* color: var(--bs-primary); */
 }
 
 .form-control.border-bottom,
@@ -477,6 +477,20 @@ html[data-bs-theme="light"] .navbar .navbar-toggler-icon {
 
 .reaction-btn {
   text-decoration: none !important;
+}
+
+[data-bs-theme="dark"] .form-floating > .form-control ~ label,
+[data-bs-theme="dark"] .form-floating > .form-select ~ label,
+[data-bs-theme="dark"] .form-floating > .form-control,
+[data-bs-theme="dark"] .form-floating > .form-select {
+  color: #bbb !important;
+  /* background-color: transparent; */
+}
+
+[data-bs-theme="light"] .form-floating > .form-control ~ label,
+[data-bs-theme="light"] .form-floating > .form-select ~ label {
+  color: #555 !important;
+  background-color: transparent;
 }
 
 /* Responsive */
