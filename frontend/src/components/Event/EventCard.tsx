@@ -44,7 +44,7 @@ interface EventCardProps {
 const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
-
+  
   // State cho các hành động Join/Leave/Like...
   const [isLoadingAction, setIsLoadingAction] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -64,6 +64,9 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
   const [displayLikeCount, setDisplayLikeCount] = useState(event.likeCount || 0);
 
   const isVerified = event.creator?.isVerified || false;
+
+  if (event.creator?.isActive === false) 
+    return;
 
   console.log("EventCard render", event.title, event.creator?.username, event.creator?.isVerified, event.creator?.volunpoints);
 
@@ -100,6 +103,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
   // Hàm xử lý Rời khỏi sự kiện
   const handleLeave = async () => {
     if (!user) return;
+    
     setIsLoadingAction(true);
     setActionError(null);
     try {

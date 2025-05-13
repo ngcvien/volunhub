@@ -142,7 +142,8 @@ class UserService {
           'avatarUrl',
           'volunpoints', 
           'isVerified',
-          'createdAt' 
+          'createdAt', 
+          'isActive'
         ]
       });
 

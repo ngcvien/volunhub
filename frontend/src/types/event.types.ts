@@ -10,6 +10,7 @@ interface EventCreator {
     bio?: string | null
     location?: string | null
     isVerified?: boolean
+    isActive?: boolean
     volunpoints?: number
     createdAt: string 
   }

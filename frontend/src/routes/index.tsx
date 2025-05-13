@@ -21,14 +21,19 @@ import AboutPage from "../pages/AboutPage"
 
 // Component để bảo vệ route, yêu cầu đăng nhập
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-  const { token, isLoading } = useAuth()
+  const { token, isLoading, user } = useAuth();
 
   if (isLoading) {
-    return <div>Kiểm tra quyền truy cập...</div> // Hoặc một spinner đẹp hơn
+    return <div>Kiểm tra quyền truy cập...</div>;
   }
 
-  return token ? children : <Navigate to="/login" replace />
-}
+  // Nếu chưa đăng nhập hoặc user bị khóa, redirect về /auth
+  if (!token || user?.isActive === false) {
+    return <Navigate to="/auth" replace state={{ reason: "locked" }} />;
+  }
+
+  return children;
+};
 
 const AppRoutes = () => {
   return (

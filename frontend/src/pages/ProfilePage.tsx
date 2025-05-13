@@ -47,10 +47,21 @@ const ProfilePage = () => {
       </Container>
     )
   }
+  
 
   // --- Hàm được gọi khi EditProfileForm lưu thành công hoặc bị hủy ---
   const handleFinishEditing = () => {
     setIsEditing(false)
+  }
+  console.log("user", user.isActive);
+  if(user.isActive === false) {
+    return (
+      <Container>
+        <Alert variant="danger" className="text-center mt-5">
+          Tài khoản của bạn đã bị khóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.
+        </Alert>
+      </Container>
+    )
   }
 
   return (

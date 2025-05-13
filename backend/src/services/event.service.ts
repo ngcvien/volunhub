@@ -117,7 +117,7 @@ class EventService {
                 where: whereClause,
                 include: [
                     {
-                        model: User, as: 'creator', attributes: ['id', 'username', 'avatarUrl', 'fullName', 'isVerified', 'bio', 'location']
+                        model: User, as: 'creator', attributes: ['id', 'username', 'avatarUrl', 'fullName', 'isVerified', 'bio', 'location', 'isActive', 'volunpoints'],
                     },
                     { model: EventImage, as: 'images', attributes: ['id', 'imageUrl'] }
                 ],

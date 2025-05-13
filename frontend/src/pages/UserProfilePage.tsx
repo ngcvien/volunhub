@@ -120,6 +120,16 @@ const UserProfilePage = () => {
             </Container>
         )
     }
+    console.log("user ------", user.isActive);
+    if (user.isActive === false) {
+        return (
+            <Container className="py-5">
+                <Alert variant="danger" className="text-center mt-5">
+                    Tài khoản này đã bị khóa. Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.
+                </Alert>
+            </Container>
+        )
+    }
 
     return (
         <div className="profile-page">

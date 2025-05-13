@@ -874,6 +874,7 @@ section {
 .testimonial-author {
   display: flex;
   align-items: center;
+  text-align: left;
   gap: 15px;
 }
 
@@ -982,6 +983,7 @@ section {
 .contact-item {
   display: flex;
   align-items: flex-start;
+  text-align: left;
   gap: 15px;
 }
 

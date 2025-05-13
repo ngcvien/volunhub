@@ -479,6 +479,16 @@ html[data-bs-theme="light"] .navbar .navbar-toggler-icon {
   text-decoration: none !important;
 }
 
+.ta-left {
+  text-align: left !important;
+}
+.ta-center {
+  text-align: center !important;
+}
+.ta-right {
+  text-align: right !important;
+}
+
 [data-bs-theme="dark"] .form-floating > .form-control ~ label,
 [data-bs-theme="dark"] .form-floating > .form-select ~ label,
 [data-bs-theme="dark"] .form-floating > .form-control,

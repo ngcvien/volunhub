@@ -500,7 +500,7 @@ const EventDetailPage = () => {
               <Card.Body className="p-3">
                 <h5 className="card-title mb-3">Thông tin chi tiết</h5>
 
-                <div className="event-details mb-3">
+                <div className="event-details mb-3 ta-left">
                   <div className="d-flex mb-2">
                     <div className="event-icon me-2">
                       <Calendar2Event size={20} className="text-primary" />
