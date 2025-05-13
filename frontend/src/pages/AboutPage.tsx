@@ -301,7 +301,8 @@ const AboutPage = () => {
     return (
         <div className="about-page">
             {/* Hero Section */}
-            <div className="hero-section" ref={headerRef}>
+            <div className="hero-section" ref={headerRef}
+            >
                 <div className="glass-container">
                     <h1 className="hero-title">Về VolunHub</h1>
                     <p className="hero-subtitle">Kết nối cộng đồng, lan tỏa yêu thương</p>

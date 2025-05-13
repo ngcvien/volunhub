@@ -45,7 +45,7 @@ interface PaginatedEventsResult {
     totalEvents: number;
 }
 
-type CreateEventInput = Omit<EventAttributes, 'id' | 'createdAt' | 'updatedAt' | 'status'>; // Chỉ định các thuộc tính cần thiết khi tạo mới
+type CreateEventInput = Omit<EventAttributes, 'id' | 'createdAt' | 'updatedAt' | 'status'>;
 
 type EventWithParticipationAndCreator = EventAttributes & {
     creator?: { id: number; username: string; };
@@ -116,7 +116,9 @@ class EventService {
             const { count, rows } = await Event.findAndCountAll({
                 where: whereClause,
                 include: [
-                    { model: User, as: 'creator', attributes: ['id', 'username', 'avatarUrl'] },
+                    {
+                        model: User, as: 'creator', attributes: ['id', 'username', 'avatarUrl', 'fullName', 'isVerified', 'bio', 'location']
+                    },
                     { model: EventImage, as: 'images', attributes: ['id', 'imageUrl'] }
                 ],
                 order: [['createdAt', 'DESC']], limit, offset, distinct: true
@@ -288,7 +290,7 @@ class EventService {
         }
     }
 
-    
+
 
     // Thêm các hàm khác sau: getAllEvents, getEventById...
 }
