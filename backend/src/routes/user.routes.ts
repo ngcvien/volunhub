@@ -46,4 +46,9 @@ router.get(
   authenticateToken,
   userController.getMyCreatedEvents 
 );
+
+router.get(
+    '/leaderboard/volunteers', // Đặt tên route cho rõ ràng
+    userController.getLeaderboard
+);
 export default router;

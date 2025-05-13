@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Button, Image, Badge, Offcanvas } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { 
-  Trophy, 
-  Calendar2Check, 
+import {
+  Trophy,
+  Calendar2Check,
   PeopleFill,
   ArrowRight,
   InfoCircle
 } from 'react-bootstrap-icons';
 import { User } from '../../types/user.types';
 import './RightSidebar.css';
+import { getLeaderboardApi } from '../../api/user.api';
+
+interface LeaderboardUserDisplay extends Pick<User, 'id' | 'username' | 'avatarUrl' | 'volunpoints' | 'fullName'> { }
 
 interface RightSidebarProps {
   currentUser: User | null;
@@ -19,17 +22,31 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ currentUser }) => {
   const [showMobileInfo, setShowMobileInfo] = useState(false);
 
   // Mock data for top volunteers and upcoming events
-  const topVolunteers = [
-    { id: 1, username: 'NguyenVanA', points: 150, avatar: '/default-avatar.png' },
-    { id: 2, username: 'TranThiB', points: 120, avatar: '/default-avatar.png' },
-    { id: 3, username: 'LeVanC', points: 100, avatar: '/default-avatar.png' },
-  ];
+  const [leaderboardUsers, setLeaderboardUsers] = useState<LeaderboardUserDisplay[]>([]);
+  const [loadingLeaderboard, setLoadingLeaderboard] = useState(true);
+  const [leaderboardError, setLeaderboardError] = useState<string | null>(null);
+
 
   const upcomingEvents = [
     { id: 10, title: 'Dọn dẹp bãi biển', date: '2024-05-01', participants: 15 },
     { id: 17, title: 'Trồng cây xanh', date: '2024-05-05', participants: 25 },
     { id: 11, title: 'Thăm trẻ em mồ côi', date: '2024-05-10', participants: 10 },
   ];
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      setLoadingLeaderboard(true);
+      setLeaderboardError(null);
+      try {
+        const response = await getLeaderboardApi(3); // Lấy top 3
+        setLeaderboardUsers(response.leaderboard);
+      } catch (err: any) {
+        setLeaderboardError(err.message || "Lỗi tải bảng xếp hạng.");
+      } finally {
+        setLoadingLeaderboard(false);
+      }
+    };
+    fetchLeaderboard();
+  }, []);
 
   const SidebarContent = () => (
     <>
@@ -74,7 +91,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ currentUser }) => {
             Top tình nguyện viên
           </h6>
           <div className="volunteer-list">
-            {topVolunteers.map((volunteer, index) => (
+            {leaderboardUsers.map((volunteer, index) => (
               <Link
                 to={`/profile/${volunteer.id}`}
                 key={volunteer.id}
@@ -82,13 +99,13 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ currentUser }) => {
               >
                 <div className="volunteer-rank">{index + 1}</div>
                 <Image
-                  src={volunteer.avatar}
+                  src={volunteer.avatarUrl}
                   roundedCircle
                   className="volunteer-avatar"
                 />
                 <div className="volunteer-info">
                   <div className="volunteer-name">{volunteer.username}</div>
-                  <div className="volunteer-points">{volunteer.points} điểm</div>
+                  <div className="volunteer-points">{volunteer.volunpoints} điểm</div>
                 </div>
               </Link>
             ))}
@@ -126,10 +143,10 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ currentUser }) => {
               </Link>
             ))}
           </div>
-          <Button 
-            variant="link" 
-            as={Link} 
-            to="/events" 
+          <Button
+            variant="link"
+            as={Link}
+            to="/events"
             className="w-100 mt-3"
           >
             Xem tất cả sự kiện

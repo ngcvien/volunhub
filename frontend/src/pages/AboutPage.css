@@ -1076,14 +1076,14 @@ section {
 
 .btn-primary {
   background: white;
-  color: #4154f1;
-  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+  /* color: #4154f1; */
+  /* box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3); */
 }
 
 .btn-primary:hover {
   background: rgba(255, 255, 255, 0.9);
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.4);
+  /* box-shadow: 0 8px 20px rgba(255, 255, 255, 0.4); */
 }
 
 .btn-secondary {

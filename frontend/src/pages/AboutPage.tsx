@@ -13,18 +13,18 @@ import "./AboutPage.css"
 gsap.registerPlugin(ScrollTrigger)
 
 const AboutPage = () => {
-    const headerRef = useRef(null)
-    const missionRef = useRef(null)
-    const valuesRef = useRef(null)
-    const statsRef = useRef(null)
-    const historyRef = useRef(null)
-    const teamRef = useRef(null)
-    const partnersRef = useRef(null)
-    const testimonialsRef = useRef(null)
-    const faqRef = useRef(null)
-    const contactRef = useRef(null)
-    const ctaRef = useRef(null)
-    const footerRef = useRef(null)
+    const headerRef = useRef<HTMLDivElement>(null)
+    const missionRef = useRef<HTMLDivElement>(null)
+    const valuesRef = useRef<HTMLDivElement>(null)
+    const statsRef = useRef<HTMLDivElement>(null)
+    const historyRef = useRef<HTMLDivElement>(null)
+    const teamRef = useRef<HTMLDivElement>(null)
+    const partnersRef = useRef<HTMLDivElement>(null)
+    const testimonialsRef = useRef<HTMLDivElement>(null)
+    const faqRef = useRef<HTMLDivElement>(null)
+    const contactRef = useRef<HTMLDivElement>(null)
+    const ctaRef = useRef<HTMLDivElement>(null)
+    const footerRef = useRef<HTMLDivElement>(null)
 
     // State để theo dõi mission card đang được active
     const [activeMission, setActiveMission] = useState(0)
@@ -767,7 +767,7 @@ const AboutPage = () => {
                                     allowfullscreen="" loading="lazy"
                                     referrerpolicy="no-referrer-when-downgrade"
                                     title="Google Maps"
-                                    >
+                                >
 
 
                                 </iframe>

@@ -1,10 +1,31 @@
 import api from "./index"
-import type { User } from "../types/user.types"
+import { User } from "../types/user.types"
+
 
 // Kiểu dữ liệu cho response từ API lấy thông tin người dùng
 interface GetUserProfileResponse {
   user: User
 }
+interface LeaderboardUser extends Pick<User, 'id' | 'username' | 'avatarUrl' | 'volunpoints' | 'fullName'> {}
+
+interface GetLeaderboardResponse {
+    message: string;
+    leaderboard: LeaderboardUser[];
+}
+/**
+ * Lấy bảng xếp hạng tình nguyện viên
+ * @param limit Số lượng muốn lấy (mặc định là 5)
+ */
+export const getLeaderboardApi = async (limit: number = 5): Promise<GetLeaderboardResponse> => {
+    try {
+        // GET /api/users/leaderboard/volunteers?limit=...
+        const response = await api.get<GetLeaderboardResponse>(`/users/leaderboard/volunteers?limit=${limit}`);
+        return response.data;
+    } catch (error: any) {
+        console.error("Lỗi API Get Leaderboard:", error.response?.data || error.message);
+        throw new Error(error.response?.data?.message || 'Không thể tải bảng xếp hạng.');
+    }
+};
 
 /**
  * Lấy thông tin profile của một người dùng theo ID

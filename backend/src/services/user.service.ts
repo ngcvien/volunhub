@@ -9,6 +9,7 @@ type LoginUserInput = Pick<UserAttributes, 'email'> & { password?: string };
 type UserProfileUpdateInput = Partial<Pick<UserAttributes, 'username' | 'fullName' | 'bio' | 'location' | 'avatarUrl'>>;
 type PublicUserProfile = Omit<UserAttributes, 'password_hash' | 'email' | 'updatedAt'>;
 type AdminUserUpdateInput = Partial<Pick<UserAttributes, 'role' | 'isVerified' | 'isActive'>>;
+type LeaderboardUser = Pick<UserAttributes, 'id' | 'username' | 'avatarUrl' | 'volunpoints' | 'fullName'>;
 
 
 class UserService {
@@ -245,6 +246,24 @@ class UserService {
       throw new Error('Không thể cập nhật trạng thái người dùng.');
     }
   }
+
+  async getTopVolunteers(limit: number = 5): Promise<LeaderboardUser[]> {
+        try {
+            const topUsers = await User.findAll({
+                attributes: ['id', 'username', 'avatarUrl', 'volunpoints', 'fullName'], // Chỉ lấy các trường cần thiết
+                order: [['volunpoints', 'DESC']], // Sắp xếp theo điểm giảm dần
+                limit: limit, // Giới hạn số lượng kết quả
+                where: {
+                    isActive: true // Chỉ lấy các user đang hoạt động (tùy chọn)
+                }
+            });
+            // Không cần map qua get({plain:true}) nếu attributes được chỉ định rõ và không có include phức tạp
+            return topUsers as LeaderboardUser[];
+        } catch (error) {
+            console.error("Lỗi khi lấy top tình nguyện viên:", error);
+            throw new Error('Không thể lấy danh sách top tình nguyện viên.');
+        }
+    }
 }
 
 // Export một instance của class để sử dụng (Singleton pattern)

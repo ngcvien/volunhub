@@ -288,6 +288,8 @@ class EventService {
         }
     }
 
+    
+
     // Thêm các hàm khác sau: getAllEvents, getEventById...
 }
 

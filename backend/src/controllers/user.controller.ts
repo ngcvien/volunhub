@@ -187,6 +187,26 @@ class UserController {
       next(error);
     }
   }
+
+  async getLeaderboard(req: Request, res: Response, next: NextFunction) {
+        try {
+            const limitQuery = req.query.limit as string | undefined;
+            // Mặc định lấy top 5 nếu không có query param 'limit'
+            const limit = limitQuery ? parseInt(limitQuery, 10) : 5;
+
+            if (isNaN(limit) || limit <= 0) {
+                return res.status(400).json({ message: 'Limit không hợp lệ.' });
+            }
+
+            const topVolunteers = await userService.getTopVolunteers(limit);
+            res.status(200).json({
+                message: 'Lấy bảng xếp hạng tình nguyện viên thành công!',
+                leaderboard: topVolunteers
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export default new UserController();
