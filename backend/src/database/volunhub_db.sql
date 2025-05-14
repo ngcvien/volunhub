@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th5 04, 2025 lúc 07:38 AM
+-- Thời gian đã tạo: Th5 14, 2025 lúc 04:11 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -34,7 +34,7 @@ CREATE TABLE `events` (
   `description` text DEFAULT NULL,
   `location` varchar(255) DEFAULT NULL,
   `event_time` datetime NOT NULL,
-  `status` enum('upcoming','ongoing','completed','cancelled') NOT NULL DEFAULT 'upcoming',
+  `status` enum('pending_approval','upcoming','ongoing','completed','cancelled','rejected') NOT NULL DEFAULT 'pending_approval',
   `image_url` varchar(255) DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL
@@ -45,20 +45,55 @@ CREATE TABLE `events` (
 --
 
 INSERT INTO `events` (`id`, `creator_id`, `title`, `description`, `location`, `event_time`, `status`, `image_url`, `created_at`, `updated_at`) VALUES
-(2, 1, 'Thu gom rác bờ biển Mỹ Khê', 'Cùng nhau làm sạch bãi biển chuẩn bị cho mùa du lịch.', 'Bãi biển Mỹ Khê, Đà Nẵng', '2025-05-15 07:00:00', 'upcoming', 'https://cdn-i.vtcnews.vn/resize/ma/upload/2022/09/24/vi-cong-dong-23402335.jpg', '2025-04-22 11:00:22', '2025-04-22 11:00:22'),
-(3, 1, 'Trồng cây xanh tại công viên Gia Định', 'Chung tay phủ xanh thành phố, giảm ô nhiễm không khí.', 'Công viên Gia Định, TP. Hồ Chí Minh', '2025-05-20 08:00:00', 'upcoming', 'https://dienbientv.vn/dataimages/202104/original/images3020506_cay_xanh.jpg', '2025-04-22 11:00:40', '2025-04-22 11:00:40'),
-(4, 1, 'Phát cháo miễn phí tại Bệnh viện K', 'Chia sẻ yêu thương qua từng phần cháo nóng.', 'Bệnh viện K, Hà Nội', '2025-05-18 10:00:00', 'upcoming', 'https://bvdktinhbacgiang.vn/upload/2005838/fck/files/2ccf93fa-1eac-47a2-9a04-fa0ae1cfd76b_51ad3.jpg', '2025-04-22 11:00:50', '2025-04-22 11:00:50'),
-(5, 1, 'Tặng quà cho trẻ em vùng cao', 'Mang đến niềm vui cho các em nhỏ vùng cao Tây Bắc.', 'Xã Tả Van, Lào Cai', '2025-05-25 03:00:00', 'upcoming', 'https://images2.thanhnien.vn/528068263637045248/2023/5/31/z4391746541643f29d8e7a6954bf26001388c653c4ec3d-16855196804471392689725.jpg', '2025-04-22 11:02:10', '2025-04-22 11:02:10'),
-(6, 1, 'Hiến máu nhân đạo', 'Một giọt máu cho đi, một cuộc đời ở lại.', 'Trung tâm hiến máu Quốc gia, Hà Nội', '2025-05-22 06:30:00', 'upcoming', 'https://thacogroup.vn/storage/tin-tuc/a3202.jpg', '2025-04-22 11:02:20', '2025-04-22 11:02:20'),
-(7, 1, 'Vẽ tranh tường cho trường mẫu giáo', 'Mang sắc màu đến với tuổi thơ.', 'Trường mẫu giáo Hoa Sen, Huế', '2025-05-19 02:00:00', 'upcoming', 'https://vietartdeco.com/wp-content/uploads/2022/06/z2824578415325_11b69d0bb38c523d2f5994c5ac387506.jpg', '2025-04-22 11:02:28', '2025-04-22 11:02:28'),
-(9, 1, 'Lắp đèn năng lượng mặt trời cho xóm nghèo', 'Thắp sáng đường quê, lan tỏa hy vọng.', 'Xã Ia Rsai, Gia Lai', '2025-05-01 16:11:00', 'upcoming', 'https://cdnphoto.dantri.com.vn/5nlnZIFmoRfz0v4iZABVQII2aHU=/thumb_w/1020/2023/08/22/panasonic-solar-latern-pr1-v3-da-edit-1docx-1692674267538.jpeg', '2025-04-22 16:12:01', '2025-04-22 16:12:01'),
-(10, 2, 'Chiến dịch \'Bữa cơm không rác\'', 'Ăn sạch, sống xanh, không rác thải nhựa.', 'KTX Đại học Quốc gia TP. HCM', '2025-05-09 16:13:00', 'upcoming', 'https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2023/5/14/1192084/740DDFC2-B7BB-4E33-8.jpeg', '2025-04-22 16:14:01', '2025-04-22 16:14:01'),
-(11, 1, 'Tổ chức hội chợ 0 đồng', 'Giúp đỡ người khó khăn có thêm quần áo và nhu yếu phẩm.', 'Phường An Khê, Đà Nẵng', '2025-05-28 04:00:00', 'upcoming', 'https://nld.mediacdn.vn/2021/1/30/img-3948-1612003061193657805867.jpg', '2025-04-22 18:00:09', '2025-04-22 18:00:09'),
-(13, 1, 'Tập huấn phòng chống cháy rừng', 'Chủ động bảo vệ rừng trước mùa khô.', 'Hạt kiểm lâm Nam Đông, Thừa Thiên Huế', '2025-05-14 09:30:00', 'upcoming', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745386667/ql2qpcypcjebdaukt9k0.jpg', '2025-04-23 05:40:43', '2025-04-23 05:40:43'),
-(14, 1, 'Làm sạch kênh Nhiêu Lộc', 'Vì một dòng kênh trong xanh trở lại.', 'Kênh Nhiêu Lộc - Thị Nghè, TP. Hồ Chí Minh', '2025-05-11 06:13:00', 'upcoming', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745388803/zw25veca7kdla7ppqk0u.jpg', '2025-04-23 06:13:58', '2025-04-23 06:13:58'),
-(16, 1, 'Hành động cho tương lai', 'Chung thay vì một tương lại Xanh - Sạch - Đẹp\n', 'Thành phố Đà Nẵng', '2025-05-11 03:37:00', 'upcoming', 'https://a.cdn-hotels.com/gdcs/production55/d1377/d704ae3e-c6b8-4ef3-904d-15473e72e0e2.jpg', '2025-04-26 03:39:39', '2025-04-26 03:39:39'),
-(17, 3, 'Tình nguyện hè', 'Các tình nguyện viên tổ chức tuyên truyền bảo vệ môi trường, phối hợp cùng nhân dân địa phương dọn vệ sinh, thu gom và xử lý rác thải, trồng thêm cây xanh. Có hơn 20km đường giao thông liên thôn được phát quang, dọn dẹp, thắp sáng 3,5km đường quê, tu sửa, làm mới, cải tạo các điểm trường, hỗ trợ các hộ gia đình xây dựng nhà vệ sinh đạt chuẩn nông thôn mới.', 'Thành phố Đà Nẵng', '2025-05-09 15:58:00', 'upcoming', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745683176/m9thkmmlutpzzahwwzqg.jpg', '2025-04-26 15:59:38', '2025-04-26 15:59:38'),
-(23, 6, 'GIỮ DẤU CHÂN SAO LA – HÀNH TRÌNH KHÔNG DỪNG LẠI', 'Hành trình “Giữ dấu chân Sao la” là chặng đường tìm kiếm sự trở về của những dấu chân Sao la và đa dạng sinh học của rừng Trường Sơn. Trên chặng đường đó, chúng ta đã cùng nhìn lại “dấu chân” của chính mình để có cách ứng xử tốt hơn với thiên nhiên.', 'Thành phố Đà Nẵng', '2025-05-18 06:01:00', 'upcoming', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1746165740/q5zh0bwgbmydjd5biqum.jpg', '2025-05-02 06:02:25', '2025-05-02 06:02:25');
+(2, 1, 'Thu gom rác bờ biển Mỹ Khê', 'Cùng nhau làm sạch bãi biển chuẩn bị cho mùa du lịch.', 'Bãi biển Mỹ Khê, Đà Nẵng', '2025-05-15 07:00:00', 'upcoming', 'https://cdn-i.vtcnews.vn/resize/ma/upload/2022/09/24/vi-cong-dong-23402335.jpg', '2025-04-22 11:00:22', '2025-05-13 15:21:43'),
+(3, 1, 'Trồng cây xanh tại công viên Gia Định', 'Chung tay phủ xanh thành phố, giảm ô nhiễm không khí.', 'Công viên Gia Định, TP. Hồ Chí Minh', '2025-05-20 08:00:00', 'upcoming', 'https://dienbientv.vn/dataimages/202104/original/images3020506_cay_xanh.jpg', '2025-04-22 11:00:40', '2025-05-13 15:21:11'),
+(4, 1, 'Phát cháo miễn phí tại Bệnh viện K', 'Chia sẻ yêu thương qua từng phần cháo nóng.', 'Bệnh viện K, Hà Nội', '2025-05-18 10:00:00', 'pending_approval', 'https://bvdktinhbacgiang.vn/upload/2005838/fck/files/2ccf93fa-1eac-47a2-9a04-fa0ae1cfd76b_51ad3.jpg', '2025-04-22 11:00:50', '2025-04-22 11:00:50'),
+(5, 1, 'Tặng quà cho trẻ em vùng cao', 'Mang đến niềm vui cho các em nhỏ vùng cao Tây Bắc.', 'Xã Tả Van, Lào Cai', '2025-05-25 03:00:00', 'pending_approval', 'https://images2.thanhnien.vn/528068263637045248/2023/5/31/z4391746541643f29d8e7a6954bf26001388c653c4ec3d-16855196804471392689725.jpg', '2025-04-22 11:02:10', '2025-04-22 11:02:10'),
+(6, 1, 'Hiến máu nhân đạo', 'Một giọt máu cho đi, một cuộc đời ở lại.', 'Trung tâm hiến máu Quốc gia, Hà Nội', '2025-05-22 06:30:00', 'pending_approval', 'https://thacogroup.vn/storage/tin-tuc/a3202.jpg', '2025-04-22 11:02:20', '2025-04-22 11:02:20'),
+(7, 1, 'Vẽ tranh tường cho trường mẫu giáo', 'Mang sắc màu đến với tuổi thơ.', 'Trường mẫu giáo Hoa Sen, Huế', '2025-05-19 02:00:00', 'pending_approval', 'https://vietartdeco.com/wp-content/uploads/2022/06/z2824578415325_11b69d0bb38c523d2f5994c5ac387506.jpg', '2025-04-22 11:02:28', '2025-04-22 11:02:28'),
+(9, 1, 'Lắp đèn năng lượng mặt trời cho xóm nghèo', 'Thắp sáng đường quê, lan tỏa hy vọng.', 'Xã Ia Rsai, Gia Lai', '2025-05-01 16:11:00', 'pending_approval', 'https://cdnphoto.dantri.com.vn/5nlnZIFmoRfz0v4iZABVQII2aHU=/thumb_w/1020/2023/08/22/panasonic-solar-latern-pr1-v3-da-edit-1docx-1692674267538.jpeg', '2025-04-22 16:12:01', '2025-04-22 16:12:01'),
+(10, 2, 'Chiến dịch \'Bữa cơm không rác\'', 'Ăn sạch, sống xanh, không rác thải nhựa.', 'KTX Đại học Quốc gia TP. HCM', '2025-05-09 16:13:00', 'rejected', 'https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2023/5/14/1192084/740DDFC2-B7BB-4E33-8.jpeg', '2025-04-22 16:14:01', '2025-05-13 15:20:26'),
+(11, 1, 'Tổ chức hội chợ 0 đồng', 'Giúp đỡ người khó khăn có thêm quần áo và nhu yếu phẩm.', 'Phường An Khê, Đà Nẵng', '2025-05-28 04:00:00', 'upcoming', 'https://nld.mediacdn.vn/2021/1/30/img-3948-1612003061193657805867.jpg', '2025-04-22 18:00:09', '2025-05-13 15:20:29'),
+(13, 1, 'Tập huấn phòng chống cháy rừng', 'Chủ động bảo vệ rừng trước mùa khô.', 'Hạt kiểm lâm Nam Đông, Thừa Thiên Huế', '2025-05-14 09:30:00', 'rejected', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745386667/ql2qpcypcjebdaukt9k0.jpg', '2025-04-23 05:40:43', '2025-05-13 15:20:30'),
+(14, 1, 'Làm sạch kênh Nhiêu Lộc', 'Vì một dòng kênh trong xanh trở lại.', 'Kênh Nhiêu Lộc - Thị Nghè, TP. Hồ Chí Minh', '2025-05-11 06:13:00', 'pending_approval', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745388803/zw25veca7kdla7ppqk0u.jpg', '2025-04-23 06:13:58', '2025-04-23 06:13:58'),
+(16, 1, 'Hành động cho tương lai', 'Chung thay vì một tương lại Xanh - Sạch - Đẹp\n', 'Thành phố Đà Nẵng', '2025-05-11 03:37:00', 'pending_approval', 'https://a.cdn-hotels.com/gdcs/production55/d1377/d704ae3e-c6b8-4ef3-904d-15473e72e0e2.jpg', '2025-04-26 03:39:39', '2025-04-26 03:39:39'),
+(17, 3, 'Tình nguyện hè', 'Các tình nguyện viên tổ chức tuyên truyền bảo vệ môi trường, phối hợp cùng nhân dân địa phương dọn vệ sinh, thu gom và xử lý rác thải, trồng thêm cây xanh. Có hơn 20km đường giao thông liên thôn được phát quang, dọn dẹp, thắp sáng 3,5km đường quê, tu sửa, làm mới, cải tạo các điểm trường, hỗ trợ các hộ gia đình xây dựng nhà vệ sinh đạt chuẩn nông thôn mới.', 'Thành phố Đà Nẵng', '2025-05-09 15:58:00', 'upcoming', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745683176/m9thkmmlutpzzahwwzqg.jpg', '2025-04-26 15:59:38', '2025-05-13 15:21:06'),
+(23, 6, 'GIỮ DẤU CHÂN SAO LA – HÀNH TRÌNH KHÔNG DỪNG LẠI', 'Hành trình “Giữ dấu chân Sao la” là chặng đường tìm kiếm sự trở về của những dấu chân Sao la và đa dạng sinh học của rừng Trường Sơn. Trên chặng đường đó, chúng ta đã cùng nhìn lại “dấu chân” của chính mình để có cách ứng xử tốt hơn với thiên nhiên.', 'Thành phố Đà Nẵng', '2025-05-18 06:01:00', 'pending_approval', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1746165740/q5zh0bwgbmydjd5biqum.jpg', '2025-05-02 06:02:25', '2025-05-02 06:02:25'),
+(24, 1, 'Sự kiện có nhiều ảnh', NULL, NULL, '2025-06-15 10:00:00', 'upcoming', NULL, '2025-05-10 10:20:51', '2025-05-13 15:21:15'),
+(25, 1, 'Thử tạo sự kiện nhiều ảnh', 'mô tả ...', 'Tỉnh Bình Định', '2025-05-15 10:42:00', 'upcoming', NULL, '2025-05-10 10:44:45', '2025-05-13 15:21:21'),
+(26, 1, 'Thử tạo sự kiện nhiều ảnh 2', 'mô tả ...', 'Tỉnh Bắc Ninh', '2025-05-16 11:06:00', 'upcoming', NULL, '2025-05-10 11:08:36', '2025-05-13 15:21:31'),
+(27, 1, 'Sự kiện có nhiều ảnh', NULL, NULL, '2025-06-15 10:00:00', 'pending_approval', NULL, '2025-05-13 06:13:08', '2025-05-13 06:13:08');
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `event_images`
+--
+
+CREATE TABLE `event_images` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `event_id` int(10) UNSIGNED NOT NULL,
+  `image_url` varchar(1024) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `event_images`
+--
+
+INSERT INTO `event_images` (`id`, `event_id`, `image_url`, `created_at`, `updated_at`) VALUES
+(1, 24, 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745683176/m9thkmmlutpzzahwwzqg.jpg', '2025-05-10 10:20:51', '2025-05-10 10:20:51'),
+(2, 24, 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745388803/zw25veca7kdla7ppqk0u.jpg', '2025-05-10 10:20:51', '2025-05-10 10:20:51'),
+(3, 25, 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1746873796/n2xwjioocaxsmlggzus6.webp', '2025-05-10 10:44:45', '2025-05-10 10:44:45'),
+(4, 25, 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1746873797/rmdtzqyvmn83l923luic.jpg', '2025-05-10 10:44:45', '2025-05-10 10:44:45'),
+(5, 25, 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1746873798/oz9pm9zxil1tj1yrooeg.jpg', '2025-05-10 10:44:45', '2025-05-10 10:44:45'),
+(6, 25, 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1746873799/yyaabifigsssy4kcq1aw.jpg', '2025-05-10 10:44:45', '2025-05-10 10:44:45'),
+(7, 26, 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1746875282/fvddjkcwlosilgtutfxq.jpg', '2025-05-10 11:08:36', '2025-05-10 11:08:36'),
+(8, 26, 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1746875284/asw9jdbdebxki8c2ezui.jpg', '2025-05-10 11:08:36', '2025-05-10 11:08:36'),
+(9, 26, 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1746875286/ly7bkfjhbfwbpqxrqteq.jpg', '2025-05-10 11:08:36', '2025-05-10 11:08:36'),
+(10, 26, 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1746875288/xnxt7llsdpekautjctx6.jpg', '2025-05-10 11:08:36', '2025-05-10 11:08:36'),
+(11, 26, 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745388803/zw25veca7kdla7ppqk0u.jpg', '2025-05-10 11:08:36', '2025-05-10 11:08:36');
 
 -- --------------------------------------------------------
 
@@ -80,7 +115,7 @@ INSERT INTO `event_likes` (`user_id`, `event_id`, `created_at`) VALUES
 (1, 9, '2025-04-27 05:52:39'),
 (1, 13, '2025-05-04 03:04:39'),
 (1, 14, '2025-04-26 14:32:55'),
-(1, 17, '2025-05-01 16:59:54'),
+(1, 17, '2025-05-04 14:21:40'),
 (2, 14, '2025-04-26 14:39:35'),
 (2, 16, '2025-04-26 14:39:38'),
 (2, 17, '2025-04-27 08:17:57'),
@@ -111,12 +146,11 @@ CREATE TABLE `event_participants` (
 INSERT INTO `event_participants` (`user_id`, `event_id`, `completion_status`, `created_at`, `updated_at`) VALUES
 (1, 2, 'pending', '2025-04-26 04:36:38', '2025-04-26 04:36:38'),
 (1, 5, 'pending', '2025-04-23 06:01:24', '2025-04-23 06:01:24'),
-(1, 9, 'pending', '2025-04-23 17:12:38', '2025-04-23 17:12:38'),
-(1, 13, 'pending', '2025-04-23 18:36:29', '2025-04-23 18:36:29'),
-(1, 14, 'pending', '2025-04-27 09:38:54', '2025-04-27 09:38:54'),
+(1, 9, 'pending', '2025-05-04 10:20:43', '2025-05-04 10:39:51'),
+(1, 16, 'pending', '2025-05-04 14:29:50', '2025-05-04 14:29:50'),
 (1, 17, 'pending', '2025-05-01 16:59:51', '2025-05-01 16:59:51'),
 (2, 3, 'pending', '2025-04-23 01:32:52', '2025-04-23 01:32:52'),
-(2, 11, 'confirmed', '2025-04-26 14:41:15', '2025-04-30 03:52:25'),
+(2, 11, 'pending', '2025-04-26 14:41:15', '2025-04-30 03:52:25'),
 (2, 17, 'pending', '2025-04-27 05:54:37', '2025-04-27 05:54:37'),
 (4, 17, 'pending', '2025-04-30 03:17:56', '2025-04-30 03:17:56');
 
@@ -146,7 +180,8 @@ INSERT INTO `event_posts` (`id`, `event_id`, `user_id`, `content`, `image_url`, 
 (3, 17, 2, 'Quá ý nghĩa luôn 🥰', NULL, '2025-04-27 08:45:50', '2025-04-27 08:45:50'),
 (4, 14, 2, 'Cùng nhau cố gắng nhé mọi người', NULL, '2025-04-27 08:56:21', '2025-04-27 08:56:21'),
 (5, 14, 1, '🥰', NULL, '2025-04-27 09:39:09', '2025-04-27 09:39:09'),
-(7, 17, 1, '🥰', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1746157077/rqtasf7pa5guz8qenfsm.webp', '2025-05-02 03:38:10', '2025-05-02 03:38:10');
+(7, 17, 1, '🥰', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1746157077/rqtasf7pa5guz8qenfsm.webp', '2025-05-02 03:38:10', '2025-05-02 03:38:10'),
+(8, 7, 1, 'Rất ý nghĩa nuôn', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1746627460/mwq8i5miojmebsjqs5gk.webp', '2025-05-07 14:18:00', '2025-05-07 14:18:00');
 
 -- --------------------------------------------------------
 
@@ -200,7 +235,11 @@ INSERT INTO `sequelizemeta` (`name`) VALUES
 ('20250429142842-add-status-to-events.js'),
 ('20250429185819-add-completion-status-to-event-participants.js'),
 ('20250502030644-add-image-url-to-event-posts.js'),
-('20250502030758-add-image-url-to-event-post-comments.js');
+('20250502030758-add-image-url-to-event-post-comments.js'),
+('20250504104431-add-volunpoints-to-users.js'),
+('20250504104522-create-volunpoint-logs-table.js'),
+('20250510093032-create-event-images-table.js'),
+('20250513142633-modify-event-status-enum-and-default.js');
 
 -- --------------------------------------------------------
 
@@ -216,6 +255,7 @@ CREATE TABLE `users` (
   `role` enum('user','admin','verified_org') NOT NULL DEFAULT 'user',
   `is_verified` tinyint(1) NOT NULL DEFAULT 0,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `volunpoints` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   `full_name` varchar(255) DEFAULT NULL,
@@ -228,13 +268,35 @@ CREATE TABLE `users` (
 -- Đang đổ dữ liệu cho bảng `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `is_verified`, `is_active`, `created_at`, `updated_at`, `full_name`, `bio`, `location`, `avatar_url`) VALUES
-(1, 'viengoc234', 'ngocvien040906@gmail.com', '$2b$10$otGtF.DDKOr7ETCF6FDTbeuBfjVpfFqGVnyg9zNmyC.owh3wLp9S6', 'admin', 1, 1, '2025-04-22 01:53:28', '2025-05-04 04:15:17', 'Ngọc Viên', 'keo con 20 nam', 'Thành phố Đà Nẵng', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745399817/b43clmc4pzonseklsewo.jpg'),
-(2, 'nhattan', 'tantdn.24ic@vku.udn.vn', '$2b$10$Jjrdha0OE6b8RiIUcexXA.EQIAJMWCT3JyE8V96gKZ72cYSADtc/a', 'user', 0, 1, '2025-04-22 03:17:11', '2025-05-04 04:12:00', 'Nhật Tân', 'Anh ở vùng quê khu nghèo khó đó', 'Thành phố Đà Nẵng', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745404162/k5cd9dwwuscfjen8ntgd.jpg'),
-(3, 'thiennhan', 'nhannt.24ic@vku.udn.vn', '$2b$10$3xEVxRn6ZwcIDIkE9hbMSe3DMxZbP22nreQgDnw20uaku50fqOJe.', 'user', 0, 1, '2025-04-22 10:18:04', '2025-05-04 04:23:49', 'Thiện Nhân', NULL, 'Thành phố Đà Nẵng', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745678582/d2bes8eyrporssi1bim6.jpg'),
-(4, 'china123', 'quoclt.24ic@vku.udn.vn', '$2b$10$EtEbeZusm1dVmB.AwkzfwOp.IpXolP62jZqk3R5unzlen.aWa5mG2', 'user', 0, 1, '2025-04-27 04:36:00', '2025-05-04 05:08:00', 'Trung Quốc', NULL, 'Thành phố Đà Nẵng', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745728858/tubexoz1cldg9nu6indj.jpg'),
-(5, 'admin', 'vienhn.24ic@vku.udn.vn', '$2b$10$fQ8pshDI3PviZiv1e6vaG.hhcAeWRF.X557hUYy4JFjsUeYzTGIny', 'admin', 1, 1, '2025-04-29 11:29:47', '2025-05-04 05:06:01', NULL, NULL, NULL, 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745926255/riuvy1u4ocfxc7fca1pg.jpg'),
-(6, 'botgymdam', 'duyhm.24ic@vku.udn.vn', '$2b$10$hpZg5nUAbmfJZq.SnixrT.IXUGllicHX0WaxnOpovMW1c8FqqP6kW', 'user', 1, 0, '2025-05-04 04:58:03', '2025-05-04 05:35:49', 'Mạnh Duy', 'trưởng hội botgymdam Đà Nẵng', 'Thành phố Đà Nẵng', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1746334794/zlee7trsx6qvn41xd5lr.jpg');
+INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `role`, `is_verified`, `is_active`, `volunpoints`, `created_at`, `updated_at`, `full_name`, `bio`, `location`, `avatar_url`) VALUES
+(1, 'viengoc234', 'ngocvien040906@gmail.com', '$2b$10$otGtF.DDKOr7ETCF6FDTbeuBfjVpfFqGVnyg9zNmyC.owh3wLp9S6', 'admin', 1, 1, 10, '2025-04-22 01:53:28', '2025-05-04 11:09:28', 'Ngọc Viên', 'keo con 20 nam', 'Thành phố Đà Nẵng', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745399817/b43clmc4pzonseklsewo.jpg'),
+(2, 'nhattan', 'tantdn.24ic@vku.udn.vn', '$2b$10$Jjrdha0OE6b8RiIUcexXA.EQIAJMWCT3JyE8V96gKZ72cYSADtc/a', 'user', 0, 1, 0, '2025-04-22 03:17:11', '2025-05-04 04:12:00', 'Nhật Tân', 'Anh ở vùng quê khu nghèo khó đó', 'Thành phố Đà Nẵng', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745404162/k5cd9dwwuscfjen8ntgd.jpg'),
+(3, 'thiennhan', 'nhannt.24ic@vku.udn.vn', '$2b$10$3xEVxRn6ZwcIDIkE9hbMSe3DMxZbP22nreQgDnw20uaku50fqOJe.', 'user', 0, 1, 0, '2025-04-22 10:18:04', '2025-05-04 04:23:49', 'Thiện Nhân', NULL, 'Thành phố Đà Nẵng', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745678582/d2bes8eyrporssi1bim6.jpg'),
+(4, 'china123', 'quoclt.24ic@vku.udn.vn', '$2b$10$EtEbeZusm1dVmB.AwkzfwOp.IpXolP62jZqk3R5unzlen.aWa5mG2', 'user', 0, 1, 0, '2025-04-27 04:36:00', '2025-05-04 05:39:48', 'Trung Quốc', NULL, 'Thành phố Đà Nẵng', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745728858/tubexoz1cldg9nu6indj.jpg'),
+(5, 'admin', 'vienhn.24ic@vku.udn.vn', '$2b$10$fQ8pshDI3PviZiv1e6vaG.hhcAeWRF.X557hUYy4JFjsUeYzTGIny', 'admin', 1, 1, 0, '2025-04-29 11:29:47', '2025-05-04 05:06:01', NULL, NULL, NULL, 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1745926255/riuvy1u4ocfxc7fca1pg.jpg'),
+(6, 'botgymdam', 'duyhm.24ic@vku.udn.vn', '$2b$10$hpZg5nUAbmfJZq.SnixrT.IXUGllicHX0WaxnOpovMW1c8FqqP6kW', 'user', 1, 0, 0, '2025-05-04 04:58:03', '2025-05-13 14:04:02', 'Mạnh Duy', 'trưởng hội botgymdam Đà Nẵng', 'Thành phố Đà Nẵng', 'https://res.cloudinary.com/dlpw5ooot/image/upload/v1746334794/zlee7trsx6qvn41xd5lr.jpg');
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `volunpoint_logs`
+--
+
+CREATE TABLE `volunpoint_logs` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `user_id` int(10) UNSIGNED DEFAULT NULL,
+  `event_id` int(10) UNSIGNED DEFAULT NULL,
+  `points_awarded` int(11) NOT NULL DEFAULT 0,
+  `reason` varchar(255) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `volunpoint_logs`
+--
+
+INSERT INTO `volunpoint_logs` (`id`, `user_id`, `event_id`, `points_awarded`, `reason`, `created_at`) VALUES
+(1, 1, 14, 10, 'Hoàn thành sự kiện: Làm sạch kênh Nhiêu Lộc', '2025-05-04 11:09:28');
 
 --
 -- Chỉ mục cho các bảng đã đổ
@@ -247,6 +309,13 @@ ALTER TABLE `events`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_events_creator_id` (`creator_id`),
   ADD KEY `idx_events_event_time` (`event_time`);
+
+--
+-- Chỉ mục cho bảng `event_images`
+--
+ALTER TABLE `event_images`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `event_images_event_id` (`event_id`);
 
 --
 -- Chỉ mục cho bảng `event_likes`
@@ -356,6 +425,14 @@ ALTER TABLE `users`
   ADD KEY `idx_users_email` (`email`);
 
 --
+-- Chỉ mục cho bảng `volunpoint_logs`
+--
+ALTER TABLE `volunpoint_logs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `volunpoint_logs_user_id` (`user_id`),
+  ADD KEY `volunpoint_logs_event_id` (`event_id`);
+
+--
 -- AUTO_INCREMENT cho các bảng đã đổ
 --
 
@@ -363,13 +440,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT cho bảng `events`
 --
 ALTER TABLE `events`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+
+--
+-- AUTO_INCREMENT cho bảng `event_images`
+--
+ALTER TABLE `event_images`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT cho bảng `event_posts`
 --
 ALTER TABLE `event_posts`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT cho bảng `event_post_comments`
@@ -384,6 +467,12 @@ ALTER TABLE `users`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
+-- AUTO_INCREMENT cho bảng `volunpoint_logs`
+--
+ALTER TABLE `volunpoint_logs`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- Các ràng buộc cho các bảng đã đổ
 --
 
@@ -392,6 +481,12 @@ ALTER TABLE `users`
 --
 ALTER TABLE `events`
   ADD CONSTRAINT `events_ibfk_1` FOREIGN KEY (`creator_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `event_images`
+--
+ALTER TABLE `event_images`
+  ADD CONSTRAINT `event_images_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `event_likes`
@@ -421,6 +516,13 @@ ALTER TABLE `event_post_comments`
   ADD CONSTRAINT `event_post_comments_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `event_posts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `event_post_comments_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `event_post_comments_ibfk_3` FOREIGN KEY (`parent_comment_id`) REFERENCES `event_post_comments` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Các ràng buộc cho bảng `volunpoint_logs`
+--
+ALTER TABLE `volunpoint_logs`
+  ADD CONSTRAINT `volunpoint_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `volunpoint_logs_ibfk_2` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
