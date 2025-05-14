@@ -1,137 +1,151 @@
-import React from "react";
-import { PhotoProvider, PhotoView } from 'react-photo-view';
-import 'react-photo-view/dist/react-photo-view.css';
+"use client"
 
-interface ImageGridProps {
-    images: string[];
+import type React from "react"
+import { useState } from "react"
+import { Image, Modal, Carousel } from "react-bootstrap"
+import "./Post.css"
+
+interface PostProps {
+  images: string[]
 }
 
-const ImageGrid: React.FC<ImageGridProps> = ({ images }) => {
-    if (!images || images.length === 0) return null;
+const Post: React.FC<PostProps> = ({ images }) => {
+  const [showModal, setShowModal] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(0)
 
-    const renderGrid = () => {
-        const count = images.length;
-        if (count === 1) {
-            return (
-                <div className="image-grid image-grid-1">
-                    <PhotoView src={images[0]}>
-                        <img src={images[0]} alt="post-img-1" style={{ width: "100%", maxHeight: 600, objectFit: "cover", borderRadius: 8 }} />
-                    </PhotoView>
-                </div>
-            );
-        }
-        if (count === 2) {
-            return (
-                <div className="image-grid image-grid-2" style={{ display: "flex", gap: 4 }}>
-                    {images.map((img, idx) => (
-                        <PhotoView key={idx} src={img}>
-                            <img src={img} alt={`post-img-${idx}`} style={{ width: "50%", height: 250, objectFit: "cover", borderRadius: 8 }} />
-                        </PhotoView>
-                    ))}
-                </div>
-            );
-        }
-        if (count === 3) {
-            return (
-                <div className="image-grid image-grid-3" style={{ display: "flex", gap: 4 }}>
-                    <div style={{ width: "66%", marginRight: 4 }}>
-                        <PhotoView src={images[0]}>
-                            <img src={images[0]} alt="post-img-0" style={{ width: "100%", height: 250, objectFit: "cover", borderRadius: 8 }} />
-                        </PhotoView>
-                    </div>
-                    <div style={{ width: "34%", display: "flex", flexDirection: "column", gap: 4 }}>
-                        <PhotoView src={images[1]}>
-                            <img src={images[1]} alt="post-img-1" style={{ width: "100%", height: 122, objectFit: "cover", borderRadius: 8 }} />
-                        </PhotoView>
-                        <PhotoView src={images[2]}>
-                            <img src={images[2]} alt="post-img-2" style={{ width: "100%", height: 122, objectFit: "cover", borderRadius: 8 }} />
-                        </PhotoView>
-                    </div>
-                </div>
-            );
-        }
-        if (count === 4) {
-            return (
-                <div className="image-grid image-grid-4" style={{ display: "flex", gap: 4 }}>
-                        <div style={{ width: "60%",  display: "flex", flexDirection: "column",justifyContent: "center", gap: 4 }}>
-                            <PhotoView src={images[0]}>
-                                <img src={images[0]} alt="post-img-0" style={{ width: "100%", height: 508, objectFit: "cover", borderRadius: 8 }} />
-                            </PhotoView>
-                            
-                        </div>
-                        <div style={{ width: "40%", display: "flex", flexDirection: "column", gap: 4 }}>
-                            <PhotoView src={images[1]}>
-                                <img src={images[1]} alt="post-img-1" style={{ width: "100%", height: 200, objectFit: "cover", borderRadius: 8 }} />
-                            </PhotoView>
-                            <PhotoView src={images[3]}>
-                                <img src={images[3]} alt="post-img-3" style={{ width: "100%", height: 200, objectFit: "cover", borderRadius: 8 }} />
-                            </PhotoView>
-                            <PhotoView src={images[2]}>
-                                <img src={images[2]} alt="post-img-2" style={{ width: "100%", height: 200, objectFit: "cover", borderRadius: 8 }} />
-                            </PhotoView>
-                        </div>
-                </div>
-            );
-        }
-        if (count >= 5) {
-            return (
-                <div className="image-grid image-grid-5" style={{ display: "flex", gap: 4 }}>
-                    {/* Bên trái: 2 ảnh dọc */}
-                    <div style={{ width: "65%", display: "flex", flexDirection: "column", gap: 4 }}>
-                        <PhotoView src={images[0]}>
-                            <img src={images[0]} alt="post-img-0" style={{ width: "100%", height: 304, objectFit: "cover", borderRadius: 8 }} />
-                        </PhotoView>
-                        <PhotoView src={images[1]}>
-                            <img src={images[1]} alt="post-img-1" style={{ width: "100%", height: 304, objectFit: "cover", borderRadius: 8 }} />
-                        </PhotoView>
-                    </div>
-                    {/* Bên phải: 3 ảnh ngang */}
-                    <div style={{ width: "35%", display: "flex", flexDirection: "column", justifyContent: "center",gap: 4 }}>
-                        {[2, 3, 4].map(idx => (
-                            <div key={idx} style={{  position: "relative" }}>
-                                <PhotoView src={images[idx]}>
-                                    <img
-                                        src={images[idx]}
-                                        alt={`post-img-${idx}`}
-                                        style={{
-                                            width: "100%",
-                                            height: 190,
-                                            objectFit: "cover",
-                                            borderRadius: 8,
-                                            filter: images.length > 5 && idx === 4 ? "brightness(0.7)" : undefined
-                                        }}
-                                    />
-                                </PhotoView>
-                                {images.length > 5 && idx === 4 && (
-                                    <div style={{
-                                        position: "absolute",
-                                        top: 0, left: 0, width: "100%", height: "100%",
-                                        background: "rgba(0,0,0,0.5)",
-                                        color: "#fff",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        fontSize: 32,
-                                        fontWeight: 700,
-                                        borderRadius: 8
-                                    }}>
-                                        +{images.length - 5}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            );
-        }
-        return null;
-    };
+  if (!images || images.length === 0) {
+    return null
+  }
 
+  const handleImageClick = (index: number) => {
+    setActiveIndex(index)
+    setShowModal(true)
+  }
+
+  const renderImageGrid = () => {
+    const imageCount = images.length
+
+    if (imageCount === 1) {
+      return (
+        <div className="single-image-container">
+          <Image
+            src={images[0] || "/placeholder.svg"}
+            alt="Post image"
+            fluid
+            className="post-image"
+            onClick={() => handleImageClick(0)}
+          />
+        </div>
+      )
+    }
+
+    if (imageCount === 2) {
+      return (
+        <div className="two-image-grid">
+          {images.map((img, index) => (
+            <div key={index} className="grid-item">
+              <Image
+                src={img || "/placeholder.svg"}
+                alt={`Post image ${index + 1}`}
+                fluid
+                className="post-image"
+                onClick={() => handleImageClick(index)}
+              />
+            </div>
+          ))}
+        </div>
+      )
+    }
+
+    if (imageCount === 3) {
+      return (
+        <div className="three-image-grid">
+          <div className="main-image">
+            <Image
+              src={images[0] || "/placeholder.svg"}
+              alt="Post image 1"
+              fluid
+              className="post-image"
+              onClick={() => handleImageClick(0)}
+            />
+          </div>
+          <div className="side-images">
+            <div className="grid-item">
+              <Image
+                src={images[1] || "/placeholder.svg"}
+                alt="Post image 2"
+                fluid
+                className="post-image"
+                onClick={() => handleImageClick(1)}
+              />
+            </div>
+            <div className="grid-item">
+              <Image
+                src={images[2] || "/placeholder.svg"}
+                alt="Post image 3"
+                fluid
+                className="post-image"
+                onClick={() => handleImageClick(2)}
+              />
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    // 4 or more images
     return (
-        <PhotoProvider>
-            {renderGrid()}
-        </PhotoProvider>
-    );
-};
+      <div className="four-image-grid">
+        {images.slice(0, 4).map((img, index) => (
+          <div key={index} className="grid-item">
+            <Image
+              src={img || "/placeholder.svg"}
+              alt={`Post image ${index + 1}`}
+              fluid
+              className="post-image"
+              onClick={() => handleImageClick(index)}
+            />
+            {index === 3 && imageCount > 4 && (
+              <div className="more-images-overlay" onClick={() => handleImageClick(3)}>
+                <span>+{imageCount - 4}</span>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    )
+  }
 
-export default ImageGrid;
+  return (
+    <>
+      <div className="post-images-container">{renderImageGrid()}</div>
+
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered size="lg" className="image-modal">
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {activeIndex + 1}/{images.length}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Carousel
+            activeIndex={activeIndex}
+            onSelect={(index) => setActiveIndex(index)}
+            interval={null}
+            indicators={images.length > 1}
+            controls={images.length > 1}
+          >
+            {images.map((img, index) => (
+              <Carousel.Item key={index}>
+                <div className="carousel-image-container">
+                  <img src={img || "/placeholder.svg"} alt={`Slide ${index + 1}`} className="carousel-image" />
+                </div>
+              </Carousel.Item>
+            ))}
+          </Carousel>
+        </Modal.Body>
+      </Modal>
+    </>
+  )
+}
+
+export default Post
