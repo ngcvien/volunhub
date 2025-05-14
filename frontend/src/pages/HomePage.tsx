@@ -11,6 +11,8 @@ import { EventType } from '../types/event.types';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from "react-router-dom";
 import { PlusCircleFill, Calendar2CheckFill } from "react-bootstrap-icons"
+import EventPost from '../components/Home/EventPost';
+import EventFeed from '../components/Home/EventFeed';
 
 import './HomePage.css';
 
@@ -106,14 +108,16 @@ const HomePage = () => {
         {events.map((event) => (
           <div key={event.id} className="event-card-wrapper mb-4 animate__animated animate__fadeIn">
             <EventCard event={event} onActionComplete={refreshEvents} />
-            {/* <EventCardOverlay
-              event={event}
-              // onParticipationChange={handleParticipationChange}
             
-            /> */}
+            
           </div>
         ))}
       </div>
+      // <EventFeed
+      //   events={events}
+      //   loading={loading}
+      //   error={error}
+      //   currentUser={user}/>
     )
   }
 

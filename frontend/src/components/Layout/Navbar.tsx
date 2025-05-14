@@ -39,8 +39,8 @@ const Navbar = () => {
   };
 
   return (
-    <BsNavbar 
-      expand="lg" 
+    <BsNavbar
+      expand="lg"
       fixed="top"
       className={`custom-navbar ${isScrolled ? 'scrolled' : ''}`}
     >
@@ -54,31 +54,31 @@ const Navbar = () => {
             className="d-inline-block align-top me-2"
             alt="VolunHub Logo"
           /> */}
-          <span className="brand-text">VolunHub</span>
+          <span className="brand-text ">VolunHub</span>
         </BsNavbar.Brand>
 
         <BsNavbar.Toggle aria-controls="basic-navbar-nav" />
-        
+
         <BsNavbar.Collapse id="basic-navbar-nav">
           {/* Main Navigation */}
           <Nav className="me-auto">
-            <Nav.Link 
-              as={Link} 
-              to="/" 
+            <Nav.Link
+              as={Link}
+              to="/"
               className={`nav-link-custom ${isActive('/') ? 'active' : ''}`}
             >
               Trang chủ
             </Nav.Link>
-            <Nav.Link 
-              as={Link} 
-              to="/events" 
+            <Nav.Link
+              as={Link}
+              to="/events"
               className={`nav-link-custom ${isActive('/events') ? 'active' : ''}`}
             >
               Sự kiện
             </Nav.Link>
-            <Nav.Link 
-              as={Link} 
-              to="/about" 
+            <Nav.Link
+              as={Link}
+              to="/about"
               className={`nav-link-custom ${isActive('/about') ? 'active' : ''}`}
             >
               Giới thiệu
@@ -90,19 +90,19 @@ const Navbar = () => {
             {user ? (
               <div className="d-flex right gap-2">
                 {/* Create Event Button */}
-                <Nav.Link 
-                  as={Link} 
+                <Nav.Link
+                  as={Link}
                   to="/events/new"
                   className="me-3"
                 >
                   <Button variant="primary" className="create-event-btn no-border home-button">
                     <PlusCircle className="me-1" />
                     Tạo sự kiện
-                </Button>
+                  </Button>
                 </Nav.Link>
                 {/* Dashboard Link */}
-                <Nav.Link 
-                  as={Link} 
+                <Nav.Link
+                  as={Link}
                   to="/dashboard/my-events"
                   className="nav-icon-link me-3"
                   title="Bảng điều khiển"
@@ -110,10 +110,12 @@ const Navbar = () => {
                   <Collection size={20} />
                 </Nav.Link>
                 {/* Notifications */}
-                <div className="nav-icon-link me-3 position-relative">
-                  <Bell size={20} />
-                  <span className="notification-badge">3</span>
-              </div>
+                <Nav.Link>
+                  <div className="nav-icon-link me-3 position-relative events">
+                    <Bell size={20} />
+                    <span className="notification-badge">3</span>
+                  </div>
+                </Nav.Link>
 
                 {/* Theme Toggle */}
                 {/* Xóa đoạn này
@@ -124,10 +126,10 @@ const Navbar = () => {
 
                 {/* User Menu */}
                 <Dropdown align="end">
-                  <Dropdown.Toggle 
-                    as="div" 
+                  <Dropdown.Toggle
+                    as="div"
                     className="user-dropdown-toggle"
-                    // onClick={() => setShowUserPopup(!showUserPopup)}
+                  // onClick={() => setShowUserPopup(!showUserPopup)}
                   >
                     <Image
                       src={user.avatarUrl || '/default-avatar.png'}
@@ -144,7 +146,7 @@ const Navbar = () => {
                       <div className="text-muted small">{user.email}</div>
                     </div>
                     <Dropdown.Divider />
-                    
+
                     <Dropdown.Item as={Link} to="/profile/me">
                       <Person className="me-2" /> Hồ sơ
                     </Dropdown.Item>
@@ -161,10 +163,10 @@ const Navbar = () => {
             ) : (
               // Login/Register buttons for non-authenticated users
               <div className="d-flex gap-2">
-                
-                <Button 
-                  variant="primary" 
-                  as={Link} 
+
+                <Button
+                  variant="primary"
+                  as={Link}
                   to="/auth"
                   className="auth-btn"
                 >

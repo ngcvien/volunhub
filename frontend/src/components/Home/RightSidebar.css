@@ -59,12 +59,17 @@
   margin-top: 1rem;
 }
 
-.stat-item {
+.right-sidebar .stat-item {
   padding: 0.5rem;
   border-radius: 8px;
   background: rgba(var(--bs-primary-rgb), 0.1);
   min-width: 70px;
   text-align: center;
+  padding: auto;
+}
+.right-sidebar .stat-label {
+  color: #0230c9;
+  font-weight: 500;
 }
 
 .stat-value {

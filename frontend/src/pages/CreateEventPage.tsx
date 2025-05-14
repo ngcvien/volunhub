@@ -503,7 +503,7 @@ const CreateEventPage = () => {
   const renderStepButtons = () => (
     <div className="form-navigation">
       {currentStep > FormStep.BasicInfo ? (
-        <Button variant="outline-secondary" onClick={prevStep} disabled={isSubmitting} className="nav-btn prev-btn">
+        <Button variant="outline-secondary" onClick={prevStep} disabled={isSubmitting} className="nav-btn prev-btn events-button">
           <ArrowLeft /> Quay lại
         </Button>
       ) : (
@@ -511,7 +511,7 @@ const CreateEventPage = () => {
       )}
 
       {currentStep < FormStep.Review ? (
-        <Button variant="primary" onClick={nextStep} disabled={isSubmitting} className="nav-btn next-btn">
+        <Button variant="primary" onClick={nextStep} disabled={isSubmitting} className="nav-btn next-btn no-border home-button">
           Tiếp theo <ArrowRight />
         </Button>
       ) : (
