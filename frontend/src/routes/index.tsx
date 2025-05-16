@@ -2,7 +2,7 @@
 
 import type { JSX } from "react"
 // import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { Route, Routes, Navigate } from "react-router-dom"
+import { Route, Routes, Navigate, useLocation } from "react-router-dom"
 import HomePage from "../pages/HomePage"
 import LoginPage from "../pages/LoginPage" // Tạo file này sau
 import RegisterPage from "../pages/RegisterPage" // File sẽ tạo ở bước 8
@@ -14,11 +14,10 @@ import ProfilePage from "../pages/ProfilePage"
 import UserProfilePage from "../pages/UserProfilePage"
 import EventDetailPage from '../pages/EventDetailPage';
 import AdminRoute from "../contexts/AdminRoute"
-import AdminUserManagementPage from "../pages/admin/AdminUserManagementPage"
+import AdminDashboardPage from "../pages/admin/AdminDashboardPage"
 import CreatorDashboardPage from "../pages/dashboard/CreatorDashboardPage"
 import AuthPage from "../pages/AuthPage"
 import AboutPage from "../pages/AboutPage"
-import AdminEventApprovalPage from "../pages/admin/AdminEventApprovalPage"
 import NotFoundPage from "../pages/NotFoundPage"
 import { Modal, Button } from "react-bootstrap"
 import { useState, useEffect } from "react"
@@ -83,10 +82,12 @@ const LockProtect = ({ children }: { children: JSX.Element }) => {
 };
 
 const AppRoutes = () => {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
   return (
-    // --- BỎ Thẻ <Router> Ở ĐÂY, dùng Fragment <>...</> hoặc <div>...</div> ---
     <>
-      <AppNavbar /> {/* Navbar vẫn ở đây */}
+      {!isAdminRoute && <AppNavbar />}
       <Container fluid className="mt-4 px-0">
         <Routes>
           {/* Public routes */}
@@ -133,27 +134,19 @@ const AppRoutes = () => {
             }
           />
           <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminDashboardPage />
+              </AdminRoute>
+            }
+          />
+          <Route
             path="/dashboard/my-events"
             element={
               <ProtectedRoute>
                 <CreatorDashboardPage />
               </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/users"
-            element={
-              <AdminRoute>
-                <AdminUserManagementPage />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path="/admin/events/approval"
-            element={
-              <AdminRoute>
-                <AdminEventApprovalPage />
-              </AdminRoute>
             }
           />
           <Route

@@ -611,14 +611,14 @@ const AboutPage = () => {
                             </div>
                         </div>
                         <div className="history-item">
-                            <div className="history-date">2022</div>
+                            <div className="history-date">2023</div>
                             <div className="history-content space-card">
                                 <h3>Đạt mốc 1000 sự kiện</h3>
                                 <p>Tổ chức thành công hơn 1000 sự kiện thiện nguyện trên toàn quốc.</p>
                             </div>
                         </div>
                         <div className="history-item">
-                            <div className="history-date">2023</div>
+                            <div className="history-date">2025</div>
                             <div className="history-content space-card">
                                 <h3>Hiện tại</h3>
                                 <p>

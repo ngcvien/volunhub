@@ -74,7 +74,7 @@ const AdminEventApprovalPage = () => {
 
     return (
         <Container fluid className="mt-3 p-5 ">
-            <h2 className='mt-4'>Duyệt Sự kiện Mới ({pendingEvents.length})</h2>
+            <h2 className='text-left mt-4'>Duyệt Sự kiện Mới ({pendingEvents.length})</h2>
             {actionError && <Alert variant="warning" onClose={() => setActionError(null)} dismissible>{actionError}</Alert>}
 
             {pendingEvents.length === 0 && !loading ? (

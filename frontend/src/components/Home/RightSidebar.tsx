@@ -66,15 +66,15 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ currentUser }) => {
                 </div>
               </div>
               <div className="stats-grid">
-                <div className="stat-item">
+                <div className="stat-item-right">
                   <div className="stat-value">12</div>
                   <div className="stat-label">Sự kiện</div>
                 </div>
-                <div className="stat-item">
+                <div className="stat-item-right">
                   <div className="stat-value">48</div>
                   <div className="stat-label">Giờ TNV</div>
                 </div>
-                <div className="stat-item">
+                <div className="stat-item-right">
                   <div className="stat-value">3</div>
                   <div className="stat-label">Huy hiệu</div>
                 </div>
