@@ -209,7 +209,7 @@ const AboutPage = () => {
 
         // Animation cho stats section
         gsap.fromTo(
-            statsRef.current?.querySelectorAll(".stat-item"),
+            statsRef.current?.querySelectorAll(".stat-item-about"),
             { opacity: 0, y: 30 },
             {
                 opacity: 1,
@@ -549,25 +549,25 @@ const AboutPage = () => {
                 <div className="container">
                     <h2 className="section-title">Thành tựu của chúng tôi</h2>
                     <div className="stats-container">
-                        <div className="stat-item space-stat">
+                        <div className="stat-item-about space-stat">
                             <div className="stat-number" data-count="5000">
                                 5,000+
                             </div>
                             <div className="stat-label">Tình nguyện viên</div>
                         </div>
-                        <div className="stat-item space-stat">
+                        <div className="stat-item-about space-stat">
                             <div className="stat-number" data-count="350">
                                 350+
                             </div>
                             <div className="stat-label">Sự kiện đã tổ chức</div>
                         </div>
-                        <div className="stat-item space-stat">
+                        <div className="stat-item-about space-stat">
                             <div className="stat-number" data-count="120">
                                 120+
                             </div>
                             <div className="stat-label">Tổ chức đối tác</div>
                         </div>
-                        <div className="stat-item space-stat">
+                        <div className="stat-item-about space-stat">
                             <div className="stat-number" data-count="50">
                                 50+
                             </div>

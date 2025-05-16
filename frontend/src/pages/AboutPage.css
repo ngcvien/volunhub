@@ -579,7 +579,7 @@
   z-index: 1;
 }
 
-.stat-item {
+.stat-item-about {
   background: rgba(20, 20, 60, 0.7);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -591,7 +591,7 @@
   border: 1px solid rgba(100, 120, 255, 0.2);
 }
 
-.stat-item:hover {
+.stat-item-about:hover {
   transform: translateY(-10px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(100, 120, 255, 0.5);
   border-color: rgba(100, 120, 255, 0.5);
