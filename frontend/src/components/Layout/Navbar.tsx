@@ -3,8 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Navbar as BsNavbar, Nav, Container, Button, Image, Dropdown } from 'react-bootstrap';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Bell, Person, BoxArrowRight, Gear, PlusCircle, Collection } from 'react-bootstrap-icons';
+import { Bell, Person, BoxArrowRight, Gear, PlusCircle, Collection, Shield } from 'react-bootstrap-icons';
 import UserPopup from '../User/UserPopup';
+import { UserRole } from '../../types/user.types';
 import "./Navbar.css";
 
 const Navbar = () => {
@@ -145,6 +146,11 @@ const Navbar = () => {
                     <Dropdown.Item as={Link} to="/profile/me">
                       <Person className="me-2" /> Hồ sơ
                     </Dropdown.Item>
+                    {user.role === UserRole.ADMIN && (
+                      <Dropdown.Item as={Link} to="/admin">
+                        <Shield className="me-2" /> Trang quản trị
+                      </Dropdown.Item>
+                    )}
                     <Dropdown.Item as={Link} to="/settings">
                       <Gear className="me-2" /> Cài đặt
                     </Dropdown.Item>

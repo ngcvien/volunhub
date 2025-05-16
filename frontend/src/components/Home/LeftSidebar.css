@@ -25,17 +25,19 @@
 
 .sidebar-card {
   background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(7px);
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   overflow: hidden;
   transition: all 0.3s ease;
   margin-bottom: 1.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  
 }
 
 html[data-bs-theme="dark"] .sidebar-card {
-  background: rgba(20, 20, 40, 0.5);
+  background: rgba(20, 20, 40, 0.411) !important;
   border: 1px solid rgba(138, 43, 226, 0.2);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
@@ -63,7 +65,7 @@ html[data-bs-theme="light"] .sidebar-card {
 .sidebar-link {
   display: flex;
   align-items: center;
-  padding: 0.75rem 0.5rem;
+  padding: 0.6rem 3.5rem !important;
   border-radius: 8px;
   margin-bottom: 0.5rem;
   transition: all 0.3s ease;
@@ -73,14 +75,14 @@ html[data-bs-theme="light"] .sidebar-card {
 .sidebar-link:hover,
 .sidebar-link.active {
   background: rgba(138, 43, 226, 0.1);
-  color: #8a2be2;
+  color: #166ed3;
   transform: translateX(5px);
 }
 
 .sidebar-icon {
   margin-right: 0.75rem;
   font-size: 1.1rem;
-  color: #8a2be2;
+  color: #166ed3;
 }
 
 .sidebar-text {
@@ -96,7 +98,7 @@ html[data-bs-theme="light"] .sidebar-card {
   z-index: 1030;
   border-radius: 30px;
   padding: 0.5rem 1rem;
-  background: linear-gradient(90deg, #00bfff, #8a2be2);
+  background: linear-gradient(90deg, #00bfff, #166ed3);
   border: none;
   box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
   transition: all 0.3s ease;
@@ -114,7 +116,7 @@ html[data-bs-theme="light"] .sidebar-card {
 }
 
 .mobile-sidebar .offcanvas-header {
-  background: linear-gradient(90deg, #00bfff, #8a2be2);
+  background: linear-gradient(90deg, #00bfff, #166ed3);
   color: white;
 }
 

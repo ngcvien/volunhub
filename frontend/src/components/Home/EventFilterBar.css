@@ -11,6 +11,7 @@
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
+  margin-top: 1rem;
 }
 
 html[data-bs-theme="dark"] .event-filter-bar {
@@ -51,7 +52,7 @@ html[data-bs-theme="light"] .event-filter-bar {
 .event-filter-bar .input-group-text {
   background: transparent;
   border: none;
-  color: #8a2be2;
+  color: #166ed3;
 }
 
 .event-filter-bar .form-control {
@@ -75,7 +76,7 @@ html[data-bs-theme="light"] .event-filter-bar {
 }
 
 .sort-select:focus {
-  border-color: #8a2be2;
+  border-color: #166ed3;
   box-shadow: 0 4px 15px rgba(138, 43, 226, 0.2);
 }
 
@@ -103,7 +104,7 @@ html[data-bs-theme="light"] .event-filter-bar {
 }
 
 .event-filter-bar .btn-group .btn.active {
-  background: linear-gradient(90deg, #00bfff, #8a2be2);
+  background: linear-gradient(90deg, #00bfff, #166ed3);
   border-color: transparent;
   color: white;
 }

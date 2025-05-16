@@ -8,7 +8,7 @@ import {
   ArrowRight,
   InfoCircle
 } from 'react-bootstrap-icons';
-import { User } from '../../types/user.types';
+import { User, UserRole } from '../../types/user.types';
 import './RightSidebar.css';
 import { getLeaderboardApi } from '../../api/user.api';
 
@@ -60,9 +60,13 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ currentUser }) => {
                   roundedCircle
                   className="user-avatar"
                 />
-                <div className="user-info">
+                <div className="user-info gap-2">
                   <h6>@{currentUser.username}</h6>
-                  <span className="text-muted">Tình nguyện viên</span>
+                  <span className="text-muted ">
+                    {currentUser.role === UserRole.ADMIN ? 'Quản trị viên' :
+                     currentUser.role === UserRole.VERIFIED_ORG ? 'Tổ chức đã xác minh' : 
+                     'Tình nguyện viên'}
+                  </span>
                 </div>
               </div>
               <div className="stats-grid">

@@ -54,7 +54,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
               >
                 <category.icon className="sidebar-icon" />
                 <span className="sidebar-text ">{category.name}</span>
-                <Badge bg="light" text="dark" className="ms-auto" >
+                <Badge bg='none' text="dark" className="ms-auto" >
                   {category.count}
                 </Badge>
               </Nav.Link>
@@ -71,12 +71,12 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
               <Nav.Link className="sidebar-link">
                 <Calendar2Event className="sidebar-icon" />
                 <span className="sidebar-text">Sự kiện đã tham gia</span>
-                <Badge bg="primary" className="ms-auto">8</Badge>
+                <Badge bg="none" text="dark" className="ms-auto">8</Badge>
               </Nav.Link>
               <Nav.Link className="sidebar-link">
                 <StarFill className="sidebar-icon" />
                 <span className="sidebar-text">Đã hoàn thành</span>
-                <Badge bg="success" className="ms-auto">5</Badge>
+                <Badge bg="none" text="dark" className="ms-auto">5</Badge>
               </Nav.Link>
             </Nav>
           </Card.Body>

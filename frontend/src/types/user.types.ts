@@ -19,6 +19,7 @@ export interface User {
     bio?: string | null;
     fullName?: string | null; 
     location?: string | null;
+    volunpoints?: number;
 }
 
 export interface RegisterUserInput {

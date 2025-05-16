@@ -40,7 +40,7 @@
   width: 50px;
   height: 50px;
   border: 2px solid transparent;
-  background: linear-gradient(white, white) padding-box, linear-gradient(90deg, #00bfff, #8a2be2) border-box;
+  background: linear-gradient(white, white) padding-box, linear-gradient(90deg, #00bfff, #166ed3) border-box;
   object-fit: cover;
 }
 
@@ -74,7 +74,7 @@
 .stat-value {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #8a2be2;
+  color: #166ed3;
 }
 
 .stat-label {
@@ -111,7 +111,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(90deg, #00bfff, #8a2be2);
+  background: linear-gradient(90deg, #00bfff, #166ed3);
   color: white;
   border-radius: 50%;
   font-weight: 700;
@@ -124,7 +124,7 @@
   height: 36px;
   margin-right: 0.75rem;
   border: 2px solid transparent;
-  background: linear-gradient(white, white) padding-box, linear-gradient(90deg, #00bfff, #8a2be2) border-box;
+  background: linear-gradient(white, white) padding-box, linear-gradient(90deg, #00bfff, #166ed3) border-box;
   object-fit: cover;
 }
 
@@ -139,7 +139,7 @@
 
 .volunteer-points {
   font-size: 0.8rem;
-  color: #8a2be2;
+  color: #166ed3;
 }
 
 /* Upcoming events */
@@ -198,7 +198,7 @@ html[data-bs-theme="light"] .upcoming-event {
 }
 
 .event-arrow {
-  color: #8a2be2;
+  color: #166ed3;
   transition: transform 0.3s ease;
 }
 
@@ -214,7 +214,7 @@ html[data-bs-theme="light"] .upcoming-event {
   z-index: 1030;
   border-radius: 30px;
   padding: 0.5rem 1rem;
-  background: linear-gradient(90deg, #00bfff, #8a2be2);
+  background: linear-gradient(90deg, #00bfff, #166ed3);
   border: none;
   box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
   transition: all 0.3s ease;
@@ -232,7 +232,7 @@ html[data-bs-theme="light"] .upcoming-event {
 }
 
 .mobile-info-sidebar .offcanvas-header {
-  background: linear-gradient(90deg, #00bfff, #8a2be2);
+  background: linear-gradient(90deg, #00bfff, #166ed3);
   color: white;
 }
 

@@ -225,56 +225,59 @@ const CreateEventPage = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = async () => {
     if (isUploadingImages && Object.values(uploadProgressMap).some(p => p < 100 && p > 0)) {
       setSubmitError("Vui lòng chờ tất cả ảnh đang tải lên hoàn tất.");
       return;
     }
+
     // Filter out images that had upload errors before submitting
     const successfullyUploadedUrls = selectedImageFiles
-        .map((file, index) => !uploadErrors[file.name] ? uploadedImageUrls.find(url => imagePreviews[index] === url || url.includes(file.name)) : null) // This find logic is still a bit weak
-        .filter(url => url) as string[];
+      .map((file, index) => !uploadErrors[file.name] ? uploadedImageUrls.find(url => imagePreviews[index] === url || url.includes(file.name)) : null)
+      .filter(url => url) as string[];
 
+    setSubmitError(null);
+    setSuccess(null);
 
-    setSubmitError(null)
-    setSuccess(null)
-
-    const titleError = validateField("title", title)
-    const eventTimeError = validateField("eventTime", eventTime)
+    const titleError = validateField("title", title);
+    const eventTimeError = validateField("eventTime", eventTime);
     if (titleError || eventTimeError) {
-      setValidationErrors({ title: titleError, eventTime: eventTimeError })
-      setCurrentStep(FormStep.BasicInfo)
-      return
+      setValidationErrors({ title: titleError, eventTime: eventTimeError });
+      setCurrentStep(FormStep.BasicInfo);
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       await createEventApi({
         title,
         description: description || null,
         location: location || null,
-        eventTime: new Date(eventTime),
-        imageUrls: uploadedImageUrls.filter(url => url), // Use the state that tracks successfully uploaded URLs
-      })
-      setSuccess(`Sự kiện "${title}" đã được tạo thành công!`)
+        eventTime: new Date(eventTime).toISOString(),
+        imageUrls: uploadedImageUrls.filter(url => url),
+      });
+      setSuccess(`Sự kiện "${title}" đã được tạo thành công và đang chờ duyệt!`);
       setTitle(""); setDescription(""); setLocation(""); setEventTime("");
       setSelectedImageFiles([]); setImagePreviews([]); setUploadedImageUrls([]);
       setUploadErrors({}); setUploadProgressMap({}); setTouched({}); setValidationErrors({});
-      setCurrentStep(FormStep.BasicInfo)
-      // setTimeout(() => { navigate("/") }, 3000) // Keep user on page to see success
+      setCurrentStep(FormStep.BasicInfo);
     } catch (err: any) {
-      setSubmitError(err.message || "Tạo sự kiện thất bại.")
+      setSubmitError(err.message || "Tạo sự kiện thất bại.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
   const nextStep = () => {
     if (validateStep()) {
-      setCurrentStep((prev) => Math.min(prev + 1, FormStep.Review) as FormStep)
+      // Nếu đang ở bước chọn ảnh và có ảnh đã upload thành công
+      if (currentStep === FormStep.Media && uploadedImageUrls.length > 0) {
+        setCurrentStep(FormStep.Review);
+      } else {
+        setCurrentStep((prev) => Math.min(prev + 1, FormStep.Review) as FormStep);
+      }
     } else {
-      if (currentStep === FormStep.BasicInfo) setTouched({ title: true, eventTime: true })
+      if (currentStep === FormStep.BasicInfo) setTouched({ title: true, eventTime: true });
     }
   }
 
@@ -446,7 +449,7 @@ const CreateEventPage = () => {
       <h3 className="form-section-title">
         <Calendar2Check className="me-2" /> Xem lại thông tin sự kiện
       </h3>
-      <div className="review-info-grid mb-4"> {/* Using a div for custom styling if needed */}
+      <div className="review-info-grid mb-4">
         <Row className="mb-2">
           <Col sm={3} className="text-muted fw-medium">Tiêu đề:</Col>
           <Col sm={9}>{title}</Col>
@@ -478,7 +481,7 @@ const CreateEventPage = () => {
           </Row>
         )}
       </div>
-      <Alert variant="info" className="d-flex">
+      <Alert variant="info" className="d-flex mb-4">
         <InfoCircle size={24} className="me-3 flex-shrink-0 mt-1" />
         <div>
           <h6 className="alert-heading">Lưu ý quan trọng</h6>
@@ -487,6 +490,21 @@ const CreateEventPage = () => {
           </p>
         </div>
       </Alert>
+      <div className="text-center">
+        <Button 
+          variant="success" 
+          size="lg"
+          onClick={handleSubmit}
+          disabled={isUploadingImages || isSubmitting} 
+          className="create-event-btn"
+        >
+          {isSubmitting ? (
+            <><Spinner animation="border" size="sm" className="me-2" /> Đang tạo...</>
+          ) : (
+            <><CheckCircle className="me-2" /> Tạo sự kiện</>
+          )}
+        </Button>
+      </div>
     </div>
   )
 
@@ -510,17 +528,9 @@ const CreateEventPage = () => {
         <div /> /* Placeholder to keep "Next" button to the right */
       )}
 
-      {currentStep < FormStep.Review ? (
+      {currentStep < FormStep.Review && (
         <Button variant="primary" onClick={nextStep} disabled={isSubmitting} className="nav-btn next-btn">
           Tiếp theo <ArrowRight />
-        </Button>
-      ) : (
-        <Button variant="success" type="submit" disabled={isUploadingImages || isSubmitting} className="nav-btn submit-btn-cep">
-          {isSubmitting ? (
-            <><Spinner animation="border" size="sm" className="me-2" /> Đang tạo...</>
-          ) : (
-            <><CheckCircle /> Tạo sự kiện</>
-          )}
         </Button>
       )}
     </div>

@@ -59,10 +59,15 @@ class EventService {
             const { imageUrls, ...coreEventData } = eventData; // Tách mảng imageUrls ra
 
             let initialStatus = EventStatus.PENDING_APPROVAL;
+            console.log('Creator role:', creator.role);
+            console.log('Creator isVerified:', creator.isVerified);
+            
             // Nếu người tạo là Admin hoặc Tổ chức đã xác minh, sự kiện được duyệt tự động
             if (creator.role === UserRole.ADMIN || (creator.role === UserRole.VERIFIED_ORG && creator.isVerified)) {
                 initialStatus = EventStatus.UPCOMING;
+                console.log('Auto-approving event due to creator role/verification');
             }
+            console.log('Initial event status:', initialStatus);
 
             const newEvent = await Event.create(
                 {
@@ -71,6 +76,7 @@ class EventService {
                 },
                 { transaction }
             );
+            console.log('Created event with status:', newEvent.status);
 
             // Tạo sự kiện chính
             // const newEvent = await Event.create(coreEventData, { transaction });
