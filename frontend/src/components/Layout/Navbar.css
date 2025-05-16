@@ -126,6 +126,7 @@
 }
 
 .dropdown-menu-custom {
+  position: absolute !important;
   background: rgba(255, 255, 255, 0.9) !important;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -133,7 +134,10 @@
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   padding: 0.5rem 0;
   min-width: 220px;
-  /* z-index: 1000; */
+  z-index: 1050;
+  margin-top: 0.5rem;
+  right: 0;
+  left: auto;
 }
 
 [data-bs-theme="dark"] .dropdown-menu-custom {
@@ -196,9 +200,9 @@
   }
 
   .dropdown-menu-custom {
-    position: static !important;
+    position: absolute !important;
     transform: none !important;
-    width: 100%;
+    /* width: 100%; */
   }
 }
 
