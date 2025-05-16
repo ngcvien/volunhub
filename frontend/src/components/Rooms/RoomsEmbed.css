@@ -1,0 +1,70 @@
+.rooms-embed-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+/* Dark mode styles */
+[data-bs-theme="dark"] .rooms-embed-container {
+  background-color: #1a1a1a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Light mode styles */
+[data-bs-theme="light"] .rooms-embed-container {
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.rooms-embed-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 1;
+}
+
+[data-bs-theme="dark"] .rooms-embed-loading {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.rooms-embed-container iframe {
+  border: none;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.3s ease;
+}
+
+.rooms-tab-button {
+  border-radius: 20px;
+  padding: 0.25rem 0.75rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.rooms-tab-button:hover {
+  transform: translateY(-2px);
+}
+
+.rooms-powered-by {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.rooms-powered-by a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.rooms-powered-by a:hover {
+  text-decoration: underline;
+}

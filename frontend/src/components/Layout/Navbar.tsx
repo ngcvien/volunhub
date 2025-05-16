@@ -117,12 +117,7 @@ const Navbar = () => {
                   </div>
                 </Nav.Link>
 
-                {/* Theme Toggle */}
-                {/* Xóa đoạn này
-                <div className="me-3">
-                  <ThemeToggle />
-                </div>
-                */}
+              
 
                 {/* User Menu */}
                 <Dropdown align="end">
