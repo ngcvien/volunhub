@@ -296,7 +296,7 @@ const CreatorDashboardPage = () => {
                   <td>{formatEventDateTime(event.eventTime)}</td>
                   <td>{event.location}</td>
                   <td className="text-center">
-                    <Badge bg="light" text="dark">
+                    <Badge bg="none" text="dark">
                       {event.participantCount || 0}
                     </Badge>
                   </td>
