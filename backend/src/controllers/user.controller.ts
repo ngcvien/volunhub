@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import userService from '../services/user.service';
 import User from '../models/User.model';
 import eventService from '../services/event.service';
+import { Op, Sequelize } from 'sequelize';
+import httpStatus from 'http-status';
+import { MESSAGES } from '../constants/messages';
 
 class UserController {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -160,7 +163,7 @@ class UserController {
         return res.status(400).json({ message: 'User ID không hợp lệ.' });
       }
 
-      // Có thể thêm kiểm tra không cho Admin tự sửa trạng thái của chính mình qua API này nếu muốn
+      // Có thể thêm kiểm tra không cho phép Admin tự sửa trạng thái của chính mình qua API này nếu muốn
       // if (req.user?.userId === targetUserId) {
       //    return res.status(403).json({ message: 'Không thể tự thay đổi trạng thái của chính mình qua API này.' });
       // }
@@ -207,6 +210,53 @@ class UserController {
             next(error);
         }
     }
+
+    /**
+ * Tìm kiếm người dùng theo từ khóa
+ */
+export const searchUsers = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { q } = req.query;
+        const keyword = q as string;
+
+        if (!keyword) {
+            res.status(400).json({
+                message: MESSAGES.INVALID_SEARCH_KEYWORD
+            });
+            return;
+        }
+
+        // Tìm kiếm theo username hoặc fullName, không phân biệt hoa thường
+        const users = await User.findAll({
+            where: {
+                [Op.or]: [
+                    Sequelize.where(
+                        Sequelize.fn('LOWER', Sequelize.col('username')),
+                        'LIKE',
+                        `%${keyword.toLowerCase()}%`
+                    ),
+                    Sequelize.where(
+                        Sequelize.fn('LOWER', Sequelize.col('full_name')),
+                        'LIKE',
+                        `%${keyword.toLowerCase()}%`
+                    )
+                ]
+            },
+            attributes: ['id', 'username', 'fullName', 'avatarUrl'],
+            limit: 10
+        });
+
+        res.json({
+            message: MESSAGES.GET_USERS_SUCCESS,
+            users: users
+        });
+    } catch (error: any) {
+        console.error('Lỗi tìm kiếm người dùng:', error);
+        res.status(500).json({
+            message: error.message || 'Lỗi server khi tìm kiếm người dùng'
+        });
+    }
+};
 }
 
 export default new UserController();

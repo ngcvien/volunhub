@@ -31,11 +31,14 @@ router.put(
     userController.updateProfile 
 );
 
+// Route tìm kiếm phải đặt trước các route có params
 router.get(
-  '/:userId', 
-  userController.getUserProfile 
+    '/search',
+    authenticateToken,
+    userController.searchUsers
 );
 
+// Route username phải đặt trước route userId
 router.get(
   '/username/:username', 
   userController.getUserProfileByUsername 
@@ -48,7 +51,14 @@ router.get(
 );
 
 router.get(
-    '/leaderboard/volunteers', // Đặt tên route cho rõ ràng
+    '/leaderboard/volunteers',
     userController.getLeaderboard
 );
+
+// Route với param id phải đặt cuối cùng
+router.get(
+  '/:userId', 
+  userController.getUserProfile 
+);
+
 export default router;

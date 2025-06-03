@@ -1,6 +1,20 @@
 import api from "./index"
-import { User } from "../types/user.types"
+import { User, BasicUserForChat } from '../types/user.types'; 
 
+// Kiểu dữ liệu cho response API tìm kiếm người dùng
+interface SearchUsersResponse {
+    message: string;
+    users: BasicUserForChat[]; // API trả về danh sách user rút gọn
+}
+export const searchUsersApi = async (query: string): Promise<SearchUsersResponse> => {
+    try {
+        const response = await api.get<SearchUsersResponse>(`/users/search?q=${query}`);
+        return response.data;
+    } catch (error: any) {
+        console.error(`Lỗi API Search Users (query: ${query}):`, error.response?.data || error.message);
+        throw new Error(error.response?.data?.message || 'Không thể tìm kiếm người dùng.');
+    }
+};
 
 // Kiểu dữ liệu cho response từ API lấy thông tin người dùng
 interface GetUserProfileResponse {

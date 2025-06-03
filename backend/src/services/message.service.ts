@@ -5,6 +5,7 @@ import Conversation from '../models/Conversation.model';
 import ConversationParticipant from '../models/ConversationParticipant.model';
 import { sequelize } from '../config/database.config';
 import { Transaction } from 'sequelize';
+import { io } from '../index';
 
 type CreateMessageInput = Pick<MessageAttributes, 'content' | 'messageType' | 'mediaUrl'>;
 
@@ -36,7 +37,7 @@ class MessageService {
                 transaction
             });
             if (!participant) {
-                 throw Object.assign(new Error('Bạn không phải là thành viên của cuộc trò chuyện này.'), { statusCode: 403 });
+                throw Object.assign(new Error('Bạn không phải là thành viên của cuộc trò chuyện này.'), { statusCode: 403 });
             }
 
             // 3. Tạo tin nhắn
@@ -48,10 +49,10 @@ class MessageService {
                 mediaUrl: data.mediaUrl || null
             };
             if (newMessageData.messageType !== MessageType.TEXT && !newMessageData.mediaUrl) {
-                throw Object.assign(new Error('Tin nhắn media phải có mediaUrl.'), {statusCode: 400});
+                throw Object.assign(new Error('Tin nhắn media phải có mediaUrl.'), { statusCode: 400 });
             }
             if (newMessageData.messageType === MessageType.TEXT && !newMessageData.content?.trim() && !newMessageData.mediaUrl) {
-                throw Object.assign(new Error('Nội dung tin nhắn không được rỗng.'), {statusCode: 400});
+                throw Object.assign(new Error('Nội dung tin nhắn không được rỗng.'), { statusCode: 400 });
             }
 
 
@@ -65,16 +66,27 @@ class MessageService {
             await transaction.commit();
 
             // Lấy lại tin nhắn kèm thông tin sender để trả về
-            return await Message.findByPk(newMessage.id, {
-                include: [{ model: User, as: 'sender', attributes: ['id', 'username', 'avatarUrl'] }]
-            }) as Message;
+            const messageWithSender = await Message.findByPk(newMessage.id, {
+                include: [{ model: User, as: 'sender', attributes: ['id', 'username', 'avatarUrl', 'fullName'] }]
+            });
+
+            if (messageWithSender) {
+                // --- PHÁT TIN NHẮN QUA SOCKET.IO ---
+                const roomName = `conversation_${conversationId}`;
+                io.to(roomName).emit('new_message', messageWithSender.get({ plain: true })); 
+                console.log(`SOCKET: Emitted 'new_message' to room ${roomName}`);
+                // --- KẾT THÚC PHÁT TIN NHẮN ---
+                return messageWithSender;
+            }
+            // Trường hợp hiếm: không tìm thấy message vừa tạo
+            throw new Error('Không thể lấy lại tin nhắn vừa tạo.');
 
         } catch (error: any) {
             await transaction.rollback();
             console.error("Lỗi khi tạo tin nhắn:", error);
             if (error.name === 'SequelizeValidationError') {
-                 throw Object.assign(new Error(`Validation Error: ${error.message}`), { statusCode: 400 });
-             }
+                throw Object.assign(new Error(`Validation Error: ${error.message}`), { statusCode: 400 });
+            }
             if (error.statusCode) throw error; // Giữ lại statusCode nếu đã gán
             throw new Error('Không thể gửi tin nhắn vào lúc này.');
         }

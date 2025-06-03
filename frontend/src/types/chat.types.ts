@@ -59,3 +59,11 @@ export interface CreateMessageResponse {
     message: string;
     messageSent: MessageType; // Tin nhắn vừa gửi
 }
+
+// Kiểu dữ liệu cho kết quả tìm kiếm người dùng (công khai)
+export interface SearchUserResult {
+    id: number;
+    username: string;
+    fullName?: string | null;
+    avatarUrl?: string | null;
+}
