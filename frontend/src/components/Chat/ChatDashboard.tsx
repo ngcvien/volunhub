@@ -318,14 +318,44 @@ const ChatDashboard: React.FC<ChatDashboardProps> = ({ show, onHide }) => {
                 <Offcanvas.Title>
                     {activeConversation ? (
                         <div className="d-flex align-items-center">
-                            <Button variant="link" size="sm" onClick={() => setActiveConversation(null)} className="me-2 p-0">
+                            <Button 
+                                variant="link" 
+                                size="sm" 
+                                onClick={() => setActiveConversation(null)} 
+                                className="me-2 p-0"
+                            >
                                 <ArrowLeft />
                             </Button>
-                            <RBImage
-                                src={activeConversation.otherParticipant?.avatarUrl || defaultAvatar}
-                                roundedCircle width={32} height={32} className="me-2" style={{objectFit: 'cover'}}
-                            />
-                            {activeConversation.otherParticipant?.fullName || activeConversation.otherParticipant?.username || 'Người dùng'}
+                            {activeConversation.otherParticipant ? (
+                                <>
+                                    <RBImage
+                                        src={activeConversation.otherParticipant.avatarUrl || defaultAvatar}
+                                        alt={activeConversation.otherParticipant.username}
+                                        roundedCircle 
+                                        width={32} 
+                                        height={32} 
+                                        className="me-2" 
+                                        style={{objectFit: 'cover'}}
+                                    />
+                                    <span>
+                                        {activeConversation.otherParticipant.fullName || 
+                                         activeConversation.otherParticipant.username}
+                                    </span>
+                                </>
+                            ) : (
+                                <>
+                                    <RBImage
+                                        src={defaultAvatar}
+                                        alt="Unknown user"
+                                        roundedCircle 
+                                        width={32} 
+                                        height={32} 
+                                        className="me-2" 
+                                        style={{objectFit: 'cover'}}
+                                    />
+                                    <span>Loading...</span>
+                                </>
+                            )}
                         </div>
                     ) : (
                         "Tin nhắn"

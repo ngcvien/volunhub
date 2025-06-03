@@ -22,22 +22,28 @@ const formatLastActivity = (isoString: string): string => {
 const ConversationListItem: React.FC<ConversationListItemProps> = ({ conversation, isActive, onClick }) => {
     const { user: currentUser } = useAuth();
 
-    // Xác định thông tin người tham gia còn lại (trong chat private)
-    let displayName = "Cuộc trò chuyện nhóm"; // Mặc định cho chat nhóm (sẽ làm sau)
-    let displayAvatar = defaultAvatar; // Ảnh mặc định cho nhóm
-
-    if (conversation.type === 'private' && conversation.participants) {
-        const otherParticipant = conversation.participants.find(p => p.id !== currentUser?.id);
-        if (otherParticipant) {
-            displayName = otherParticipant.fullName || otherParticipant.username;
-            displayAvatar = otherParticipant.avatarUrl || defaultAvatar;
-        } else {
-            // Trường hợp lạ: chat private nhưng không tìm thấy người còn lại (có thể là chat với chính mình?)
-            displayName = currentUser?.username || "Không rõ";
-            displayAvatar = currentUser?.avatarUrl || defaultAvatar;
+    // Xử lý hiển thị thông tin người dùng cho chat private
+    const getDisplayInfo = () => {
+        if (conversation.type === 'private' && conversation.participants) {
+            // Tìm người tham gia khác (không phải current user)
+            const otherParticipant = conversation.participants.find(p => p.id !== currentUser?.id);
+            
+            if (otherParticipant) {
+                return {
+                    name: otherParticipant.fullName || otherParticipant.username,
+                    avatar: otherParticipant.avatarUrl || defaultAvatar
+                };
+            }
         }
-    }
-    // TODO: Xử lý hiển thị tên/ảnh cho group chat sau
+        
+        // Fallback cho trường hợp group chat hoặc không tìm thấy thông tin
+        return {
+            name: "Loading...",
+            avatar: defaultAvatar
+        };
+    };
+
+    const { name: displayName, avatar: displayAvatar } = getDisplayInfo();
 
     // TODO: Hiển thị tin nhắn cuối cùng (nếu có) và unread count
     const lastMessageSnippet = conversation.lastMessage ?
@@ -45,11 +51,10 @@ const ConversationListItem: React.FC<ConversationListItemProps> = ({ conversatio
             conversation.lastMessage.content.substring(0, 30) + (conversation.lastMessage.content.length > 30 ? '...' : '')
             : `[${conversation.lastMessage.messageType}]`)
         : 'Chưa có tin nhắn nào';
-    // const unreadCount = conversation.unreadCount || 0;
 
     return (
         <ListGroup.Item
-            action // Làm cho item có thể click được
+            action
             active={isActive}
             onClick={onClick}
             className="conversation-list-item d-flex justify-content-between align-items-start py-3 px-2"
@@ -66,20 +71,15 @@ const ConversationListItem: React.FC<ConversationListItemProps> = ({ conversatio
                 />
                 <div className="ms-2 me-auto">
                     <div className="fw-bold">{displayName}</div>
-                    {/* <small className="text-muted text-truncate" style={{maxWidth: '150px'}}>
+                    <small className="text-muted text-truncate" style={{maxWidth: '150px', display: 'block'}}>
                         {lastMessageSnippet}
-                    </small> */}
+                    </small>
                 </div>
             </div>
             <div className="text-end">
                 <small className="text-muted" style={{ fontSize: '0.75em' }}>
                     {formatLastActivity(conversation.updatedAt)}
                 </small>
-                {/* {unreadCount > 0 && (
-                    <Badge bg="danger" pill className="ms-2">
-                        {unreadCount}
-                    </Badge>
-                )} */}
             </div>
         </ListGroup.Item>
     );

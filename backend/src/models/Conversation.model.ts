@@ -16,9 +16,10 @@ export interface ConversationAttributes {
     updatedAt?: Date;
 
     // Thuộc tính ảo từ associations
-    // participants?: User[];
-    // messages?: Message[];
-    // lastMessage?: Message; // Có thể thêm sau để tối ưu
+    participants?: User[];
+    messages?: Message[];
+    lastMessage?: MessageAttributes;
+    otherParticipant?: BasicUserForChat;
 }
 export interface BasicUserForChat extends Pick<UserAttributes, 'id' | 'username' | 'avatarUrl' | 'fullName'> {}
 

@@ -85,50 +85,61 @@ class ConversationService {
             const conversations = await Conversation.findAll({
                 include: [
                     {
-                        model: ConversationParticipant, // Include bảng nối
-                        as: 'conversationParticipants', // Cần định nghĩa alias này trong associations
-                        where: { userId: userId },    // Lọc theo userId
-                        attributes: []                // Không cần lấy trường nào từ bảng nối ở đây
+                        model: ConversationParticipant,
+                        as: 'conversationParticipants',
+                        where: { userId: userId },
+                        attributes: []
                     },
                     {
-                        model: User,                  // Lấy thông tin của TẤT CẢ participants
+                        model: User,
                         as: 'participants',
-                        attributes: ['id', 'username', 'avatarUrl', 'fullName'], // Các trường công khai
+                        attributes: ['id', 'username', 'avatarUrl', 'fullName'],
                         through: { attributes: [] }
                     },
-                    // TODO: Thêm logic để lấy tin nhắn cuối cùng (lastMessage)
-                    // và sắp xếp cuộc trò chuyện theo thời gian tin nhắn cuối cùng
-                    // Điều này thường phức tạp và có thể cần subquery hoặc query riêng
-                    // Ví dụ:
-                    // {
-                    //     model: Message,
-                    //     as: 'messages',
-                    //     limit: 1,
-                    //     order: [['createdAt', 'DESC']],
-                    //     attributes: ['id', 'content', 'senderId', 'createdAt', 'messageType']
-                    // }
+                    {
+                        model: Message,
+                        as: 'messages',
+                        separate: true,
+                        limit: 1,
+                        order: [['createdAt', 'DESC']],
+                        include: [{
+                            model: User,
+                            as: 'sender',
+                            attributes: ['id', 'username', 'avatarUrl', 'fullName']
+                        }]
+                    }
                 ],
-                order: [['updatedAt', 'DESC']] // Sắp xếp theo lần cập nhật cuối (khi có tin nhắn mới)
+                order: [['updatedAt', 'DESC']]
             });
 
-            // Xử lý thêm để mỗi conversation có thông tin 'otherParticipant' cho chat private
-            // và có thể là lastMessage nếu đã query ở trên
-            const results: ConversationListItem[] = conversations.map(convInstance => {
-                // Lấy plain object, cast sang kiểu ConversationListItem
-                const conv = convInstance.get({ plain: true }) as ConversationListItem;
+            const results: ConversationListItem[] = await Promise.all(
+                conversations.map(async (convInstance) => {
+                    const conv = convInstance.get({ plain: true }) as ConversationListItem;
+                    
+                    if (conv.type === ConversationType.PRIVATE && conv.participants) {
+                        conv.otherParticipant = conv.participants.find(p => p.id !== userId);
+                    }
 
-                // Gán lại participants với kiểu BasicUserForChat (nếu cần thiết, hoặc đảm bảo include trả về đúng kiểu)
-                // conv.participants = convInstance.participants?.map(p => p.get({ plain: true })) as BasicUserForChat[];
+                    // Lấy tin nhắn cuối cùng
+                    const messages = await convInstance.getMessages({
+                        limit: 1,
+                        order: [['createdAt', 'DESC']],
+                        include: [{
+                            model: User,
+                            as: 'sender',
+                            attributes: ['id', 'username', 'avatarUrl', 'fullName']
+                        }]
+                    });
 
-                if (conv.type === ConversationType.PRIVATE && conv.participants) {
-                    conv.otherParticipant = conv.participants.find(p => p.id !== userId);
-                }
-                // TODO: Xử lý lastMessage nếu có
-                return conv;
-            });
+                    if (messages && messages.length > 0) {
+                        conv.lastMessage = messages[0].get({ plain: true });
+                    }
+
+                    return conv;
+                })
+            );
 
             return results;
-
         } catch (error) {
             console.error(`Lỗi khi lấy danh sách cuộc trò chuyện cho user ${userId}:`, error);
             throw new Error('Không thể tải danh sách cuộc trò chuyện.');

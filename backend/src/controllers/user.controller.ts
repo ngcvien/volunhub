@@ -3,7 +3,7 @@ import userService from '../services/user.service';
 import User from '../models/User.model';
 import eventService from '../services/event.service';
 import { Op, Sequelize } from 'sequelize';
-import httpStatus from 'http-status';
+import httpStatus from 'http';
 import { MESSAGES } from '../constants/messages';
 
 class UserController {
@@ -209,42 +209,45 @@ class UserController {
         } catch (error) {
             next(error);
         }
-    }
+    }    /**
+     * Tìm kiếm người dùng theo từ khóa
+     */
+    async searchUsers(req: Request, res: Response): Promise<void> {
+        try {
+            const { q } = req.query;
+            const keyword = q as string;
 
-    /**
- * Tìm kiếm người dùng theo từ khóa
- */
-export const searchUsers = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { q } = req.query;
-        const keyword = q as string;
+            if (!keyword) {
+                res.status(400).json({
+                    message: MESSAGES.INVALID_SEARCH_KEYWORD
+                });
+                return;
+            }
 
-        if (!keyword) {
-            res.status(400).json({
-                message: MESSAGES.INVALID_SEARCH_KEYWORD
+            // Tìm kiếm theo username hoặc fullName, không phân biệt hoa thường
+            const users = await User.findAll({
+                where: {
+                    [Op.and]: [
+                        {
+                            [Op.or]: [
+                                Sequelize.where(
+                                    Sequelize.fn('LOWER', Sequelize.col('username')),
+                                    'LIKE',
+                                    `%${keyword.toLowerCase()}%`
+                                ),
+                                Sequelize.where(
+                                    Sequelize.fn('LOWER', Sequelize.col('full_name')),
+                                    'LIKE',
+                                    `%${keyword.toLowerCase()}%`
+                                )
+                            ]
+                        },
+                        // Chỉ tìm người dùng đang hoạt động                        { isActive: true }
+                    ]
+                },
+                attributes: ['id', 'username', 'fullName', 'avatarUrl', 'isVerified', 'isActive'],
+                limit: 10
             });
-            return;
-        }
-
-        // Tìm kiếm theo username hoặc fullName, không phân biệt hoa thường
-        const users = await User.findAll({
-            where: {
-                [Op.or]: [
-                    Sequelize.where(
-                        Sequelize.fn('LOWER', Sequelize.col('username')),
-                        'LIKE',
-                        `%${keyword.toLowerCase()}%`
-                    ),
-                    Sequelize.where(
-                        Sequelize.fn('LOWER', Sequelize.col('full_name')),
-                        'LIKE',
-                        `%${keyword.toLowerCase()}%`
-                    )
-                ]
-            },
-            attributes: ['id', 'username', 'fullName', 'avatarUrl'],
-            limit: 10
-        });
 
         res.json({
             message: MESSAGES.GET_USERS_SUCCESS,
