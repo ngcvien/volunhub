@@ -47,6 +47,6 @@ app.use('/api', rootRouter);
 app.use(errorMiddleware);
 
 // --- Khởi động Server ---
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0',() => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });

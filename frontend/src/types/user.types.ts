@@ -46,3 +46,9 @@ export interface AuthContextType {
     toggleTheme: () => void;                    // Hàm chuyển đổi theme
     updateUserContext: (newUserData: User) => void;
 }
+export interface BasicUserForChat {
+    id: number;
+    username: string;
+    avatarUrl?: string | null;
+    fullName?: string | null; // Thêm fullName nếu bạn muốn hiển thị
+}
