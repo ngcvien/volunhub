@@ -5,7 +5,7 @@ import eventRoutes from './event.routes';
 import uploadRoutes from './upload.routes'; 
 import postRoutes from './post.routes'; 
 import adminRoutes from './admin.routes'; 
-
+import conversationRoutes from './conversation.routes';
 
 const router = Router();
 
@@ -14,6 +14,7 @@ router.use('/events', eventRoutes);
 router.use('/uploads', uploadRoutes); 
 router.use('/posts', postRoutes);
 router.use('/admin', adminRoutes);
+router.use('/conversations', conversationRoutes); 
 
 
 export default router;

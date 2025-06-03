@@ -1,8 +1,8 @@
 // backend/src/models/Conversation.model.ts
 import { DataTypes, Model, Optional } from 'sequelize';
 import { sequelize } from '../config/database.config'; // Import từ config
-import User from './User.model'; // Sẽ dùng cho association
-import Message from './Message.model'; // Sẽ dùng cho association
+import User, {UserAttributes } from './User.model'; // Sẽ dùng cho association
+import Message, {MessageAttributes} from './Message.model'; // Sẽ dùng cho association
 
 export enum ConversationType {
     PRIVATE = 'private',
@@ -16,12 +16,19 @@ export interface ConversationAttributes {
     updatedAt?: Date;
 
     // Thuộc tính ảo từ associations
-    participants?: User[];
-    messages?: Message[];
-    lastMessage?: Message; // Có thể thêm sau để tối ưu
+    // participants?: User[];
+    // messages?: Message[];
+    // lastMessage?: Message; // Có thể thêm sau để tối ưu
+}
+export interface BasicUserForChat extends Pick<UserAttributes, 'id' | 'username' | 'avatarUrl' | 'fullName'> {}
+
+export interface ConversationListItem extends ConversationAttributes {
+    participants?: BasicUserForChat[]; // Danh sách đầy đủ người tham gia (đã rút gọn)
+    otherParticipant?: BasicUserForChat; // Người tham gia còn lại (trong chat 1-1)
+    lastMessage?: MessageAttributes; // Tin nhắn cuối cùng (sẽ làm sau)
 }
 
-interface ConversationCreationAttributes extends Optional<ConversationAttributes, 'id' | 'createdAt' | 'updatedAt' | 'participants' | 'messages' | 'lastMessage'> {}
+interface ConversationCreationAttributes extends Optional<ConversationAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
 
 class Conversation extends Model<ConversationAttributes, ConversationCreationAttributes> implements ConversationAttributes {
     public id!: number;
@@ -33,7 +40,8 @@ class Conversation extends Model<ConversationAttributes, ConversationCreationAtt
     // Associations (sẽ được định nghĩa trong associations.ts)
     public readonly participants?: User[];
     public readonly messages?: Message[];
-    public readonly lastMessage?: Message; // Ví dụ
+    public readonly lastMessage?: Message; 
+    public readonly conversationParticipants?: any; 
 }
 
 Conversation.init(

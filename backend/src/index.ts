@@ -4,11 +4,11 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { connectDB } from './services/database.service';
-import rootRouter from './routes/index.routes'; // Import root router
+import rootRouter from './routes/index.routes';
 import errorMiddleware from './middlewares/error.middleware';
-import './models/User.model'; // Import model User
-import './models/Event.model'; // Import model Event
-import './models/Participation.model'; // Import model Participation
+import './models/User.model'; 
+import './models/Event.model'; 
+import './models/Participation.model'; 
 
 
 // Tải biến môi trường

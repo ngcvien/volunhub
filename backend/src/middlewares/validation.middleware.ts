@@ -1,7 +1,9 @@
 // backend/src/middlewares/validation.middleware.ts
-import { check, validationResult, body } from 'express-validator';
+import { check, validationResult, body, param } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import { UserRole } from '../models/User.model';
+import { MessageType } from '../models/Message.model';
+import Event from '../models/Event.model';
 
 // Hàm xử lý lỗi validation chung (có thể tạo file riêng nếu muốn)
 const handleValidationErrors = (req: Request, res: Response, next: NextFunction) => {
@@ -84,5 +86,47 @@ export const updateUserStatusValidator = [
         .optional()
         .isBoolean()
         .withMessage('Trạng thái hoạt động phải là true hoặc false.'),
+    handleValidationErrors
+];
+
+export const startConversationValidator = [
+    body('recipientId', 'Recipient ID không hợp lệ và là bắt buộc').isInt({ min: 1 }),
+    handleValidationErrors
+];
+
+export const sendMessageValidator = [
+    // postId hoặc conversationId sẽ được lấy từ param
+    body('content', 'Nội dung tin nhắn không được để trống nếu không có mediaUrl')
+        .if(body('mediaUrl').isEmpty({ ignore_whitespace: true })) // Chỉ bắt buộc nếu không có mediaUrl
+        .trim().isLength({ min: 1 }),
+    body('messageType')
+        .optional()
+        .isIn(Object.values(MessageType))
+        .withMessage(`Loại tin nhắn không hợp lệ. Chỉ chấp nhận: ${Object.values(MessageType).join(', ')}`),
+    body('mediaUrl')
+        .optional({ checkFalsy: true }) // Cho phép null hoặc chuỗi rỗng
+        .isURL().withMessage('Media URL không hợp lệ nếu được cung cấp.')
+        .if(body('messageType').not().equals(MessageType.TEXT)) // Bắt buộc nếu không phải text
+        .notEmpty().withMessage('Media URL là bắt buộc cho tin nhắn media.'),
+    // Đảm bảo nếu là text thì content phải có, nếu là media thì mediaUrl phải có
+    body().custom((value, { req }) => {
+        const { content, messageType, mediaUrl } = req.body;
+        if ((messageType && messageType !== MessageType.TEXT) && !mediaUrl) {
+            throw new Error('Media URL là bắt buộc cho loại tin nhắn không phải text.');
+        }
+        if ((!messageType || messageType === MessageType.TEXT) && !content?.trim() && !mediaUrl) {
+            // Cho phép gửi tin nhắn chỉ có mediaUrl nếu messageType được set đúng
+            if (messageType === MessageType.TEXT && !content?.trim()) {
+                throw new Error('Nội dung là bắt buộc cho tin nhắn text không có media.');
+            }
+        }
+        return true;
+    }),
+    handleValidationErrors
+];
+
+// Validator cho route param (có thể tạo file riêng cho param validators)
+export const conversationIdParamValidator = [
+    param('conversationId', 'Conversation ID trong URL không hợp lệ').isInt({ min: 1 }),
     handleValidationErrors
 ];

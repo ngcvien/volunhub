@@ -4,12 +4,12 @@ import Event from './Event.model';
 import Participation from './Participation.model';
 import EventLike from './EventLike.model';
 import EventPost from './EventPost.model';
-import EventPostComment from './EventPostComment.model'; 
+import EventPostComment from './EventPostComment.model';
 import VolunpointLog from './VolunpointLog.model';
 import EventImage from './EventImage.model';
-import Conversation from './Conversation.model';              
-import ConversationParticipant from './ConversationParticipant.model'; 
-import Message from './Message.model'; 
+import Conversation from './Conversation.model';
+import ConversationParticipant from './ConversationParticipant.model';
+import Message from './Message.model';
 
 const setupAssociations = () => {
     console.log('Setting up database associations...'); // Thêm log để kiểm tra
@@ -115,6 +115,12 @@ const setupAssociations = () => {
             foreignKey: 'conversationId',
             as: 'conversation'
         });
+        Conversation.hasMany(ConversationParticipant, {
+            foreignKey: 'conversationId',
+            as: 'conversationParticipants'   
+        });
+        ConversationParticipant.belongsTo(Conversation, { foreignKey: 'conversationId', as: 'conversation' });
+
 
         // User <-> Message (One-to-Many: User là người gửi)
         User.hasMany(Message, {
@@ -129,7 +135,7 @@ const setupAssociations = () => {
 
         Participation.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
-        if (VolunpointLog) { 
+        if (VolunpointLog) {
             VolunpointLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
             User.hasMany(VolunpointLog, { foreignKey: 'userId', as: 'pointLogs' });
 
@@ -138,8 +144,8 @@ const setupAssociations = () => {
         }
 
         Event.hasMany(EventImage, {
-            foreignKey: 'eventId', 
-            as: 'images'          
+            foreignKey: 'eventId',
+            as: 'images'
         });
         // Một EventImage thuộc về một Event
         EventImage.belongsTo(Event, {
