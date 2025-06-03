@@ -1,0 +1,71 @@
+.leaderboard-container {
+  max-width: 900px;
+}
+.leaderboard-title {
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #2d6a4f;
+}
+.leaderboard-card {
+  box-shadow: 0 4px 24px rgba(44, 62, 80, 0.08);
+  border-radius: 18px;
+  border: none;
+}
+.leaderboard-table th, .leaderboard-table td {
+  vertical-align: middle;
+  text-align: center;
+}
+.leaderboard-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #b7e4c7;
+  background: #f8f9fa;
+}
+.top-avatar {
+  border: 3px solid #ffd700;
+  box-shadow: 0 0 12px #ffd70055;
+}
+.rank-badge {
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: #e9ecef;
+  color: #333;
+}
+.rank-1 {
+  background: linear-gradient(90deg, #ffd700, #fffbe7);
+  color: #b8860b;
+}
+.rank-2 {
+  background: linear-gradient(90deg, #c0c0c0, #f8f9fa);
+  color: #555;
+}
+.rank-3 {
+  background: linear-gradient(90deg, #cd7f32, #f8e7d0);
+  color: #7c4700;
+}
+.top-1-row {
+  background: #fffbe7;
+  font-weight: bold;
+}
+.top-2-row {
+  background: #f8f9fa;
+}
+.top-3-row {
+  background: #f8e7d0;
+}
+.leaderboard-fullname {
+  font-weight: 500;
+  color: #2d6a4f;
+}
+.leaderboard-username {
+  color: #888;
+  font-size: 0.98rem;
+}
+.volunpoint-badge {
+  font-size: 1.1rem;
+  padding: 8px 18px;
+}

@@ -7,6 +7,9 @@ import EventPost from './EventPost.model';
 import EventPostComment from './EventPostComment.model'; 
 import VolunpointLog from './VolunpointLog.model';
 import EventImage from './EventImage.model';
+import Conversation from './Conversation.model';              
+import ConversationParticipant from './ConversationParticipant.model'; 
+import Message from './Message.model'; 
 
 const setupAssociations = () => {
     console.log('Setting up database associations...'); // Thêm log để kiểm tra
@@ -84,6 +87,44 @@ const setupAssociations = () => {
             foreignKey: 'parentId', // Cột trong bảng trỏ về comment cha
             as: 'parentComment',  // Lấy comment cha
             constraints: false
+        });
+
+        // User <-> Conversation (Many-to-Many through ConversationParticipant)
+        User.belongsToMany(Conversation, {
+            through: ConversationParticipant,
+            foreignKey: 'userId',       // Khóa trong ConversationParticipant trỏ về User
+            otherKey: 'conversationId', // Khóa trong ConversationParticipant trỏ về Conversation
+            as: 'conversations',        // user.getConversations()
+            timestamps: false           // Không cần timestamps ở đây
+        });
+        Conversation.belongsToMany(User, {
+            through: ConversationParticipant,
+            foreignKey: 'conversationId', // Khóa trong ConversationParticipant trỏ về Conversation
+            otherKey: 'userId',         // Khóa trong ConversationParticipant trỏ về User
+            as: 'participants',       // conversation.getParticipants()
+            timestamps: false
+        });
+
+        // Conversation <-> Message (One-to-Many)
+        Conversation.hasMany(Message, {
+            foreignKey: 'conversationId',
+            as: 'messages', // conversation.getMessages()
+            onDelete: 'CASCADE' // Xóa tin nhắn nếu cuộc trò chuyện bị xóa
+        });
+        Message.belongsTo(Conversation, {
+            foreignKey: 'conversationId',
+            as: 'conversation'
+        });
+
+        // User <-> Message (One-to-Many: User là người gửi)
+        User.hasMany(Message, {
+            foreignKey: 'senderId',
+            as: 'sentMessages', // user.getSentMessages()
+            onDelete: 'CASCADE' // Xóa tin nhắn nếu người gửi bị xóa (hoặc SET NULL tùy logic)
+        });
+        Message.belongsTo(User, {
+            foreignKey: 'senderId',
+            as: 'sender' // message.getSender()
         });
 
         Participation.belongsTo(User, { foreignKey: 'userId', as: 'user' });

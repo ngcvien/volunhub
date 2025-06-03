@@ -265,7 +265,7 @@ const HomePage = () => {
   }
 
   return (
-    <div className="homepage">
+    <div className={`homepage${theme === 'dark' ? ' dark' : ''}`}> 
       {/* Space Background */}
       <div className="space-background" ref={spaceBackgroundRef}>
         <canvas ref={starsCanvasRef} className="stars-canvas"></canvas>

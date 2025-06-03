@@ -21,6 +21,7 @@ import AboutPage from "../pages/AboutPage"
 import NotFoundPage from "../pages/NotFoundPage"
 import { Modal, Button } from "react-bootstrap"
 import { useState, useEffect } from "react"
+import LeaderboardPage from "../pages/LeaderboardPage"
 
 // Component để bảo vệ route, yêu cầu đăng nhập
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -100,6 +101,7 @@ const AppRoutes = () => {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
 
           <Route
             path="/events/new"
