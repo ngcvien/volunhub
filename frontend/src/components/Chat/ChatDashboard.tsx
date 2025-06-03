@@ -3,12 +3,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Offcanvas, ListGroup, Spinner, Alert, Form, Button, InputGroup, Image as RBImage } from 'react-bootstrap'; // Thêm Image, InputGroup
 import ConversationListItem from './ConversationListItem';
-import MessageItem from './MessageItem'; // <<<--- IMPORT MESSAGE ITEM
-import { MessageType as MessageDataType, ConversationListItem as ConversationListItemType, MessageInputData } from '../../types/chat.types';
+import MessageItem from './MessageItem'; 
+import { MessageType as MessageDataType, ConversationListItem as ConversationListItemType, MessageInputData, BasicUserForChat, MessageTypeEnum } from '../../types/chat.types';
 import { useAuth } from '../../contexts/AuthContext';
 // Import các hàm API
 import { findOrCreatePrivateConversationApi, getUserConversationsApi } from '../../api/conversation.api';
 import { getMessagesForConversationApi, sendMessageApi } from '../../api/message.api';
+import { searchUsersApi } from '../../api/user.api'; // Import API tìm kiếm user
 // Import Socket.IO client
 import { io, Socket } from 'socket.io-client';
 // Import Icons
@@ -43,10 +44,10 @@ const ChatDashboard: React.FC<ChatDashboardProps> = ({ show, onHide }) => {
     // State cho việc tìm kiếm người dùng mới để chat
     const [showNewChatSearch, setShowNewChatSearch] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState<any[]>([]); // Sẽ là BasicUserForChat[]
+    const [searchResults, setSearchResults] = useState<BasicUserForChat[]>([]);
     const [loadingSearch, setLoadingSearch] = useState(false);
     const [searchError, setSearchError] = useState<string | null>(null);
-    const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 
     // --- SOCKET.IO CLIENT CONNECTION AND AUTHENTICATION ---
@@ -73,7 +74,7 @@ const ChatDashboard: React.FC<ChatDashboardProps> = ({ show, onHide }) => {
 
             newSocket.on('connect', () => {
                 console.log(`SOCKET: Connected with ID: ${newSocket.id}`);
-                // Sau khi kết nối, nếu có active conversation, join room
+                // Join room cho conversation hiện tại nếu có
                 if (activeConversation) {
                     newSocket.emit('join_conversation', activeConversation.id);
                 }
@@ -85,32 +86,76 @@ const ChatDashboard: React.FC<ChatDashboardProps> = ({ show, onHide }) => {
                 if (err.message === 'Authentication error: Invalid token') {
                     alert('Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.');
                     onHide(); // Đóng chat
-                    // Tùy chọn: Gọi hàm logout của AuthContext để xóa token
-                    // logout();
                 }
             });
 
-            // Lắng nghe tin nhắn mới từ server
+            // Xử lý tin nhắn mới từ server
             newSocket.on('new_message', (newMessage: MessageDataType) => {
-                console.log('SOCKET: New message received:', newMessage);
-                // Nếu tin nhắn thuộc cuộc trò chuyện đang hoạt động
-                if (activeConversation && newMessage.conversationId === activeConversation.id) {
-                    setMessages(prevMessages => [...prevMessages, newMessage]);
-                }
-                // TODO: Cập nhật 'lastMessage' và 'updatedAt' của cuộc trò chuyện trong list conversations
-                // để nó nhảy lên đầu
-                setConversations(prevConvs => {
-                    const convToUpdate = prevConvs.find(c => c.id === newMessage.conversationId);
-                    if (convToUpdate) {
-                        const updatedConv = { ...convToUpdate, lastMessage: newMessage, updatedAt: newMessage.createdAt };
-                        return [updatedConv, ...prevConvs.filter(c => c.id !== newMessage.conversationId)].sort((a,b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+                console.log('SOCKET: Received new message:', newMessage);
+                
+                setMessages(prevMessages => {
+                    // Kiểm tra xem tin nhắn đã tồn tại chưa
+                    const messageExists = prevMessages.some(msg => {
+                        // So sánh ID thật
+                        if (msg.id === newMessage.id) {
+                            return true;
+                        }
+                        // Nếu là optimistic message (id âm), kiểm tra nội dung và thời gian
+                        if (msg.id < 0 && 
+                            msg.content === newMessage.content && 
+                            msg.senderId === newMessage.senderId &&
+                            Math.abs(new Date(msg.createdAt).getTime() - new Date(newMessage.createdAt).getTime()) < 5000) {
+                            return true;
+                        }
+                        return false;
+                    });
+
+                    if (messageExists) {
+                        // Thay thế optimistic message bằng tin nhắn thật
+                        return prevMessages.map(msg => {
+                            if (msg.id < 0 && 
+                                msg.content === newMessage.content && 
+                                msg.senderId === newMessage.senderId) {
+                                return newMessage;
+                            }
+                            return msg;
+                        });
                     }
-                    return prevConvs;
+
+                    // Nếu là tin nhắn mới, thêm vào danh sách
+                    return [...prevMessages, newMessage];
+                });
+                
+                // Cập nhật lastMessage trong danh sách conversations
+                setConversations(prevConvs => {
+                    const updatedConvs = prevConvs.map(conv => {
+                        if (conv.id === newMessage.conversationId) {
+                            return {
+                                ...conv,
+                                lastMessage: newMessage,
+                                updatedAt: newMessage.createdAt
+                            };
+                        }
+                        return conv;
+                    });
+                    // Sắp xếp lại theo thời gian cập nhật mới nhất
+                    return updatedConvs.sort((a, b) => 
+                        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+                    );
                 });
             });
 
             socketRef.current = newSocket;
         }
+
+        // Cleanup function
+        return () => {
+            if (socketRef.current) {
+                socketRef.current.disconnect();
+                socketRef.current = null;
+                console.log('SOCKET: Disconnected');
+            }
+        };
     }, [show, user, token, activeConversation, onHide]); // Dependencies for socket connection management
 
 
@@ -176,31 +221,49 @@ const ChatDashboard: React.FC<ChatDashboardProps> = ({ show, onHide }) => {
         setActiveConversation(conversation);
         setShowNewChatSearch(false); // Ẩn tìm kiếm mới khi chọn chat cũ
         setSearchQuery(''); setSearchResults([]); setSearchError(null);
-    };
-
+    };    // Cập nhật hàm gửi tin nhắn với optimistic update
     const handleSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!newMessageContent.trim() || !activeConversation || !user) return; // Add mediaUrl check later
+        if (!newMessageContent.trim() || !activeConversation || !user) return;
 
         setIsSending(true);
+        const messageContent = newMessageContent;
+        setNewMessageContent(''); // Clear input ngay lập tức
+
+        const optimisticMessage: MessageDataType = {
+            id: -Date.now(), // ID tạm thời (số âm để không trùng với ID thật từ server)
+            conversationId: activeConversation.id,
+            senderId: user.id,
+            content: messageContent,
+            createdAt: new Date().toISOString(),
+            messageType: MessageTypeEnum.TEXT,
+            mediaUrl: null,
+            sender: user
+        };
+
+        // Optimistic update - thêm tin nhắn tạm thời
+        setMessages(prevMessages => [...prevMessages, optimisticMessage]);
+
         try {
-            // Gửi tin nhắn qua API HTTP (để lưu vào DB)
-            const response = await sendMessageApi(activeConversation.id, { content: newMessageContent, messageType: 'text' });
-            // Sau khi gửi, tin nhắn sẽ được server phát lại qua socket.io
-            // Client sẽ nhận tin nhắn qua socket.on('new_message') và tự cập nhật messages state
-            // Tuy nhiên, chúng ta có thể thêm nó vào state ngay lập tức để có optimistic update
-            // Hoặc chờ socket trả về để đảm bảo tính nhất quán (tùy thuộc vào thiết kế)
-            // Để đơn giản và chắc chắn, chờ socket phát lại.
-            // setMessages(prevMessages => [...prevMessages, response.messageSent]); // Bỏ optimistic update ở đây
-
-            setNewMessageContent(''); // Xóa input
-
+            // Gửi tin nhắn lên server
+            await sendMessageApi(activeConversation.id, {
+                content: messageContent,
+                messageType: MessageTypeEnum.TEXT
+            });
+            // Không cần setMessages ở đây vì sẽ nhận qua socket
         } catch (error: any) {
+            // Nếu có lỗi, rollback optimistic update
+            setMessages(prevMessages => 
+                prevMessages.filter(msg => msg.id !== optimisticMessage.id)
+            );
+            setNewMessageContent(messageContent); // Khôi phục nội dung tin nhắn
             alert(error.message || "Lỗi gửi tin nhắn");
         } finally {
             setIsSending(false);
         }
     };
+
+    const defaultAvatar = '/default-avatar.png';
 
     // Hàm tìm kiếm người dùng mới để chat (sẽ dùng cho ô tìm kiếm)
     const handleSearchUsers = async (query: string) => {
@@ -214,20 +277,14 @@ const ChatDashboard: React.FC<ChatDashboardProps> = ({ show, onHide }) => {
         if (searchTimeoutRef.current) {
             clearTimeout(searchTimeoutRef.current);
         }
+
         searchTimeoutRef.current = setTimeout(async () => {
             setLoadingSearch(true);
             setSearchError(null);
             try {
-                // TODO: Tạo API users/search ở backend (hoặc dùng API Event/User Search đã có)
-                // const response = await searchUsersApi(query);
-                // Giả lập API Search
-                await new Promise(res => setTimeout(res, 300));
-                const mockResults = [
-                    { id: 1, username: 'user1', fullName: 'Người Dùng 1', avatarUrl: '/default-avatar.png' },
-                    { id: 2, username: 'user2', fullName: 'Người Dùng 2', avatarUrl: '/default-avatar.png' },
-                ].filter(u => u.username.includes(query) || u.fullName.includes(query));
-
-                setSearchResults(mockResults.filter(u => u.id !== user?.id)); // Không hiển thị chính mình
+                const response = await searchUsersApi(query);
+                // Lọc ra không hiển thị chính mình trong kết quả tìm kiếm
+                setSearchResults(response.users.filter(u => u.id !== user?.id));
             } catch (err: any) {
                 setSearchError(err.message || 'Lỗi tìm kiếm người dùng.');
             } finally {
@@ -303,7 +360,7 @@ const ChatDashboard: React.FC<ChatDashboardProps> = ({ show, onHide }) => {
                                 </Button>
                             )}
                             {loadingSearch && <div className="text-center"><Spinner size="sm"/> Đang tìm...</div>}
-                            {searchError && <Alert variant="danger" size="sm" className="py-1">{searchError}</Alert>}
+                            {searchError && <Alert variant="danger" className="py-1 mb-2">{searchError}</Alert>}
 
                             {/* Kết quả tìm kiếm */}
                             {searchQuery.length >= 2 && searchResults.length > 0 && (
