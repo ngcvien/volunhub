@@ -96,15 +96,26 @@ const ChatDashboard: React.FC<ChatDashboardProps> = ({ show, onHide }) => {
         setIsSending(true);
         try {
             const response = await sendMessageApi(activeConversation.id, { content: newMessage });
-            // Thêm tin nhắn mới vào state (cập nhật UI lạc quan hoặc chờ API trả về)
-            // Backend nên trả về tin nhắn mới kèm sender đầy đủ
-            setMessages(prevMessages => [...prevMessages, response.messageSent]);
-            setNewMessage(''); // Xóa input
+            console.log('API Response:', response); // Debug log
 
-            // TODO: Cập nhật lại updatedAt của conversation này trong list conversations
-            // để nó nhảy lên đầu (cần HomePage refresh lại conversations)
+            // Construct new message with fallback values in case API response is incomplete
+            const newMessageWithDetails = {
+                id: response.id || Date.now().toString(),
+                content: newMessage.trim(), // Use the message we're sending as fallback
+                senderId: user.id,
+                conversationId: activeConversation.id,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                sender: {
+                    id: user.id,
+                    username: user.username
+                }
+            };
 
+            setMessages(prevMessages => [...prevMessages, newMessageWithDetails]);
+            setNewMessage('');
         } catch (error: any) {
+            console.error('Send message error:', error);
             alert(error.message || "Lỗi gửi tin nhắn");
         } finally {
             setIsSending(false);
@@ -157,12 +168,29 @@ const ChatDashboard: React.FC<ChatDashboardProps> = ({ show, onHide }) => {
                             {loadingMessages && <div className="text-center"><Spinner size="sm" /></div>}
                             {errorMessages && <Alert variant="danger">{errorMessages}</Alert>}
                             {!loadingMessages && messages.map(msg => (
-                                // TODO: Tạo component MessageItem để hiển thị tin nhắn (sent/received)
-                                <div key={msg.id} className={`message-bubble mb-2 p-2 rounded ${msg.senderId === user?.id ? 'sent bg-primary text-white ms-auto' : 'received bg-light text-dark me-auto'}`} style={{maxWidth: '75%'}}>
-                                    {/* <small className="d-block text-muted" style={{fontSize:'0.7em'}}>{msg.sender?.username}</small> */}
-                                    <div>{msg.content}</div>
-                                    <small className={`d-block text-end mt-1 ${msg.senderId === user?.id ? 'text-light-emphasis' : 'text-muted'}`} style={{fontSize:'0.65em'}}>
-                                        {new Date(msg.createdAt).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})}
+                                <div 
+                                    key={msg.id} 
+                                    className={`message-bubble mb-2 p-2 rounded ${
+                                        msg.senderId && user && msg.senderId === user.id 
+                                            ? 'sent bg-primary text-white ms-auto' 
+                                            : 'received bg-light text-dark me-auto'
+                                    }`} 
+                                    style={{maxWidth: '75%'}}
+                                >
+                                    <div>{msg.content || 'No content'}</div>
+                                    <small 
+                                        className={`d-block text-end mt-1 ${
+                                            msg.senderId && user && msg.senderId === user.id 
+                                                ? 'text-light-emphasis' 
+                                                : 'text-muted'
+                                        }`} 
+                                        style={{fontSize:'0.65em'}}
+                                    >
+                                        {msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString('vi-VN', {
+                                            hour:'2-digit', 
+                                            minute:'2-digit',
+                                            hour12: false
+                                        }) : 'N/A'}
                                     </small>
                                 </div>
                             ))}

@@ -9,7 +9,7 @@ import { Button } from 'react-bootstrap';
 import { ChatDotsFill } from 'react-bootstrap-icons';
 
 function App() {
-    const [showChat, setShowChat] = useState(false); // State quản lý hiển thị chat
+    const [showChat, setShowChat] = useState(false); 
 
   return (
     <AuthProvider>
