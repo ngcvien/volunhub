@@ -32,7 +32,7 @@ class EventController {
             const userId = req.user?.userId;
 
             // Lấy các query parameters từ URL (?q=..., &page=..., &limit=...)
-            const query = req.query.q as string | undefined; // Từ khóa tìm kiếm
+            const query = req.query.search as string | undefined; // Từ khóa tìm kiếm
             const page = parseInt(req.query.page as string) || 1; // Trang hiện tại, mặc định là 1
             const limit = parseInt(req.query.limit as string) || 10; // Số item/trang, mặc định 10
             const sortBy = req.query.sortBy as string | undefined;

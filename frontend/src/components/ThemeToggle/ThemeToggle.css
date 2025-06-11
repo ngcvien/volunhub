@@ -1,7 +1,7 @@
 .theme-toggle-wrapper {
   position: fixed;
   bottom: 20px;
-  right: 20px;
+  left: 20px;
   z-index: 1000;
 }
 
@@ -113,8 +113,7 @@
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .theme-toggle-wrapper {
-    bottom: 15px;
-    left: 15px;
+    display: none; /* Ẩn nút theme toggle trên mobile */
   }
 
   .theme-toggle-btn {
