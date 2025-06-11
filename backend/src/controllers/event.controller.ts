@@ -35,6 +35,8 @@ class EventController {
             const query = req.query.q as string | undefined; // Từ khóa tìm kiếm
             const page = parseInt(req.query.page as string) || 1; // Trang hiện tại, mặc định là 1
             const limit = parseInt(req.query.limit as string) || 10; // Số item/trang, mặc định 10
+            const sortBy = req.query.sortBy as string | undefined;
+            const location = req.query.location as string | undefined;
             // Lấy các filter khác sau này: const status = req.query.status as string | undefined;
 
             // Gọi service với object options
@@ -43,6 +45,8 @@ class EventController {
                 query,
                 page,
                 limit,
+                sortBy,
+                location,
                 // status
             });
 

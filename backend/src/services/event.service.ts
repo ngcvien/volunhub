@@ -26,6 +26,8 @@ interface GetAllEventsOptions {
     page?: number;           // Trang hiện tại (cho phân trang)
     limit?: number;          // Số lượng kết quả mỗi trang
     status?: EventStatus;
+    sortBy?: string;         // Thêm sortBy để lọc/sắp xếp
+    location?: string;       // Thêm location để lọc theo địa điểm
     // provinceCode?: number;
 }
 
@@ -105,7 +107,7 @@ class EventService {
         }
     }
     async getAllEvents(options: GetAllEventsOptions): Promise<PaginatedEventsResult> {
-        const { userId, query, page = 1, limit = 10 } = options; // Giá trị mặc định cho phân trang
+        const { userId, query, page = 1, limit = 10, sortBy, location } = options; // Giá trị mặc định cho phân trang
         const offset = (page - 1) * limit; // Tính offset
 
         // Xây dựng mệnh đề WHERE dựa trên query và các filter khác
@@ -113,28 +115,37 @@ class EventService {
             status: {
                 [Op.in]: [EventStatus.UPCOMING, EventStatus.ONGOING, EventStatus.COMPLETED]
             }
-        }; // Bắt đầu với object rỗng
+        };
         if (query) {
-            // Tìm kiếm query trong title hoặc description
-            // Dùng Op.like không phân biệt hoa thường (mặc định trong MySQL thường là vậy)
             whereClause[Op.or] = [
                 { title: { [Op.like]: `%${query}%` } },
                 { description: { [Op.like]: `%${query}%` } }
-                // Có thể thêm tìm kiếm location ở đây nếu location là text
-                // { location: { [Op.like]: `%${query}%` } }
             ];
         }
-        // Thêm các điều kiện lọc khác vào whereClause nếu có (ví dụ: status, provinceCode...)
         if (options.status) {
             whereClause.status = options.status;
         }
-        // if (options.provinceCode) {
-        //     whereClause.provinceCode = options.provinceCode; // Giả sử có cột provinceCode
-        // }
+        // Lọc theo location nếu sortBy là 'nearby' và có location
+        if (sortBy === 'nearby' && location) {
+            whereClause.location = {
+                [Op.like]: `%${location}%`
+            };
+        }
 
+        // Sắp xếp
+        let order: any = [['createdAt', 'DESC']];
+        if (sortBy === 'popular') {
+            order = [[sequelize.literal('(SELECT COUNT(*) FROM event_likes WHERE event_likes.event_id = Event.id)'), 'DESC']];
+        } else if (sortBy === 'upcoming') {
+            order = [['eventTime', 'ASC']];
+        } else if (sortBy === 'nearby' && location) {
+            // Nếu muốn sắp xếp theo khoảng cách, cần có toạ độ, ở đây chỉ lọc theo tỉnh/thành phố
+            order = [['createdAt', 'DESC']];
+        } else if (sortBy === 'latest') {
+            order = [['createdAt', 'DESC']];
+        }
 
         try {
-            // 1. Dùng findAndCountAll để lấy cả dữ liệu và tổng số bản ghi (cho phân trang)
             const { count, rows } = await Event.findAndCountAll({
                 where: whereClause,
                 include: [
@@ -143,14 +154,13 @@ class EventService {
                     },
                     { model: EventImage, as: 'images', attributes: ['id', 'imageUrl'] }
                 ],
-                order: [['createdAt', 'DESC']], limit, offset, distinct: true
+                order, limit, offset, distinct: true
             });
 
-            const events = rows; // rows chứa danh sách sự kiện của trang hiện tại
-            const totalEvents = count; // count là tổng số sự kiện khớp điều kiện (chưa phân trang)
-            const totalPages = Math.ceil(totalEvents / limit); // Tính tổng số trang
+            const events = rows;
+            const totalEvents = count;
+            const totalPages = Math.ceil(totalEvents / limit);
 
-            // Nếu không có sự kiện nào khớp, trả về kết quả rỗng
             if (events.length === 0) {
                 return { events: [], totalPages: 0, currentPage: 1, totalEvents: 0 };
             }
@@ -161,9 +171,17 @@ class EventService {
             let likedEventIds = new Set<number>();
 
             // Lấy count và trạng thái chỉ khi có events để query
-            const likeCounts = await EventLike.count({ where: { eventId: eventIds }, group: ['eventId'], raw: true });
+            const likeRows = await EventLike.findAll({
+                where: { eventId: eventIds },
+                attributes: [
+                    ['event_id', 'eventId'],
+                    [sequelize.fn('COUNT', sequelize.col('event_id')), 'count']
+                ],
+                group: ['event_id'],
+                raw: true
+            });
             const likeCountMap = new Map<number, number>();
-            likeCounts.forEach((item: any) => { likeCountMap.set(item.eventId, parseInt(item.count, 10) || 0); });
+            likeRows.forEach((item: any) => { likeCountMap.set(item.eventId, parseInt(item.count, 10) || 0); });
 
             if (userId) {
                 const [userParticipations, userLikes] = await Promise.all([
@@ -176,11 +194,22 @@ class EventService {
 
             // 3. Map kết quả cuối cùng
             const results: EventWithDetails[] = events.map(eventInstance => {
-                const plainEvent = eventInstance.get({ plain: true }) as EventWithDetails;
-                plainEvent.likeCount = likeCountMap.get(plainEvent.id) || 0;
-                plainEvent.isLiked = likedEventIds.has(plainEvent.id);
-                plainEvent.isParticipating = participatingEventIds.has(plainEvent.id);
-                return plainEvent;
+                const plainEvent = eventInstance.get({ plain: true }) as any;
+                return {
+                    ...plainEvent,
+                    likeCount: likeCountMap.get(plainEvent.id) || 0,
+                    isLiked: likedEventIds.has(plainEvent.id),
+                    isParticipating: participatingEventIds.has(plainEvent.id),
+                    creator: plainEvent.creator || {
+                        id: 0,
+                        username: '',
+                        avatarUrl: null,
+                        isVerified: false,
+                        fullName: '',
+                        bio: '',
+                        location: ''
+                    }
+                };
             });
 
             // 4. Trả về kết quả đã phân trang

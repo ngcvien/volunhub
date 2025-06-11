@@ -44,6 +44,7 @@ const EventFilterBar: React.FC<EventFilterBarProps> = ({
           <option value="latest">Mới nhất</option>
           <option value="popular">Phổ biến nhất</option>
           <option value="upcoming">Sắp diễn ra</option>
+          <option value="nearby">Gần đây</option>
         </Form.Select>
 
         {/* <ButtonGroup className="ms-2">

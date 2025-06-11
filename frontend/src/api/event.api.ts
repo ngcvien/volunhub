@@ -23,16 +23,18 @@ export const createEventApi = async (eventData: CreateEventInputApi): Promise<Cr
     }
 };
 
-
-
-export const getAllEventsApi = async (triggerParam?: string | number): Promise<GetAllEventsResponse> => {
+// Hàm mới: nhận object filter
+export const getAllEventsApi = async (filters: Record<string, any> = {}): Promise<GetAllEventsResponse> => {
     try {
-        // Thêm query parameter vào URL nếu có triggerParam
-        const apiUrl = triggerParam ? `/events?_t=${triggerParam}` : '/events';
-        // _t là tên query param tùy chọn, bạn có thể đặt tên khác
-        console.log(`Calling API: ${apiUrl}`); // Log URL để kiểm tra
+        // Build query string từ object filters
+        const params = new URLSearchParams();
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== "") {
+                params.append(key, value);
+            }
+        });
+        const apiUrl = `/events${params.toString() ? `?${params.toString()}` : ""}`;
         const response = await api.get<GetAllEventsResponse>(apiUrl);
-        console.log('API Response in getAllEventsApi:', response.data);
         return response.data;
     } catch (error: any) {
         console.error("Lỗi API Lấy danh sách sự kiện:", error.response?.data || error.message);

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { Container, Row, Col, Spinner, Alert, Button } from "react-bootstrap"
+import { Container, Row, Col, Spinner, Alert, Button, Toast } from "react-bootstrap"
 import { useInView } from "react-intersection-observer"
 import LeftSidebar from "../components/Home/LeftSidebar"
 import RightSidebar from "../components/Home/RightSidebar"
@@ -24,6 +24,7 @@ const HomePage = () => {
   const [page, setPage] = useState(1)
   const [refreshKey, setRefreshKey] = useState<number>(0)
   const [viewMode, setViewMode] = useState<"card" | "list">("card")
+  const [showLocationToast, setShowLocationToast] = useState(false)
   const [filters, setFilters] = useState({
     category: "all",
     status: "active",
@@ -49,7 +50,12 @@ const HomePage = () => {
     async (pageNum: number) => {
       try {
         setLoading(true)
-        const response = await getAllEventsApi(pageNum, filters)
+        // Build filters to send
+        let filtersToSend = { ...filters, page: pageNum };
+        if (filters.sortBy === 'nearby' && user?.location) {
+          (filtersToSend as Record<string, any>).location = user.location;
+        }
+        const response = await getAllEventsApi(filtersToSend as Record<string, any>)
         if (pageNum === 1) {
           setEvents(response.events)
         } else {
@@ -62,7 +68,7 @@ const HomePage = () => {
         setLoading(false)
       }
     },
-    [filters],
+    [filters, user],
   )
 
   // Initial load
@@ -81,8 +87,26 @@ const HomePage = () => {
 
   // Handle filter changes
   const handleFilterChange = (newFilters: typeof filters) => {
+    const isNearbyFilter = newFilters.sortBy === "nearby"
+    const hasLocation = Boolean(user?.location)
+
+    if (isNearbyFilter && !hasLocation) {
+      setShowLocationToast(true)
+      return
+    }
+
     setFilters(newFilters)
     setPage(1)
+  }
+
+  // Handle location toast close
+  const handleLocationToastClose = () => {
+    setShowLocationToast(false)
+  }
+
+  // Handle location update click
+  const handleLocationUpdateClick = () => {
+    setShowLocationToast(false)
   }
 
   // Stars background effect
@@ -293,6 +317,37 @@ const HomePage = () => {
                 filters={filters}
                 onFilterChange={handleFilterChange}
               />
+
+              {/* Location Toast */}
+              {showLocationToast && (
+                <Toast 
+                  onClose={handleLocationToastClose}
+                  delay={5000} 
+                  autohide
+                  className="position-fixed top-0 end-0 m-3"
+                  bg="warning"
+                >
+                  <Toast.Header>
+                    <strong className="me-auto">Cập nhật địa chỉ</strong>
+                  </Toast.Header>
+                  <Toast.Body>
+                    Vui lòng cập nhật địa chỉ của bạn trong hồ sơ để xem các sự kiện gần đây.
+                    <div className="mt-2">
+                      <div className="d-inline-block">
+                        <Link to="/profile" className="text-decoration-none">
+                          <Button 
+                            variant="outline-dark" 
+                            size="sm"
+                            onClick={handleLocationUpdateClick}
+                          >
+                            Cập nhật ngay
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </Toast.Body>
+                </Toast>
+              )}
 
               {/* Feed Title */}
               <div className="d-flex justify-content-between align-items-center mb-4">
