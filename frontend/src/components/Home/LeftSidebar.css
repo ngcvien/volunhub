@@ -5,9 +5,9 @@
   top: 80px;
   height: calc(100vh - 100px);
   overflow-y: auto;
-  padding-right: 1rem;
+  /* padding-right: 1rem; */
   scrollbar-width: thin;
-  scrollbar-color: rgba(138, 43, 226, 0.5) transparent;
+  scrollbar-color: rgba(43, 76, 226, 0.5) transparent;
 }
 
 .left-sidebar::-webkit-scrollbar {
@@ -19,7 +19,7 @@
 }
 
 .left-sidebar::-webkit-scrollbar-thumb {
-  background-color: rgba(138, 43, 226, 0.5);
+  background-color: rgba(46, 43, 226, 0.5);
   border-radius: 6px;
 }
 
@@ -51,7 +51,7 @@ html[data-bs-theme="light"] .sidebar-card {
 .sidebar-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 30px rgba(138, 43, 226, 0.2);
-  border-color: rgba(138, 43, 226, 0.3);
+  border-color: rgba(55, 43, 226, 0.3);
 }
 
 .sidebar-title {
@@ -65,7 +65,8 @@ html[data-bs-theme="light"] .sidebar-card {
 .sidebar-link {
   display: flex;
   align-items: center;
-  padding: 0.6rem 3.5rem !important;
+  padding: 0.6rem 3.5rem!important;
+  padding-right: 0 !important;
   border-radius: 8px;
   margin-bottom: 0.5rem;
   transition: all 0.3s ease;
@@ -74,7 +75,7 @@ html[data-bs-theme="light"] .sidebar-card {
 
 .sidebar-link:hover,
 .sidebar-link.active {
-  background: rgba(138, 43, 226, 0.1);
+  background: rgba(55, 43, 226, 0.1);
   color: #166ed3;
   transform: translateX(5px);
 }
@@ -100,7 +101,7 @@ html[data-bs-theme="light"] .sidebar-card {
   padding: 0.5rem 1rem;
   background: linear-gradient(90deg, #00bfff, #166ed3);
   border: none;
-  box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+  box-shadow: 0 4px 15px rgba(55, 43, 226, 0.3);
   transition: all 0.3s ease;
 }
 
