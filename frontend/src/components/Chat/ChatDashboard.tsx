@@ -18,12 +18,18 @@ import { SendFill, ArrowLeft, PersonPlus, XCircleFill } from 'react-bootstrap-ic
 interface ChatDashboardProps {
     show: boolean;
     onHide: () => void;
+    initialChatUser?: {
+        id: number;
+        username: string;
+        fullName?: string | null;
+        avatarUrl?: string | null;
+    };
 }
 
 // URL của backend WebSocket
 const SOCKET_SERVER_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:4000'; // Loại bỏ /api
 
-const ChatDashboard: React.FC<ChatDashboardProps> = ({ show, onHide }) => {
+const ChatDashboard: React.FC<ChatDashboardProps> = ({ show, onHide, initialChatUser }) => {
     const { user, token } = useAuth(); // Lấy user và token từ context
     const socketRef = useRef<Socket | null>(null); // Ref để lưu instance socket
 

@@ -1,8 +1,10 @@
 import type React from "react"
 import { Popover, Image, Button, Badge, OverlayTrigger, Tooltip } from "react-bootstrap"
 import { Link } from "react-router-dom"
-import { Envelope, PersonPlus, PatchCheckFill, CashCoin, Coin } from "react-bootstrap-icons"
+import { PersonPlus, PatchCheckFill, Coin, ChatDotsFill } from "react-bootstrap-icons"
 import "./UserPopup.css"
+import ChatDashboard from "../Chat/ChatDashboard"
+import { useState } from "react"
 
 interface UserPopupProps {
   userId: number
@@ -24,65 +26,89 @@ const UserPopup: React.FC<UserPopupProps> = ({
   isVerified,
   volunpoints = 0,
 }) => {
+  const [showChat, setShowChat] = useState(false);
+
+  const handleStartChat = () => {
+    setShowChat(true);
+  };
+
   return (
-    <Popover id={`user-popover-${userId}`} className="user-popup" >
-      <Popover.Body className="p-0">
-        <div className="user-popup-content">
-          <div className="user-popup-header">
-            <div className="user-popup-avatar-container">
-              <Image
-                src={avatarUrl || "/default-avatar.png"}
-                alt={username}
-                roundedCircle
-                className="user-popup-avatar"
-              />
+    <>
+      <Popover id={`user-popover-${userId}`} className="user-popup" >
+        <Popover.Body className="p-0">
+          <div className="user-popup-content">
+            <div className="user-popup-header">
+              <div className="user-popup-avatar-container">
+                <Image
+                  src={avatarUrl || "/default-avatar.png"}
+                  alt={username}
+                  roundedCircle
+                  className="user-popup-avatar"
+                />
+              </div>
             </div>
-          </div>
 
-          {/* User info */}
-          <div className="user-popup-info">
-            <h5 className="mb-1">
-              {fullName || username}
-              {isVerified && (
-                <OverlayTrigger placement="top" overlay={<Tooltip>Người dùng đã được xác minh</Tooltip>}>
-                  <PatchCheckFill />
-                </OverlayTrigger>
+            {/* User info */}
+            <div className="user-popup-info">
+              <h5 className="mb-1">
+                {fullName || username}
+                {isVerified && (
+                  <OverlayTrigger placement="top" overlay={<Tooltip>Người dùng đã được xác minh</Tooltip>}>
+                    <PatchCheckFill />
+                  </OverlayTrigger>
+                )}
+              </h5>
+              <p className="text-muted small mb-2">@{username}</p>
+
+              {location && (
+                <p className="small mb-2">
+                  <i className="bi bi-geo-alt me-1"></i> {location}
+                </p>
               )}
-            </h5>
-            <p className="text-muted small mb-2">@{username}</p>
 
-            {location && (
-              <p className="small mb-2">
-                <i className="bi bi-geo-alt me-1"></i> {location}
-              </p>
-            )}
+              {bio && <p className="small text-truncate-3 mb-3">{bio}</p>}
 
-            {bio && <p className="small text-truncate-3 mb-3">{bio}</p>}
+              <div className="d-flex align-items-center mb-3">
+                <Badge bg="primary" className="volun-credit-badge">
+                  <i className="bi bi-star-fill me-1"></i> {volunpoints} <Coin size={16} className="ms-1" />
+                </Badge>
+              </div>
 
-            <div className="d-flex align-items-center mb-3">
-              <Badge bg="primary" className="volun-credit-badge">
-                <i className="bi bi-star-fill me-1"></i> {volunpoints} <Coin size={16} className="ms-1" />
-              </Badge>
-            </div>
-
-            {/* Action buttons */}
-            <div className="d-flex gap-2">
-              <Link to={`/profile/${userId}`} className="flex-grow-1">
-                <Button variant="primary" size="sm" className="w-100 no-border home-button">
-                  Xem hồ sơ
+              {/* Action buttons */}
+              <div className="d-flex gap-2">
+                <Link to={`/profile/${userId}`} className="flex-grow-1">
+                  <Button variant="primary" size="sm" className="w-100 no-border home-button">
+                    Xem hồ sơ
+                  </Button>
+                </Link>
+                <Button 
+                  variant="outline-primary" 
+                  size="sm" 
+                  className="action-btn"
+                  onClick={handleStartChat}
+                >
+                  <ChatDotsFill size={16} />
                 </Button>
-              </Link>
-              <Button variant="outline-primary" size="sm" className="action-btn">
-                <Envelope size={16} />
-              </Button>
-              <Button variant="outline-primary" size="sm" className="action-btn">
-                <PersonPlus size={16} />
-              </Button>
+                <Button variant="outline-primary" size="sm" className="action-btn">
+                  <PersonPlus size={16} />
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      </Popover.Body>
-    </Popover>
+        </Popover.Body>
+      </Popover>
+
+      <ChatDashboard 
+        show={showChat} 
+        onHide={() => setShowChat(false)} 
+        initialChatUser={{
+          id: userId,
+          username: username,
+          fullName: fullName,
+          avatarUrl: avatarUrl
+        }}
+      />
+    </>
   )
 }
 
