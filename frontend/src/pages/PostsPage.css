@@ -1,0 +1,26 @@
+.posts-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 2rem 0;
+}
+
+.search-container {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-container .input-group-text {
+  background-color: white;
+  border-right: none;
+}
+
+.search-container .form-control {
+  border-left: none;
+}
+
+.search-container .form-control:focus {
+  box-shadow: none;
+  border-color: #ced4da;
+} 

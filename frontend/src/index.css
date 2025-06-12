@@ -14,7 +14,7 @@
 }
 
 [data-bs-theme="dark"] {
-  --bs-body-bg: #000000 !important;
+  --bs-body-bg: #0a1028 !important;
   --bs-tertiary-bg-rgb: 10, 10, 10 !important;
 
 }

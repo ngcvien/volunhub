@@ -72,10 +72,10 @@ const Navbar = () => {
             </Nav.Link>
             <Nav.Link
               as={Link}
-              to="/events"
-              className={`nav-link-custom ${isActive('/events') ? 'active' : ''}`}
+              to="/leaderboard"
+              className={`nav-link-custom ${isActive('/leaderboard') ? 'active' : ''}`}
             >
-              Sự kiện
+              Bảng xếp hạng
             </Nav.Link>
             <Nav.Link
               as={Link}
