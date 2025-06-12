@@ -7,6 +7,7 @@ import LeftSidebar from "../components/Home/LeftSidebar"
 import RightSidebar from "../components/Home/RightSidebar"
 import EventCard from "../components/Event/EventCard"
 import EventFilterBar from "../components/Home/EventFilterBar"
+import EventStories from "../components/Home/EventStories"
 import { getAllEventsApi } from "../api/event.api"
 import type { EventType } from "../types/event.types"
 import { useAuth } from "../contexts/AuthContext"
@@ -317,6 +318,8 @@ const HomePage = () => {
                 filters={filters}
                 onFilterChange={handleFilterChange}
               />
+            <EventStories/>
+
 
               {/* Location Toast */}
               {showLocationToast && (
