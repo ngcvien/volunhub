@@ -2,18 +2,21 @@
 
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
+import Post from "./Post"
 import {
   Card, Button, Spinner, Alert,
   Image, Badge, OverlayTrigger,
-  Tooltip, Overlay, Modal,
-  Col, Row
+  Tooltip, Modal,
+  Col, Row, Overlay,
+  Form, // Thêm Form cho input copy link
+  InputGroup // Thêm InputGroup cho input copy link
 } from "react-bootstrap"
 import { Link } from "react-router-dom"
 import type { EventType, EventImageInfo } from "../../types/event.types"
 import { useAuth } from "../../contexts/AuthContext"
 import { joinEventApi, leaveEventApi, likeEventApi, unlikeEventApi } from "../../api/event.api"
 import { formatDistanceToNow, format } from "date-fns"
-import { is, vi } from "date-fns/locale"
+import { vi } from "date-fns/locale"
 import {
   GeoAlt,
   Calendar2Event,
@@ -24,13 +27,23 @@ import {
   BookmarkPlus,
   HandThumbsUp,
   HandThumbsUpFill,
-  PatchCheckFill
+  PatchCheckFill,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  Image as ImageIcon,
+  // Thêm các icon mới cho mạng xã hội
+  Facebook,
+  Twitter,
+  Linkedin,
+  Envelope,
+  Link45deg,
+  Clipboard,
+  CheckCircle
 } from "react-bootstrap-icons"
 import "./EventCard.css"
 import UserPopup from "../User/UserPopup"
 import { useNavigate } from "react-router-dom";
-import Post from "./Post"
-
 
 // Ảnh mặc định
 const defaultAvatar = '/default-avatar.png'; // Đảm bảo file này có trong /public
@@ -54,14 +67,19 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
   const [likeError, setLikeError] = useState<string | null>(null);
   // State cục bộ để hiển thị trạng thái like, khởi tạo từ prop
   const [displayLiked, setDisplayLiked] = useState(event.isLiked ?? false);
+  const [displayLikeCount, setDisplayLikeCount] = useState(event.likeCount || 0);
 
   // State và Ref cho User Popup
   const [showUserPopup, setShowUserPopup] = useState(false);
   const triggerRef = useRef<HTMLSpanElement>(null);
   const popupTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [showImageModal, setShowImageModal] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const [displayLikeCount, setDisplayLikeCount] = useState(event.likeCount || 0);
+  // Thêm state mới cho modal share
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+  const linkInputRef = useRef<HTMLInputElement>(null);
 
   const isVerified = event.creator?.isVerified || false;
 
@@ -211,7 +229,6 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
   const renderImageGrid = (images: EventImageInfo[] | undefined) => {
     if (!images || images.length === 0) {
       return (
-
         <div className="event-image-container mb-3">
           <Image
             src={event.imageUrl ||
@@ -246,13 +263,13 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
       <div className="event-card-image-grid-container" style={{ height: '200px', overflow: 'hidden' }}>
         <Row className="g-1 h-100"> {/* g-1 là gutter nhỏ */}
           {imageCount === 2 && (
-            <>
+            <span className="d-flex align-items-center">
               <Col xs={6} className="h-100"><Image src={images[0].imageUrl} alt={`${event.title} 1`} fluid className="h-100" style={{ objectFit: 'cover' }} /></Col>
               <Col xs={6} className="h-100"><Image src={images[1].imageUrl} alt={`${event.title} 2`} fluid className="h-100" style={{ objectFit: 'cover' }} /></Col>
-            </>
+            </span>
           )}
           {imageCount === 3 && (
-            <>
+            <span className="d-flex align-items-center">
               {/* Ảnh lớn bên trái, 2 ảnh nhỏ bên phải */}
               <Col xs={8} className="h-100 pe-1"> {/* Giảm padding end một chút */}
                 <Image src={images[0].imageUrl} alt={`${event.title} 1`} fluid className="h-100" style={{ objectFit: 'cover' }} />
@@ -267,10 +284,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
                   </Col>
                 </Row>
               </Col>
-            </>
+            </span>
           )}
           {imageCount >= 4 && (
-            <>
+            <span className="d-flex align-items-center">
               {/* Grid 2x2 cho 4 ảnh */}
               {displayImages.map((img, index) => (
                 <Col key={img.id || index} xs={6} className={`h-50 ${index < 2 ? 'pb-1' : 'pt-0'}`}>
@@ -288,18 +305,64 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
                   </div>
                 </Col>
               ))}
-            </>
+            </span>
           )}
         </Row>
       </div>
     );
   };
 
+  // Thêm hàm xử lý share
+  const handleShare = () => {
+    setShowShareModal(true);
+    setCopySuccess(false);
+  };
+
+  // Hàm copy link vào clipboard
+  const copyToClipboard = () => {
+    if (linkInputRef.current) {
+      linkInputRef.current.select();
+      document.execCommand('copy');
+      setCopySuccess(true);
+      
+      // Reset success message after 3 seconds
+      setTimeout(() => {
+        setCopySuccess(false);
+      }, 3000);
+    }
+  };
+
+  // Hàm chia sẻ qua các nền tảng mạng xã hội
+  const shareToSocial = (platform: string) => {
+    const eventUrl = `${window.location.origin}/events/${event.id}`;
+    const eventTitle = encodeURIComponent(event.title);
+    const eventDescription = encodeURIComponent(event.description || 'Tham gia sự kiện này cùng tôi!');
+    
+    let shareUrl = '';
+    
+    switch (platform) {
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventUrl)}`;
+        break;
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?text=${eventTitle}&url=${encodeURIComponent(eventUrl)}`;
+        break;
+      case 'linkedin':
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(eventUrl)}`;
+        break;
+      case 'email':
+        shareUrl = `mailto:?subject=${eventTitle}&body=${eventDescription}%0A%0A${encodeURIComponent(eventUrl)}`;
+        break;
+      default:
+        return;
+    }
+    
+    // Mở cửa sổ mới để chia sẻ
+    window.open(shareUrl, '_blank', 'width=600,height=400');
+  };
 
   return (
-
-    <Card className="event-card shadow-sm mb-4"> {/* Thêm mb-4 nếu muốn khoảng cách giữa các card */}
-
+    <Card className="event-card shadow-sm mb-4">
       {/* Card Header */}
       <Card.Header className="bg-transparent border-0 pt-3 pb-0">
         <div className="d-flex align-items-center text-start">
@@ -330,11 +393,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
               >
                 {event.creator?.fullName || event.creator?.username || "Người dùng ẩn"}
                 {isVerified && (
-                  <OverlayTrigger placement="top" overlay={<Tooltip>Người dùng đã được xác minh</Tooltip>}>
+                  <OverlayTrigger placement="top" overlay={<Tooltip>Người dùng đã được xác minh</Tooltip>} placement="top">
                     <PatchCheckFill />
                   </OverlayTrigger>
                 )}
-
               </Link>
               <div className="text-muted small d-flex align-items-center">
                 <span>{formatTimeAgo(event.createdAt)}</span>
@@ -441,16 +503,15 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
         }
       />
 
-
-
+      {/* Modal xem ảnh */}
       <Modal
         show={showImageModal}
         onHide={() => setShowImageModal(false)}
         centered
-        size="lg"
-        contentClassName="bg-transparent border-0"
+        dialogClassName="event-image-modal-dialog"
+        contentClassName="event-image-modal-content bg-transparent border-0"
       >
-        <Modal.Header closeButton className="border-0">
+        <Modal.Header closeButton>
           <Modal.Title className="text-center w-100" style={{ color: '#fff' }} >
             <Link
               to={`/events/${event.id}`}
@@ -471,6 +532,81 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
         </Modal.Body>
       </Modal>
 
+      {/* Modal chia sẻ */}
+      <Modal
+        show={showShareModal}
+        onHide={() => setShowShareModal(false)}
+        centered
+        size="md"
+        className="share-modal"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Chia sẻ sự kiện</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p className="text-center mb-4">Chia sẻ sự kiện "{event.title}" với bạn bè</p>
+          
+          <div className="social-share-buttons">
+            <Button 
+              variant="outline-primary" 
+              className="social-share-btn facebook-btn"
+              onClick={() => shareToSocial('facebook')}
+            >
+              <Facebook size={20} className="me-2" /> Facebook
+            </Button>
+            
+            <Button 
+              variant="outline-info" 
+              className="social-share-btn twitter-btn"
+              onClick={() => shareToSocial('twitter')}
+            >
+              <Twitter size={20} className="me-2" /> Twitter
+            </Button>
+            
+            <Button 
+              variant="outline-primary" 
+              className="social-share-btn linkedin-btn"
+              onClick={() => shareToSocial('linkedin')}
+            >
+              <Linkedin size={20} className="me-2" /> LinkedIn
+            </Button>
+            
+            <Button 
+              variant="outline-secondary" 
+              className="social-share-btn email-btn"
+              onClick={() => shareToSocial('email')}
+            >
+              <Envelope size={20} className="me-2" /> Email
+            </Button>
+          </div>
+          
+          <div className="mt-4">
+            <Form.Label className="d-flex align-items-center">
+              <Link45deg size={18} className="me-2" /> Hoặc sao chép đường dẫn:
+            </Form.Label>
+            <InputGroup>
+              <Form.Control
+                ref={linkInputRef}
+                type="text"
+                value={`${window.location.origin}/events/${event.id}`}
+                readOnly
+              />
+              <Button 
+                variant="outline-secondary" 
+                onClick={copyToClipboard}
+                className="d-flex align-items-center"
+              >
+                {copySuccess ? (
+                  <><CheckCircle size={16} className="me-1" /> Đã sao chép</>
+                ) : (
+                  <><Clipboard size={16} className="me-1" /> Sao chép</>
+                )}
+              </Button>
+            </InputGroup>
+          </div>
+        </Modal.Body>
+      </Modal>
+
       {/* Card Footer */}
       <Card.Footer className="bg-transparent pt-0 pb-3">
         {(actionError || likeError) && (
@@ -487,15 +623,11 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
               onClick={displayParticipating ? handleLeave : handleJoin}
               disabled={isLoadingAction}
               className={`participation-button me-2 mb-2 no-border ${displayParticipating ? 'events-button' : 'home-button'}`}
-
             >
               {isLoadingAction ? (
                 <Spinner animation="border" size="sm" />
               ) : (
-                <>
-                  <PersonCheck className="me-1" />
-                  {displayParticipating ? "Đã tham gia" : "Tham gia"}
-                </>
+                <><PersonCheck className="me-1" /> {displayParticipating ? "Đã tham gia" : "Tham gia"}</>
               )}
             </Button>
           )}
@@ -525,8 +657,14 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
               </Button>
             </OverlayTrigger>
 
+            {/* Thay đổi nút Share để mở modal */}
             <OverlayTrigger placement="top" overlay={<Tooltip>Chia sẻ</Tooltip>}>
-              <Button variant="link" size="sm" className="action-button me-1 mb-2">
+              <Button 
+                variant="link" 
+                size="sm" 
+                className="action-button me-1 mb-2"
+                onClick={handleShare}
+              >
                 <Share />
               </Button>
             </OverlayTrigger>
