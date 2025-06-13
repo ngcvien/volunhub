@@ -196,7 +196,7 @@ const EventStories: React.FC = () => {
           ))}
           
           {/* Add a "create event" story item */}
-          <Link to="/events/create" className="event-story-item create-story">
+          <Link to="/events/new" className="event-story-item create-story">
             <div className="event-story-image-container create-story-container">
               <div className="create-story-icon">+</div>
             </div>
