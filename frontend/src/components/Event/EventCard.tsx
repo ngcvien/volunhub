@@ -393,7 +393,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onActionComplete }) => {
               >
                 {event.creator?.fullName || event.creator?.username || "Người dùng ẩn"}
                 {isVerified && (
-                  <OverlayTrigger placement="top" overlay={<Tooltip>Người dùng đã được xác minh</Tooltip>} placement="top">
+                  <OverlayTrigger placement="top" overlay={<Tooltip>Người dùng đã được xác minh</Tooltip>} >
                     <PatchCheckFill />
                   </OverlayTrigger>
                 )}
